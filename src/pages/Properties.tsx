@@ -94,12 +94,12 @@ export default function Properties() {
       {/* Property Type */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Property Type</label>
-        <Select value={selectedType} onValueChange={setSelectedType}>
+        <Select value={selectedType || "all"} onValueChange={(v) => setSelectedType(v === "all" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             {propertyTypes.map((type) => (
               <SelectItem key={type.value} value={type.value}>
                 {type.label}
@@ -112,12 +112,12 @@ export default function Properties() {
       {/* Price Range */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Price Range</label>
-        <Select value={priceRange} onValueChange={setPriceRange}>
+        <Select value={priceRange || "any"} onValueChange={(v) => setPriceRange(v === "any" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Any Price" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any Price</SelectItem>
+            <SelectItem value="any">Any Price</SelectItem>
             <SelectItem value="0-500000">Up to $500K</SelectItem>
             <SelectItem value="500000-1000000">$500K - $1M</SelectItem>
             <SelectItem value="1000000-2000000">$1M - $2M</SelectItem>
@@ -130,12 +130,12 @@ export default function Properties() {
       {/* Bedrooms */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Bedrooms</label>
-        <Select value={bedrooms} onValueChange={setBedrooms}>
+        <Select value={bedrooms || "any"} onValueChange={(v) => setBedrooms(v === "any" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Any" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any</SelectItem>
+            <SelectItem value="any">Any</SelectItem>
             <SelectItem value="1">1+</SelectItem>
             <SelectItem value="2">2+</SelectItem>
             <SelectItem value="3">3+</SelectItem>
