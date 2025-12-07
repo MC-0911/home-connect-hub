@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 const stepComponents = [
@@ -118,17 +119,69 @@ const ListingFormContent = () => {
 
     setIsSubmitting(true);
     
-    // Simulate submission - replace with actual Supabase integration when database is set up
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Upload images to Supabase Storage
+      const imageUrls: string[] = [];
+      
+      for (const file of formData.images) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, file);
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+        
+        imageUrls.push(publicUrl);
+      }
+
+      // Insert property into database
+      const { error: insertError } = await supabase
+        .from('properties')
+        .insert({
+          user_id: user.id,
+          title: formData.title,
+          description: formData.description,
+          property_type: formData.propertyType as any,
+          listing_type: formData.listingType as any,
+          price: parseFloat(formData.price),
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip_code: formData.zipCode,
+          bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
+          bathrooms: formData.bathrooms ? parseFloat(formData.bathrooms) : 0,
+          square_feet: formData.squareFeet ? parseInt(formData.squareFeet) : 0,
+          lot_size: formData.lotSize ? parseInt(formData.lotSize) : null,
+          year_built: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
+          amenities: formData.amenities,
+          images: imageUrls,
+        });
+
+      if (insertError) throw insertError;
     
-    toast({
-      title: "Listing Created!",
-      description: "Your property has been submitted for review.",
-    });
-    
-    resetForm();
-    setIsSubmitting(false);
-    navigate('/properties');
+      toast({
+        title: "Listing Created!",
+        description: "Your property has been published successfully.",
+      });
+      
+      resetForm();
+      navigate('/properties');
+    } catch (error: any) {
+      console.error('Error creating listing:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create listing. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
