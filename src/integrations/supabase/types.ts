@@ -50,6 +50,81 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          address: string
+          amenities: string[] | null
+          bathrooms: number | null
+          bedrooms: number | null
+          city: string
+          created_at: string
+          description: string
+          featured: boolean | null
+          id: string
+          images: string[] | null
+          listing_type: Database["public"]["Enums"]["listing_type"]
+          lot_size: number | null
+          price: number
+          property_type: Database["public"]["Enums"]["property_type"]
+          square_feet: number | null
+          state: string
+          status: Database["public"]["Enums"]["property_status"] | null
+          title: string
+          updated_at: string
+          user_id: string
+          year_built: number | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city: string
+          created_at?: string
+          description: string
+          featured?: boolean | null
+          id?: string
+          images?: string[] | null
+          listing_type?: Database["public"]["Enums"]["listing_type"]
+          lot_size?: number | null
+          price: number
+          property_type: Database["public"]["Enums"]["property_type"]
+          square_feet?: number | null
+          state: string
+          status?: Database["public"]["Enums"]["property_status"] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          year_built?: number | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          city?: string
+          created_at?: string
+          description?: string
+          featured?: boolean | null
+          id?: string
+          images?: string[] | null
+          listing_type?: Database["public"]["Enums"]["listing_type"]
+          lot_size?: number | null
+          price?: number
+          property_type?: Database["public"]["Enums"]["property_type"]
+          square_feet?: number | null
+          state?: string
+          status?: Database["public"]["Enums"]["property_status"] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          year_built?: number | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -58,7 +133,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      listing_type: "sale" | "rent"
+      property_status: "active" | "pending" | "sold" | "rented"
+      property_type:
+        | "house"
+        | "apartment"
+        | "condo"
+        | "land"
+        | "townhouse"
+        | "villa"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -185,6 +268,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      listing_type: ["sale", "rent"],
+      property_status: ["active", "pending", "sold", "rented"],
+      property_type: [
+        "house",
+        "apartment",
+        "condo",
+        "land",
+        "townhouse",
+        "villa",
+      ],
+    },
   },
 } as const
