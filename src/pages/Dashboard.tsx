@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, BarChart3, MessageSquare, Bell, Handshake } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -39,6 +40,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("listings");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -202,137 +204,244 @@ export default function Dashboard() {
             ))}
           </motion.div>
 
-          {/* Properties Table */}
+          {/* Tab List Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.15 }}
+            className="mb-8"
           >
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="font-display text-xl text-foreground">
-                  Your Properties
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
-                  </div>
-                ) : properties.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">
-                      No properties yet
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Start by adding your first property listing
-                    </p>
-                    <Button variant="gold" asChild>
-                      <Link to="/add-property">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Property
-                      </Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Property</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Listed</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {properties.map((property) => (
-                          <TableRow key={property.id}>
-                            <TableCell>
-                              <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
-                                  {property.images && property.images[0] ? (
-                                    <img
-                                      src={property.images[0]}
-                                      alt={property.title}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <Building2 className="w-6 h-6 text-muted-foreground" />
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
+                <TabsTrigger 
+                  value="listings" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  My Listings <span className="ml-1 text-muted-foreground">({properties.length})</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="saved" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Saved <span className="ml-1 text-muted-foreground">(0)</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="visits" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Visits
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="offers" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Offers
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="messages" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative"
+                >
+                  Messages
+                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                    1
+                  </Badge>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="alerts" 
+                  className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Alerts
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="listings" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="font-display text-xl text-foreground">
+                      Your Properties
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
+                      </div>
+                    ) : properties.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium text-foreground mb-2">
+                          No properties yet
+                        </h3>
+                        <p className="text-muted-foreground mb-4">
+                          Start by adding your first property listing
+                        </p>
+                        <Button variant="gold" asChild>
+                          <Link to="/add-property">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Property
+                          </Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Property</TableHead>
+                              <TableHead>Type</TableHead>
+                              <TableHead>Price</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Listed</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {properties.map((property) => (
+                              <TableRow key={property.id}>
+                                <TableCell>
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
+                                      {property.images && property.images[0] ? (
+                                        <img
+                                          src={property.images[0]}
+                                          alt={property.title}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <Building2 className="w-6 h-6 text-muted-foreground" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-foreground line-clamp-1">
+                                        {property.title}
+                                      </p>
+                                      <p className="text-sm text-muted-foreground line-clamp-1">
+                                        {property.city}, {property.state}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="capitalize">
+                                  {property.property_type}
+                                </TableCell>
+                                <TableCell className="font-medium">
+                                  {formatPrice(property.price)}
+                                  {property.listing_type === "rent" && (
+                                    <span className="text-muted-foreground text-sm">/mo</span>
                                   )}
-                                </div>
-                                <div>
-                                  <p className="font-medium text-foreground line-clamp-1">
-                                    {property.title}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground line-clamp-1">
-                                    {property.city}, {property.state}
-                                  </p>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="capitalize">
-                              {property.property_type}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {formatPrice(property.price)}
-                              {property.listing_type === "rent" && (
-                                <span className="text-muted-foreground text-sm">/mo</span>
-                              )}
-                            </TableCell>
-                            <TableCell>{getStatusBadge(property.status)}</TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {new Date(property.created_at).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <Button variant="ghost" size="icon" asChild>
-                                  <Link to={`/property/${property.id}`}>
-                                    <Eye className="w-4 h-4" />
-                                  </Link>
-                                </Button>
-                                <Button variant="ghost" size="icon" asChild>
-                                  <Link to={`/edit-property/${property.id}`}>
-                                    <Edit className="w-4 h-4" />
-                                  </Link>
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                      <Trash2 className="w-4 h-4" />
+                                </TableCell>
+                                <TableCell>{getStatusBadge(property.status)}</TableCell>
+                                <TableCell className="text-muted-foreground">
+                                  {new Date(property.created_at).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button variant="ghost" size="icon" asChild>
+                                      <Link to={`/property/${property.id}`}>
+                                        <Eye className="w-4 h-4" />
+                                      </Link>
                                     </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Property</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete "{property.title}"? This action cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => handleDelete(property.id)}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                                    <Button variant="ghost" size="icon" asChild>
+                                      <Link to={`/edit-property/${property.id}`}>
+                                        <Edit className="w-4 h-4" />
+                                      </Link>
+                                    </Button>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                          <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete Property</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete "{property.title}"? This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            onClick={() => handleDelete(property.id)}
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                          >
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="saved" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardContent className="py-12">
+                    <div className="text-center">
+                      <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No saved properties</h3>
+                      <p className="text-muted-foreground">Properties you save will appear here</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="visits" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardContent className="py-12">
+                    <div className="text-center">
+                      <BarChart3 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No visits yet</h3>
+                      <p className="text-muted-foreground">Property visit statistics will appear here</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="offers" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardContent className="py-12">
+                    <div className="text-center">
+                      <Handshake className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No offers</h3>
+                      <p className="text-muted-foreground">Offers on your properties will appear here</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="messages" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardContent className="py-12">
+                    <div className="text-center">
+                      <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No messages</h3>
+                      <p className="text-muted-foreground">Messages from buyers will appear here</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="alerts" className="mt-6">
+                <Card className="bg-card border-border">
+                  <CardContent className="py-12">
+                    <div className="text-center">
+                      <Bell className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium text-foreground mb-2">No alerts</h3>
+                      <p className="text-muted-foreground">Important notifications will appear here</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </motion.div>
         </div>
       </main>
