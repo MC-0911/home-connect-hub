@@ -99,6 +99,26 @@ export function Header() {
                 )}
               </Link>
             ))}
+            {user && (
+              <Link
+                to="/dashboard"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2",
+                  isHomePage ? "text-primary-foreground/90" : "text-muted-foreground",
+                  location.pathname === "/dashboard" &&
+                    (isHomePage ? "text-primary-foreground" : "text-foreground")
+                )}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+                {location.pathname === "/dashboard" && (
+                  <motion.div
+                    layoutId="activeNavDashboard"
+                    className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full"
+                  />
+                )}
+              </Link>
+            )}
           </div>
 
           {/* Auth Buttons / User Menu */}
@@ -115,31 +135,11 @@ export function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="flex items-center gap-2 p-2">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="cursor-pointer">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       My Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/favorites" className="cursor-pointer">
-                      <Heart className="mr-2 h-4 w-4" />
-                      Favorites
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -221,12 +221,6 @@ export function Header() {
               <div className="pt-4 border-t border-border space-y-2">
                 {user ? (
                   <>
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Link>
-                    </Button>
                     <Button variant="outline" className="w-full" asChild>
                       <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
                         <User className="w-4 h-4 mr-2" />
