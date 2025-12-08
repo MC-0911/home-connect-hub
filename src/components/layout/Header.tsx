@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, Search, Heart, User, LogIn, LogOut } from "lucide-react";
+import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -125,6 +125,12 @@ export function Header() {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       My Profile
@@ -215,6 +221,12 @@ export function Header() {
               <div className="pt-4 border-t border-border space-y-2">
                 {user ? (
                   <>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Link>
+                    </Button>
                     <Button variant="outline" className="w-full" asChild>
                       <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
                         <User className="w-4 h-4 mr-2" />
