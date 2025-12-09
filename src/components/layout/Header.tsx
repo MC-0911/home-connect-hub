@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,6 +18,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 const navLinks = [
   { href: "/", label: "Home", icon: Home },
   { href: "/properties", label: "Properties", icon: Search },
+  { href: "/property-requirements", label: "Find My Property", icon: ClipboardList },
   { href: "/favorites", label: "Favorites", icon: Heart },
 ];
 
