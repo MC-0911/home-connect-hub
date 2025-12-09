@@ -25,8 +25,17 @@ const navLinks = [
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -54,7 +63,7 @@ export function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isHomePage
+        isHomePage && !isScrolled
           ? "bg-transparent"
           : "bg-card/95 backdrop-blur-md border-b border-border shadow-sm"
       )}
@@ -70,7 +79,7 @@ export function Header() {
               <span
                 className={cn(
                   "font-display text-xl font-semibold transition-colors",
-                  isHomePage ? "text-primary-foreground" : "text-foreground"
+                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"
                 )}
               >
                 Royal Landmark
@@ -86,9 +95,9 @@ export function Header() {
                 to={link.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-accent relative py-2",
-                  isHomePage ? "text-primary-foreground/90" : "text-muted-foreground",
+                  isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground",
                   location.pathname === link.href &&
-                    (isHomePage ? "text-primary-foreground" : "text-foreground")
+                    (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground")
                 )}
               >
                 {link.label}
@@ -105,9 +114,9 @@ export function Header() {
                 to="/dashboard"
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2",
-                  isHomePage ? "text-primary-foreground/90" : "text-muted-foreground",
+                  isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground",
                   location.pathname === "/dashboard" &&
-                    (isHomePage ? "text-primary-foreground" : "text-foreground")
+                    (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground")
                 )}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -153,7 +162,7 @@ export function Header() {
             ) : (
               <>
                 <Button
-                  variant={isHomePage ? "hero-outline" : "ghost"}
+                  variant={isHomePage && !isScrolled ? "hero-outline" : "ghost"}
                   size="sm"
                   asChild
                 >
@@ -162,7 +171,7 @@ export function Header() {
                     Sign In
                   </Link>
                 </Button>
-                <Button variant={isHomePage ? "hero" : "gold"} size="sm" asChild>
+                <Button variant={isHomePage && !isScrolled ? "hero" : "gold"} size="sm" asChild>
                   <Link to="/auth?mode=signup">Get Started</Link>
                 </Button>
               </>
@@ -178,14 +187,14 @@ export function Header() {
               <X
                 className={cn(
                   "w-6 h-6",
-                  isHomePage ? "text-primary-foreground" : "text-foreground"
+                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"
                 )}
               />
             ) : (
               <Menu
                 className={cn(
                   "w-6 h-6",
-                  isHomePage ? "text-primary-foreground" : "text-foreground"
+                  isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"
                 )}
               />
             )}
