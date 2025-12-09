@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      buyer_requirements: {
+        Row: {
+          additional_requirements: string | null
+          created_at: string
+          current_situation: string | null
+          email: string
+          full_name: string
+          id: string
+          marketing_consent: boolean | null
+          max_budget: number | null
+          max_distance: number | null
+          min_bathrooms: number
+          min_bedrooms: number
+          min_budget: number | null
+          move_timeline: string | null
+          must_have_features: string[] | null
+          phone: string | null
+          preferred_contact_method: string | null
+          preferred_locations: string[] | null
+          property_type: string
+          requirement_type: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          additional_requirements?: string | null
+          created_at?: string
+          current_situation?: string | null
+          email: string
+          full_name: string
+          id?: string
+          marketing_consent?: boolean | null
+          max_budget?: number | null
+          max_distance?: number | null
+          min_bathrooms?: number
+          min_bedrooms?: number
+          min_budget?: number | null
+          move_timeline?: string | null
+          must_have_features?: string[] | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          preferred_locations?: string[] | null
+          property_type: string
+          requirement_type: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          additional_requirements?: string | null
+          created_at?: string
+          current_situation?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          marketing_consent?: boolean | null
+          max_budget?: number | null
+          max_distance?: number | null
+          min_bathrooms?: number
+          min_bedrooms?: number
+          min_budget?: number | null
+          move_timeline?: string | null
+          must_have_features?: string[] | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          preferred_locations?: string[] | null
+          property_type?: string
+          requirement_type?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

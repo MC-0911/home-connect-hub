@@ -116,7 +116,7 @@ export function CTASection() {
               
               <div className="flex flex-wrap gap-4">
                 <Button variant="gold" size="lg" asChild>
-                  <Link to="/auth?mode=signup">
+                  <Link to="/property-requirements">
                     Submit Buyer Inquiry
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
