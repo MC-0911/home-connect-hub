@@ -122,16 +122,41 @@ export default function Properties() {
       {/* Listing Type */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Listing Type</label>
-        <Select value={listingType || "all"} onValueChange={(v) => setListingType(v === "all" ? "" : v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Buy or Rent" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Listings</SelectItem>
-            <SelectItem value="sale">Buy</SelectItem>
-            <SelectItem value="rent">Rent</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex rounded-full bg-muted p-1">
+          <button
+            type="button"
+            onClick={() => setListingType("")}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              listingType === "" 
+                ? "bg-primary text-primary-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setListingType("sale")}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              listingType === "sale" 
+                ? "bg-primary text-primary-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Buy
+          </button>
+          <button
+            type="button"
+            onClick={() => setListingType("rent")}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              listingType === "rent" 
+                ? "bg-primary text-primary-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Rent
+          </button>
+        </div>
       </div>
 
       {/* Price Range */}
