@@ -38,7 +38,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -58,6 +58,7 @@ interface Profile {
   suspended_at: string | null;
   suspension_reason: string | null;
   email?: string | null;
+  is_admin?: boolean;
 }
 
 export function UsersTable() {
@@ -85,6 +86,12 @@ export function UsersTable() {
       const { data: emailsData, error: emailsError } = await supabase
         .rpc('get_user_emails');
 
+      // Fetch admin roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .eq('role', 'admin');
+
       // Create a map of user_id to email
       const emailMap = new Map<string, string>();
       if (!emailsError && emailsData) {
@@ -93,10 +100,19 @@ export function UsersTable() {
         });
       }
 
-      // Merge emails into profiles
+      // Create a set of admin user_ids
+      const adminSet = new Set<string>();
+      if (!rolesError && rolesData) {
+        rolesData.forEach((item: { user_id: string }) => {
+          adminSet.add(item.user_id);
+        });
+      }
+
+      // Merge emails and admin status into profiles
       const usersWithEmails = (profilesData || []).map(profile => ({
         ...profile,
         email: emailMap.get(profile.user_id) || null,
+        is_admin: adminSet.has(profile.user_id),
       }));
 
       setUsers(usersWithEmails);
@@ -104,6 +120,47 @@ export function UsersTable() {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const assignAdminRole = async (user: Profile) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: user.user_id, role: 'admin' });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('User is already an admin');
+        } else {
+          throw error;
+        }
+        return;
+      }
+
+      toast.success(`${user.full_name || 'User'} is now an admin`);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error assigning admin role:', error);
+      toast.error('Failed to assign admin role');
+    }
+  };
+
+  const removeAdminRole = async (user: Profile) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.user_id)
+        .eq('role', 'admin');
+
+      if (error) throw error;
+
+      toast.success(`Admin role removed from ${user.full_name || 'User'}`);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error removing admin role:', error);
+      toast.error('Failed to remove admin role');
     }
   };
 
@@ -354,17 +411,25 @@ export function UsersTable() {
                     )}
                   </TableCell>
                   <TableCell>
-                    {user.is_suspended ? (
-                      <Badge variant="destructive" className="gap-1">
-                        <UserX className="h-3 w-3" />
-                        Suspended
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
-                        <UserCheck className="h-3 w-3" />
-                        Active
-                      </Badge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {user.is_admin && (
+                        <Badge variant="secondary" className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
+                          <Shield className="h-3 w-3" />
+                          Admin
+                        </Badge>
+                      )}
+                      {user.is_suspended ? (
+                        <Badge variant="destructive" className="gap-1">
+                          <UserX className="h-3 w-3" />
+                          Suspended
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
+                          <UserCheck className="h-3 w-3" />
+                          Active
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -387,6 +452,66 @@ export function UsersTable() {
                           <Eye className="h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {user.is_admin ? (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem 
+                                className="flex items-center gap-2 cursor-pointer text-amber-600"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <Shield className="h-4 w-4" />
+                                Remove Admin Role
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Remove Admin Role</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to remove admin privileges from {user.full_name || 'this user'}?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => removeAdminRole(user)}
+                                  className="bg-amber-600 hover:bg-amber-700"
+                                >
+                                  Remove Admin
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        ) : (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem 
+                                className="flex items-center gap-2 cursor-pointer text-primary"
+                                onSelect={(e) => e.preventDefault()}
+                              >
+                                <Shield className="h-4 w-4" />
+                                Make Admin
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Assign Admin Role</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to make {user.full_name || 'this user'} an admin? 
+                                  They will have full access to manage the platform.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => assignAdminRole(user)}
+                                >
+                                  Make Admin
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
                         <DropdownMenuSeparator />
                         {user.is_suspended ? (
                           <AlertDialog>
