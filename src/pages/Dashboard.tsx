@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, BarChart3, MessageSquare, Bell, Handshake } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { VisitsTab } from "@/components/dashboard/VisitsTab";
+import { OffersTab } from "@/components/dashboard/OffersTab";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -402,27 +404,11 @@ export default function Dashboard() {
               </TabsContent>
 
               <TabsContent value="visits" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <BarChart3 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No visits yet</h3>
-                      <p className="text-muted-foreground">Property visit statistics will appear here</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <VisitsTab />
               </TabsContent>
 
               <TabsContent value="offers" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <Handshake className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No offers</h3>
-                      <p className="text-muted-foreground">Offers on your properties will appear here</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <OffersTab />
               </TabsContent>
 
               <TabsContent value="messages" className="mt-6">

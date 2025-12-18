@@ -336,6 +336,106 @@ export type Database = {
         }
         Relationships: []
       }
+      property_offers: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          message: string | null
+          offer_amount: number
+          property_id: string
+          seller_id: string
+          seller_response: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          message?: string | null
+          offer_amount: number
+          property_id: string
+          seller_id: string
+          seller_response?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          message?: string | null
+          offer_amount?: number
+          property_id?: string
+          seller_id?: string
+          seller_response?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_offers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_visits: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          preferred_date: string
+          preferred_time: string
+          property_id: string
+          seller_id: string
+          seller_notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          preferred_date: string
+          preferred_time: string
+          property_id: string
+          seller_id: string
+          seller_notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          property_id?: string
+          seller_id?: string
+          seller_notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_visits_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_presence: {
         Row: {
           is_online: boolean | null

@@ -26,6 +26,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { ScheduleVisitDialog } from "@/components/dashboard/ScheduleVisitDialog";
+import { MakeOfferDialog } from "@/components/dashboard/MakeOfferDialog";
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -34,7 +36,9 @@ export default function PropertyDetail() {
   const property = mockProperties.find((p) => p.id === id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [dbProperty, setDbProperty] = useState<{ user_id: string } | null>(null);
+  const [dbProperty, setDbProperty] = useState<{ user_id: string; price?: number } | null>(null);
+  const [showVisitDialog, setShowVisitDialog] = useState(false);
+  const [showOfferDialog, setShowOfferDialog] = useState(false);
 
   // Try to get property from database to get seller's user_id
   useEffect(() => {
@@ -42,7 +46,7 @@ export default function PropertyDetail() {
       if (!id) return;
       const { data } = await supabase
         .from('properties')
-        .select('user_id')
+        .select('user_id, price')
         .eq('id', id)
         .maybeSingle();
       if (data) setDbProperty(data);
@@ -92,8 +96,11 @@ export default function PropertyDetail() {
       navigate('/auth');
       return;
     }
-    navigate('/dashboard?tab=visits');
-    toast.success("Redirected to schedule visits");
+    if (!dbProperty?.user_id) {
+      toast.error("Unable to schedule visit for this property");
+      return;
+    }
+    setShowVisitDialog(true);
   };
 
   const handleMakeOffer = () => {
@@ -102,8 +109,11 @@ export default function PropertyDetail() {
       navigate('/auth');
       return;
     }
-    navigate('/dashboard?tab=offers');
-    toast.success("Redirected to offers section");
+    if (!dbProperty?.user_id) {
+      toast.error("Unable to make offer for this property");
+      return;
+    }
+    setShowOfferDialog(true);
   };
 
   const nextImage = () => {
@@ -361,6 +371,27 @@ export default function PropertyDetail() {
       </main>
 
       <Footer />
+
+      {/* Dialogs */}
+      {dbProperty && id && (
+        <>
+          <ScheduleVisitDialog
+            open={showVisitDialog}
+            onOpenChange={setShowVisitDialog}
+            propertyId={id}
+            sellerId={dbProperty.user_id}
+            propertyTitle={property.title}
+          />
+          <MakeOfferDialog
+            open={showOfferDialog}
+            onOpenChange={setShowOfferDialog}
+            propertyId={id}
+            sellerId={dbProperty.user_id}
+            propertyTitle={property.title}
+            listPrice={dbProperty.price || property.price}
+          />
+        </>
+      )}
     </div>
   );
 }
