@@ -218,14 +218,14 @@ export default function Dashboard() {
               </TabsList>
 
               <TabsContent value="listings" className="mt-6">
-                <Card className="bg-card border-border">
+                <Card className="border-border bg-primary-foreground">
                   <CardHeader className="bg-primary-foreground">
                     <CardTitle className="font-display text-xl text-foreground">
                       Your Properties
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {loading ? <div className="flex items-center justify-center py-12">
+                    {loading ? <div className="flex items-center justify-center py-12 bg-primary-foreground">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
                       </div> : properties.length === 0 ? <div className="text-center py-12">
                         <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
