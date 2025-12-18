@@ -18,6 +18,7 @@ export default function Properties() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("location") || "");
   const [selectedType, setSelectedType] = useState(searchParams.get("type") || "");
+  const [listingType, setListingType] = useState(searchParams.get("listing") || "");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [bedrooms, setBedrooms] = useState("");
@@ -42,6 +43,11 @@ export default function Properties() {
     // Type filter
     if (selectedType) {
       result = result.filter((p) => p.propertyType === selectedType);
+    }
+
+    // Listing type filter
+    if (listingType) {
+      result = result.filter((p) => p.priceType === listingType);
     }
 
     // Price filter
@@ -78,12 +84,13 @@ export default function Properties() {
     }
 
     return result;
-  }, [searchQuery, selectedType, minPrice, maxPrice, bedrooms, selectedAmenities, sortBy]);
+  }, [searchQuery, selectedType, listingType, minPrice, maxPrice, bedrooms, selectedAmenities, sortBy]);
 
-  const activeFiltersCount = [selectedType, minPrice || maxPrice, bedrooms, selectedAmenities.length > 0].filter(Boolean).length;
+  const activeFiltersCount = [selectedType, listingType, minPrice || maxPrice, bedrooms, selectedAmenities.length > 0].filter(Boolean).length;
 
   const clearFilters = () => {
     setSelectedType("");
+    setListingType("");
     setMinPrice("");
     setMaxPrice("");
     setBedrooms("");
@@ -108,6 +115,21 @@ export default function Properties() {
                 {type.label}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Listing Type */}
+      <div>
+        <label className="text-sm font-medium text-foreground mb-3 block">Listing Type</label>
+        <Select value={listingType || "all"} onValueChange={(v) => setListingType(v === "all" ? "" : v)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Buy or Rent" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Listings</SelectItem>
+            <SelectItem value="sale">Buy</SelectItem>
+            <SelectItem value="rent">Rent</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -288,6 +310,12 @@ export default function Properties() {
                 <Badge variant="secondary" className="gap-1">
                   {propertyTypes.find((t) => t.value === selectedType)?.label}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedType("")} />
+                </Badge>
+              )}
+              {listingType && (
+                <Badge variant="secondary" className="gap-1">
+                  {listingType === 'sale' ? 'Buy' : 'Rent'}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setListingType("")} />
                 </Badge>
               )}
               {(minPrice || maxPrice) && (
