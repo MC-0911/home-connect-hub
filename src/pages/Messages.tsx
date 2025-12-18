@@ -109,7 +109,7 @@ export default function Messages() {
                 "w-full lg:w-80 xl:w-96 border-r border-border flex flex-col",
                 showChat && "hidden lg:flex"
               )}>
-                <div className="p-4 border-b border-border">
+                <div className="p-4 border-b border-border hover:bg-secondary/5 transition-colors cursor-default">
                   <h1 className="font-display text-xl font-semibold text-foreground flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
                     Messages
