@@ -11,6 +11,9 @@ export interface Message {
   is_read: boolean;
   read_at: string | null;
   created_at: string;
+  attachment_url: string | null;
+  attachment_type: string | null;
+  attachment_name: string | null;
 }
 
 export interface Conversation {
@@ -144,8 +147,12 @@ export const useMessages = () => {
   }, [user]);
 
   // Send a message
-  const sendMessage = async (conversationId: string, content: string) => {
-    if (!user || !content.trim()) return;
+  const sendMessage = async (
+    conversationId: string, 
+    content: string,
+    attachment?: { url: string; type: string; name: string }
+  ) => {
+    if (!user || (!content.trim() && !attachment)) return;
 
     try {
       const { data, error } = await supabase
@@ -153,7 +160,10 @@ export const useMessages = () => {
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
-          content: content.trim(),
+          content: content.trim() || (attachment ? `Sent ${attachment.type.startsWith('image/') ? 'an image' : 'a file'}` : ''),
+          attachment_url: attachment?.url || null,
+          attachment_type: attachment?.type || null,
+          attachment_name: attachment?.name || null,
         })
         .select()
         .single();
@@ -165,6 +175,40 @@ export const useMessages = () => {
       toast({
         title: "Error",
         description: "Failed to send message",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  // Upload attachment
+  const uploadAttachment = async (file: File): Promise<{ url: string; type: string; name: string } | null> => {
+    if (!user) return null;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('message-attachments')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('message-attachments')
+        .getPublicUrl(fileName);
+
+      return {
+        url: publicUrl,
+        type: file.type,
+        name: file.name,
+      };
+    } catch (error: any) {
+      console.error('Error uploading attachment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload file",
         variant: "destructive",
       });
       return null;
@@ -285,6 +329,7 @@ export const useMessages = () => {
     fetchConversations,
     fetchMessages,
     sendMessage,
+    uploadAttachment,
     startConversation,
     getUnreadCount,
   };

@@ -21,6 +21,7 @@ export default function Messages() {
     loading,
     fetchMessages,
     sendMessage,
+    uploadAttachment,
     startConversation,
   } = useMessages();
   const { fetchPresence } = usePresence();
@@ -72,9 +73,9 @@ export default function Messages() {
     setShowChat(true);
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, attachment?: { url: string; type: string; name: string }) => {
     if (activeConversation) {
-      await sendMessage(activeConversation.id, content);
+      await sendMessage(activeConversation.id, content, attachment);
     }
   };
 
@@ -140,6 +141,7 @@ export default function Messages() {
                     conversation={activeConversation}
                     messages={messages}
                     onSendMessage={handleSendMessage}
+                    onUploadAttachment={uploadAttachment}
                     onBack={handleBack}
                   />
                 ) : (
