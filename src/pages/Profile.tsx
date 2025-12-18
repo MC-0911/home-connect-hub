@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, MapPin, FileText, Camera, Loader2, Upload } from 'lucide-react';
+import { User, Mail, Phone, MapPin, FileText, Loader2, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { ImageCropper } from '@/components/profile/ImageCropper';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ const Profile = () => {
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -68,7 +71,7 @@ const Profile = () => {
     navigate('/');
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
@@ -82,30 +85,62 @@ const Profile = () => {
       return;
     }
 
+    // Create object URL for the cropper
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+    setCropperOpen(true);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleCropComplete = async (croppedImage: Blob) => {
+    if (!user) return;
+
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}/avatar.${fileExt}`;
+      const filePath = `${user.id}/avatar.jpg`;
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, croppedImage, { 
+          upsert: true,
+          contentType: 'image/jpeg'
+        });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
+      // Get public URL with cache buster
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
+      const urlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
+
       // Update form data and save
-      setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
-      await updateProfile({ avatar_url: publicUrl });
+      setFormData(prev => ({ ...prev, avatar_url: urlWithCacheBuster }));
+      await updateProfile({ avatar_url: urlWithCacheBuster });
+      
+      setCropperOpen(false);
+      if (selectedImage) {
+        URL.revokeObjectURL(selectedImage);
+        setSelectedImage(null);
+      }
     } catch (error: any) {
       console.error('Error uploading avatar:', error.message);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleCropperClose = () => {
+    setCropperOpen(false);
+    if (selectedImage) {
+      URL.revokeObjectURL(selectedImage);
+      setSelectedImage(null);
     }
   };
 
@@ -184,7 +219,7 @@ const Profile = () => {
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
-                            onChange={handleAvatarUpload}
+                            onChange={handleFileSelect}
                             className="hidden"
                           />
                           <Button
@@ -194,7 +229,7 @@ const Profile = () => {
                             disabled={uploading}
                           >
                             <Upload className="mr-2 h-4 w-4" />
-                            {uploading ? 'Uploading...' : 'Upload Photo'}
+                            Upload Photo
                           </Button>
                           <p className="text-xs text-muted-foreground">
                             JPG, PNG or GIF. Max 5MB.
@@ -316,6 +351,14 @@ const Profile = () => {
       </main>
 
       <Footer />
+
+      <ImageCropper
+        imageSrc={selectedImage}
+        open={cropperOpen}
+        onClose={handleCropperClose}
+        onCropComplete={handleCropComplete}
+        isUploading={uploading}
+      />
     </div>
   );
 };
