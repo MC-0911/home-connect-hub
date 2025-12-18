@@ -57,6 +57,7 @@ interface Profile {
   is_suspended: boolean | null;
   suspended_at: string | null;
   suspension_reason: string | null;
+  email?: string | null;
 }
 
 export function UsersTable() {
@@ -72,13 +73,33 @@ export function UsersTable() {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch profiles
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch user emails using the admin function
+      const { data: emailsData, error: emailsError } = await supabase
+        .rpc('get_user_emails');
+
+      // Create a map of user_id to email
+      const emailMap = new Map<string, string>();
+      if (!emailsError && emailsData) {
+        emailsData.forEach((item: { user_id: string; email: string }) => {
+          emailMap.set(item.user_id, item.email);
+        });
+      }
+
+      // Merge emails into profiles
+      const usersWithEmails = (profilesData || []).map(profile => ({
+        ...profile,
+        email: emailMap.get(profile.user_id) || null,
+      }));
+
+      setUsers(usersWithEmails);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -181,7 +202,7 @@ export function UsersTable() {
 
   const filteredUsers = users.filter(user =>
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phone?.includes(searchTerm) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -222,7 +243,7 @@ export function UsersTable() {
         <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search users by name, phone, location, or ID..."
+            placeholder="Search users by name, email, location, or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -275,7 +296,7 @@ export function UsersTable() {
                 />
               </TableHead>
               <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
-              <TableHead>Contact</TableHead>
+              <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Location" sortKey="location" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
@@ -315,17 +336,11 @@ export function UsersTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-sm flex items-center gap-1.5">
-                        <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="text-muted-foreground">ID-based</span>
-                      </p>
-                      {user.phone && (
-                        <p className="text-sm flex items-center gap-1.5">
-                          <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                          {user.phone}
-                        </p>
-                      )}
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className={user.email ? '' : 'text-muted-foreground'}>
+                        {user.email || 'No email'}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
