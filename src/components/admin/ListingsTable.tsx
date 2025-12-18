@@ -40,6 +40,9 @@ import { Search, Eye, Star, StarOff, MoreHorizontal, MoreVertical, Trash2, Check
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { useTableUtils } from '@/hooks/useTableUtils';
+import { TablePagination } from './TablePagination';
+import { SortableTableHead } from './SortableTableHead';
 
 interface Property {
   id: string;
@@ -202,7 +205,24 @@ export function ListingsTable() {
     return matchesSearch && matchesStatus;
   });
 
-  const allSelected = filteredListings.length > 0 && filteredListings.every(l => selectedIds.has(l.id));
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    sortConfig,
+    handleSort,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+  } = useTableUtils({
+    data: filteredListings,
+    itemsPerPage: 10,
+    defaultSortKey: 'created_at',
+    defaultSortDirection: 'desc',
+  });
+
+  const allSelected = paginatedData.length > 0 && paginatedData.every(l => selectedIds.has(l.id));
   const someSelected = selectedIds.size > 0;
 
   const getStatusColor = (status: string) => {
@@ -313,27 +333,28 @@ export function ListingsTable() {
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>Property</TableHead>
-              <TableHead>Price</TableHead>
+              <SortableTableHead label="Property" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Price" sortKey="price" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
+              <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Featured</TableHead>
-              <TableHead>Created</TableHead>
+              <SortableTableHead label="Created" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredListings.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                   No listings found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredListings.map((listing) => (
+              paginatedData.map((listing) => (
                 <TableRow key={listing.id} className="hover:bg-muted/30">
                   <TableCell>
                     <Checkbox
@@ -428,6 +449,15 @@ export function ListingsTable() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={goToPage}
+      />
 
       {/* Bulk Delete Dialog */}
       <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>

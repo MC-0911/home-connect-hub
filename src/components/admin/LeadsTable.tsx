@@ -46,6 +46,9 @@ import {
 import { Search, Eye, Mail, Phone, Download, FileSpreadsheet, FileText, MoreVertical, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useTableUtils } from '@/hooks/useTableUtils';
+import { TablePagination } from './TablePagination';
+import { SortableTableHead } from './SortableTableHead';
 
 interface Lead {
   id: string;
@@ -183,7 +186,25 @@ export function LeadsTable() {
     return matchesSearch && matchesStatus;
   });
 
-  const allSelected = filteredLeads.length > 0 && filteredLeads.every(l => selectedIds.has(l.id));
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    sortConfig,
+    handleSort,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+    sortedData,
+  } = useTableUtils({
+    data: filteredLeads,
+    itemsPerPage: 10,
+    defaultSortKey: 'created_at',
+    defaultSortDirection: 'desc',
+  });
+
+  const allSelected = paginatedData.length > 0 && paginatedData.every(l => selectedIds.has(l.id));
   const someSelected = selectedIds.size > 0;
 
   const exportToCSV = () => {
@@ -381,26 +402,27 @@ export function LeadsTable() {
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>Contact</TableHead>
+              <SortableTableHead label="Contact" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Requirements</TableHead>
-              <TableHead>Budget</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Submitted</TableHead>
+              <SortableTableHead label="Budget" sortKey="max_budget" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Submitted" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLeads.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No leads found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLeads.map((lead) => (
+              paginatedData.map((lead) => (
                 <TableRow key={lead.id} className="hover:bg-muted/30">
                   <TableCell>
                     <Checkbox
@@ -588,6 +610,15 @@ export function LeadsTable() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={goToPage}
+      />
 
       {/* Bulk Delete Dialog */}
       <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>

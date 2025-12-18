@@ -48,6 +48,9 @@ import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useTableUtils } from '@/hooks/useTableUtils';
+import { TablePagination } from './TablePagination';
+import { SortableTableHead } from './SortableTableHead';
 
 interface Blog {
   id: string;
@@ -243,7 +246,24 @@ export function BlogsTable() {
     return matchesSearch && matchesStatus;
   });
 
-  const allSelected = filteredBlogs.length > 0 && filteredBlogs.every(b => selectedIds.has(b.id));
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    sortConfig,
+    handleSort,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+  } = useTableUtils({
+    data: filteredBlogs,
+    itemsPerPage: 10,
+    defaultSortKey: 'created_at',
+    defaultSortDirection: 'desc',
+  });
+
+  const allSelected = paginatedData.length > 0 && paginatedData.every(b => selectedIds.has(b.id));
   const someSelected = selectedIds.size > 0;
 
   const getStatusColor = (status: string) => {
@@ -438,25 +458,26 @@ export function BlogsTable() {
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Published</TableHead>
-              <TableHead>Created</TableHead>
+              <SortableTableHead label="Title" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Published" sortKey="published_at" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Created" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredBlogs.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                   No blogs found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredBlogs.map((blog) => (
+              paginatedData.map((blog) => (
                 <TableRow key={blog.id} className="hover:bg-muted/30">
                   <TableCell>
                     <Checkbox
@@ -520,6 +541,15 @@ export function BlogsTable() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={goToPage}
+      />
 
       {/* Bulk Delete Dialog */}
       <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
