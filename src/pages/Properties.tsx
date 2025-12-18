@@ -184,19 +184,29 @@ export default function Properties() {
       {/* Bedrooms */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Bedrooms</label>
-        <Select value={bedrooms || "any"} onValueChange={(v) => setBedrooms(v === "any" ? "" : v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Any" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any</SelectItem>
-            <SelectItem value="1">1+</SelectItem>
-            <SelectItem value="2">2+</SelectItem>
-            <SelectItem value="3">3+</SelectItem>
-            <SelectItem value="4">4+</SelectItem>
-            <SelectItem value="5">5+</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex rounded-full bg-muted p-1">
+          {[
+            { value: "", label: "Any" },
+            { value: "1", label: "1+" },
+            { value: "2", label: "2+" },
+            { value: "3", label: "3+" },
+            { value: "4", label: "4+" },
+            { value: "5", label: "5+" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setBedrooms(option.value)}
+              className={`flex-1 px-3 py-2 text-sm font-medium rounded-full transition-colors ${
+                bedrooms === option.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Amenities */}
