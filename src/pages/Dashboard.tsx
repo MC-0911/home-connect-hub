@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
@@ -30,6 +30,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
@@ -344,42 +350,55 @@ export default function Dashboard() {
                                   {new Date(property.created_at).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                  <div className="flex items-center justify-end gap-2">
-                                    <Button variant="ghost" size="icon" asChild>
-                                      <Link to={`/property/${property.id}`}>
-                                        <Eye className="w-4 h-4" />
-                                      </Link>
-                                    </Button>
-                                    <Button variant="ghost" size="icon" asChild>
-                                      <Link to={`/edit-property/${property.id}`}>
-                                        <Edit className="w-4 h-4" />
-                                      </Link>
-                                    </Button>
-                                    <AlertDialog>
-                                      <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                          <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                      </AlertDialogTrigger>
-                                      <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                          <AlertDialogTitle>Delete Property</AlertDialogTitle>
-                                          <AlertDialogDescription>
-                                            Are you sure you want to delete "{property.title}"? This action cannot be undone.
-                                          </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                          <AlertDialogAction
-                                            onClick={() => handleDelete(property.id)}
-                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreVertical className="w-4 h-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="bg-popover">
+                                      <DropdownMenuItem asChild>
+                                        <Link to={`/property/${property.id}`} className="flex items-center gap-2 cursor-pointer">
+                                          <Eye className="w-4 h-4" />
+                                          View
+                                        </Link>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem asChild>
+                                        <Link to={`/edit-property/${property.id}`} className="flex items-center gap-2 cursor-pointer">
+                                          <Edit className="w-4 h-4" />
+                                          Edit
+                                        </Link>
+                                      </DropdownMenuItem>
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <DropdownMenuItem 
+                                            className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                                            onSelect={(e) => e.preventDefault()}
                                           >
+                                            <Trash2 className="w-4 h-4" />
                                             Delete
-                                          </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                      </AlertDialogContent>
-                                    </AlertDialog>
-                                  </div>
+                                          </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Property</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Are you sure you want to delete "{property.title}"? This action cannot be undone.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => handleDelete(property.id)}
+                                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                              Delete
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </TableCell>
                               </TableRow>
                             ))}
