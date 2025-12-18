@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["DM Sans", "system-ui", "sans-serif"],
-        display: ["Playfair Display", "Georgia", "serif"],
+        sans: ["Lufga", "DM Sans", "system-ui", "sans-serif"],
+        display: ["Lufga", "Playfair Display", "Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
