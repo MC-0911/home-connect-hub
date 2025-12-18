@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
@@ -10,8 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { mockProperties, propertyTypes, amenitiesList } from "@/lib/mockData";
+import { propertyTypes, amenitiesList } from "@/lib/mockData";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/integrations/supabase/types";
+
+type Property = Tables<"properties">;
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,9 +29,32 @@ export default function Properties() {
   const [bathrooms, setBathrooms] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProperties(data || []);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   const filteredProperties = useMemo(() => {
-    let result = [...mockProperties];
+    let result = [...properties];
 
     // Search filter
     if (searchQuery) {
@@ -43,12 +70,12 @@ export default function Properties() {
 
     // Type filter
     if (selectedType) {
-      result = result.filter((p) => p.propertyType === selectedType);
+      result = result.filter((p) => p.property_type === selectedType);
     }
 
     // Listing type filter
     if (listingType) {
-      result = result.filter((p) => p.priceType === listingType);
+      result = result.filter((p) => p.listing_type === listingType);
     }
 
     // Price filter
@@ -61,19 +88,19 @@ export default function Properties() {
     // Bedrooms filter
     if (bedrooms) {
       const minBeds = parseInt(bedrooms);
-      result = result.filter((p) => p.bedrooms >= minBeds);
+      result = result.filter((p) => (p.bedrooms || 0) >= minBeds);
     }
 
     // Bathrooms filter
     if (bathrooms) {
       const minBaths = parseInt(bathrooms);
-      result = result.filter((p) => p.bathrooms >= minBaths);
+      result = result.filter((p) => (p.bathrooms || 0) >= minBaths);
     }
 
     // Amenities filter
     if (selectedAmenities.length > 0) {
       result = result.filter((p) =>
-        selectedAmenities.every((a) => p.amenities.includes(a))
+        selectedAmenities.every((a) => (p.amenities || []).includes(a))
       );
     }
 
@@ -86,12 +113,12 @@ export default function Properties() {
         result.sort((a, b) => b.price - a.price);
         break;
       case "newest":
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
     }
 
     return result;
-  }, [searchQuery, selectedType, listingType, minPrice, maxPrice, bedrooms, bathrooms, selectedAmenities, sortBy]);
+  }, [properties, searchQuery, selectedType, listingType, minPrice, maxPrice, bedrooms, bathrooms, selectedAmenities, sortBy]);
 
   const activeFiltersCount = [selectedType, listingType, minPrice || maxPrice, bedrooms, bathrooms, selectedAmenities.length > 0].filter(Boolean).length;
 
