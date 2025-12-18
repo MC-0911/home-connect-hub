@@ -52,10 +52,10 @@ export function WhyChooseUs() {
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="text-center"
             >
-              <div className="w-14 h-14 rounded-xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
-                <stat.icon className="w-7 h-7 text-accent" />
+              <div className="w-14 h-14 rounded-xl bg-primary-foreground/10 flex items-center justify-center mx-auto mb-4">
+                <stat.icon className="w-7 h-7 text-primary-foreground" />
               </div>
-              <p className="text-3xl sm:text-4xl font-bold text-accent mb-1">{stat.value}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-1">{stat.value}</p>
               <p className="text-primary-foreground/80 text-sm">{stat.label}</p>
             </motion.div>
           ))}
@@ -78,16 +78,16 @@ export function WhyChooseUs() {
                   "{testimonial.quote}"
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold">
+                  <div className="w-12 h-12 rounded-full bg-primary-foreground/20 flex items-center justify-center text-primary-foreground font-bold">
                     {testimonial.avatar}
                   </div>
                   <div>
                     <p className="font-semibold">{testimonial.author}</p>
                     <p className="text-primary-foreground/80 text-sm">{testimonial.role}</p>
                   </div>
-                  <div className="ml-auto flex items-center gap-1 bg-accent/20 px-3 py-1.5 rounded-full">
-                    <Star className="w-4 h-4 text-accent fill-accent" />
-                    <span className="text-sm font-medium">{testimonial.rating} Rating</span>
+                  <div className="ml-auto flex items-center gap-1 bg-primary-foreground/10 px-3 py-1.5 rounded-full">
+                    <Star className="w-4 h-4 text-primary-foreground fill-primary-foreground" />
+                    <span className="text-sm font-medium text-primary-foreground">{testimonial.rating} Rating</span>
                   </div>
                 </div>
               </div>
@@ -103,8 +103,8 @@ export function WhyChooseUs() {
                     transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                     className="flex items-center gap-2 bg-primary-foreground/10 rounded-full px-4 py-2"
                   >
-                    <badge.icon className="w-4 h-4 text-accent" />
-                    <span className="text-sm font-medium whitespace-nowrap">{badge.text}</span>
+                    <badge.icon className="w-4 h-4 text-primary-foreground" />
+                    <span className="text-sm font-medium whitespace-nowrap text-primary-foreground">{badge.text}</span>
                   </motion.div>
                 ))}
               </div>
