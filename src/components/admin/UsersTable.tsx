@@ -354,7 +354,7 @@ export function UsersTable() {
               </TableHead>
               <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
-              <SortableTableHead label="Location" sortKey="location" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Ph No." sortKey="phone" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
@@ -401,10 +401,10 @@ export function UsersTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {user.location ? (
+                    {user.phone ? (
                       <span className="flex items-center gap-1.5 text-sm">
-                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                        {user.location}
+                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                        {user.phone}
                       </span>
                     ) : (
                       <span className="text-muted-foreground">-</span>
