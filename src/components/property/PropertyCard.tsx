@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Bed, Bath, Square, ArrowRight } from "lucide-react";
+import { Heart, MapPin, Bed, Bath, Square, ArrowRight, Ruler } from "lucide-react";
 import { formatPrice } from "@/lib/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -126,7 +126,10 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
                   </div>
                 </>
               ) : (
-                <span className="text-muted-foreground/70">Land Property</span>
+                <div className="flex items-center gap-1.5">
+                  <Ruler className="w-4 h-4" />
+                  <span>{property.lot_size ? `${property.lot_size.toLocaleString()} sqft lot` : 'Land Property'}</span>
+                </div>
               )}
             </div>
 
