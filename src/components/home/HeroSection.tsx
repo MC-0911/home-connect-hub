@@ -102,7 +102,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-6xl mx-auto"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-9 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-10 gap-4">
               <div className="relative lg:col-span-2">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -155,7 +155,7 @@ export function HeroSection() {
               <Button
                 variant="gold"
                 size="lg"
-                className="h-12 lg:col-span-1"
+                className="h-12 lg:col-span-2"
                 onClick={handleSearch}
               >
                 <Search className="w-5 h-5 mr-2" />
