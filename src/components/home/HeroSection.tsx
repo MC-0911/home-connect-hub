@@ -107,7 +107,7 @@ export function HeroSection() {
               <div className="relative lg:col-span-1">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  placeholder="Location"
+                  placeholder="City, neighborhood, or ZIP"
                   className="pl-10 h-12 border-border"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
