@@ -9,19 +9,18 @@ import {
   Bed,
   Bath,
   Square,
-  Calendar,
+  Calendar as CalendarIcon,
   Home,
   Check,
   ChevronLeft,
   ChevronRight,
   MessageCircle,
+  DollarSign,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { mockProperties, formatPrice } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -35,7 +34,6 @@ export default function PropertyDetail() {
   const property = mockProperties.find((p) => p.id === id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [dbProperty, setDbProperty] = useState<{ user_id: string } | null>(null);
 
   // Try to get property from database to get seller's user_id
@@ -74,30 +72,9 @@ export default function PropertyDetail() {
     );
   }
 
-  const handleContact = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // If user is logged in and property has a seller, redirect to messages
-    if (user && dbProperty?.user_id) {
-      navigate(`/messages?seller=${dbProperty.user_id}&property=${id}`);
-      return;
-    }
-    
-    // If not logged in, prompt to login
+  const handleContactSeller = () => {
     if (!user) {
       toast.error("Please sign in to contact the seller");
-      navigate('/auth');
-      return;
-    }
-    
-    // Fallback for mock data
-    toast.success("Message sent! The seller will contact you soon.");
-    setContactForm({ name: "", email: "", message: "" });
-  };
-
-  const handleStartChat = () => {
-    if (!user) {
-      toast.error("Please sign in to message the seller");
       navigate('/auth');
       return;
     }
@@ -105,8 +82,28 @@ export default function PropertyDetail() {
     if (dbProperty?.user_id) {
       navigate(`/messages?seller=${dbProperty.user_id}&property=${id}`);
     } else {
-      toast.info("Direct messaging is not available for this property");
+      navigate('/dashboard?tab=messages');
     }
+  };
+
+  const handleScheduleVisit = () => {
+    if (!user) {
+      toast.error("Please sign in to schedule a visit");
+      navigate('/auth');
+      return;
+    }
+    navigate('/dashboard?tab=visits');
+    toast.success("Redirected to schedule visits");
+  };
+
+  const handleMakeOffer = () => {
+    if (!user) {
+      toast.error("Please sign in to make an offer");
+      navigate('/auth');
+      return;
+    }
+    navigate('/dashboard?tab=offers');
+    toast.success("Redirected to offers section");
   };
 
   const nextImage = () => {
@@ -260,7 +257,7 @@ export default function PropertyDetail() {
                 )}
                 {property.yearBuilt && (
                   <div className="bg-card rounded-xl p-4 border border-border text-center">
-                    <Calendar className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <CalendarIcon className="w-6 h-6 text-accent mx-auto mb-2" />
                     <span className="block font-semibold text-foreground">{property.yearBuilt}</span>
                     <span className="text-sm text-muted-foreground">Year Built</span>
                   </div>
@@ -324,50 +321,35 @@ export default function PropertyDetail() {
                   </div>
                 </div>
 
-                <form onSubmit={handleContact} className="space-y-4">
-                  <div>
-                    <Input
-                      placeholder="Your Name"
-                      value={contactForm.name}
-                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="email"
-                      placeholder="Your Email"
-                      value={contactForm.email}
-                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Textarea
-                      placeholder="I'm interested in this property..."
-                      rows={4}
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <Button variant="gold" className="w-full" type="submit">
-                    <MessageCircle className="w-5 h-5 mr-2" />
-                    {user ? 'Start Chat' : 'Contact Seller'}
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center gap-2 h-12"
+                    onClick={handleContactSeller}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Contact Seller
                   </Button>
                   
-                  {user && dbProperty?.user_id && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full mt-2" 
-                      type="button"
-                      onClick={handleStartChat}
-                    >
-                      <MessageCircle className="w-5 h-5 mr-2" />
-                      Open Direct Message
-                    </Button>
-                  )}
-                </form>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center gap-2 h-12"
+                    onClick={handleScheduleVisit}
+                  >
+                    <CalendarIcon className="w-5 h-5" />
+                    Schedule Visit
+                  </Button>
+                  
+                  <Button 
+                    variant="gold" 
+                    className="w-full justify-center gap-2 h-12"
+                    onClick={handleMakeOffer}
+                  >
+                    <DollarSign className="w-5 h-5" />
+                    Make Offer
+                  </Button>
+                </div>
 
                 <p className="text-xs text-muted-foreground text-center mt-4">
                   By contacting the seller, you agree to our Terms of Service and Privacy Policy.
