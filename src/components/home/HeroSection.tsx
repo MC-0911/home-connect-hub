@@ -101,10 +101,10 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-3xl mx-auto"
+            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-5xl mx-auto"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+              <div className="relative lg:col-span-1">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   placeholder="Location"
@@ -114,7 +114,7 @@ export function HeroSection() {
                 />
               </div>
 
-              <div className="relative">
+              <div className="relative lg:col-span-2">
                 <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
                 <Select value={propertyType} onValueChange={setPropertyType}>
                   <SelectTrigger className="pl-10 h-12">
@@ -131,7 +131,7 @@ export function HeroSection() {
                 </Select>
               </div>
 
-              <div className="relative">
+              <div className="relative lg:col-span-1">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="number"
@@ -142,7 +142,7 @@ export function HeroSection() {
                 />
               </div>
 
-              <div className="relative">
+              <div className="relative lg:col-span-1">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="number"
@@ -156,7 +156,7 @@ export function HeroSection() {
               <Button
                 variant="gold"
                 size="lg"
-                className="h-12"
+                className="h-12 lg:col-span-1"
                 onClick={handleSearch}
               >
                 <Search className="w-5 h-5 mr-2" />
