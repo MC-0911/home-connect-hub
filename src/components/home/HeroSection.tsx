@@ -10,13 +10,15 @@ export function HeroSection() {
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (location) params.set("location", location);
     if (propertyType) params.set("type", propertyType);
-    if (priceRange) params.set("price", priceRange);
+    if (minPrice) params.set("minPrice", minPrice);
+    if (maxPrice) params.set("maxPrice", maxPrice);
     navigate(`/properties?${params.toString()}`);
   };
 
@@ -101,7 +103,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-3xl mx-auto"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -130,19 +132,25 @@ export function HeroSection() {
               </div>
 
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
-                <Select value={priceRange} onValueChange={setPriceRange}>
-                  <SelectTrigger className="pl-10 h-12">
-                    <SelectValue placeholder="Price Range" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-500000">Up to $500K</SelectItem>
-                    <SelectItem value="500000-1000000">$500K - $1M</SelectItem>
-                    <SelectItem value="1000000-2000000">$1M - $2M</SelectItem>
-                    <SelectItem value="2000000-5000000">$2M - $5M</SelectItem>
-                    <SelectItem value="5000000+">$5M+</SelectItem>
-                  </SelectContent>
-                </Select>
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="number"
+                  placeholder="Min Price"
+                  className="pl-10 h-12 border-border"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+              </div>
+
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="number"
+                  placeholder="Max Price"
+                  className="pl-10 h-12 border-border"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
               </div>
 
               <Button
