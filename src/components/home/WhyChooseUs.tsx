@@ -36,7 +36,7 @@ export function WhyChooseUs() {
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold">
             Why Choose Us?
           </h2>
-          <p className="text-primary-foreground/70 mt-4 max-w-2xl mx-auto">
+          <p className="text-primary-foreground/80 mt-4 max-w-2xl mx-auto">
             Trusted by thousands of buyers and sellers across the country
           </p>
         </motion.div>
@@ -56,7 +56,7 @@ export function WhyChooseUs() {
                 <stat.icon className="w-7 h-7 text-accent" />
               </div>
               <p className="text-3xl sm:text-4xl font-bold text-accent mb-1">{stat.value}</p>
-              <p className="text-primary-foreground/60 text-sm">{stat.label}</p>
+              <p className="text-primary-foreground/80 text-sm">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -73,7 +73,7 @@ export function WhyChooseUs() {
             <div className="flex flex-col lg:flex-row gap-8 items-center">
               {/* Quote */}
               <div className="flex-1">
-                <Quote className="w-10 h-10 text-accent/40 mb-4" />
+                <Quote className="w-10 h-10 text-accent mb-4" />
                 <p className="text-xl sm:text-2xl font-display leading-relaxed mb-6">
                   "{testimonial.quote}"
                 </p>
@@ -83,7 +83,7 @@ export function WhyChooseUs() {
                   </div>
                   <div>
                     <p className="font-semibold">{testimonial.author}</p>
-                    <p className="text-primary-foreground/60 text-sm">{testimonial.role}</p>
+                    <p className="text-primary-foreground/80 text-sm">{testimonial.role}</p>
                   </div>
                   <div className="ml-auto flex items-center gap-1 bg-accent/20 px-3 py-1.5 rounded-full">
                     <Star className="w-4 h-4 text-accent fill-accent" />
