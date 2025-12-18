@@ -43,7 +43,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Eye, Mail, Phone, Download, FileSpreadsheet, FileText, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
+import { Search, Eye, Mail, Phone, Download, FileSpreadsheet, FileText, MoreVertical, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -74,6 +74,7 @@ export function LeadsTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [leadDialogOpen, setLeadDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
@@ -469,17 +470,26 @@ export function LeadsTable() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => setSelectedLead(lead)}
-                          className="h-8 w-8 p-0"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover">
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            setSelectedLead(lead);
+                            setLeadDialogOpen(true);
+                          }}
+                          className="flex items-center gap-2 cursor-pointer"
                         >
                           <Eye className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
+                          View Details
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Dialog open={leadDialogOpen && selectedLead?.id === lead.id} onOpenChange={setLeadDialogOpen}>
                       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>Lead Details</DialogTitle>

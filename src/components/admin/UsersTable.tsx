@@ -38,7 +38,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreHorizontal } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -337,88 +337,94 @@ export function UsersTable() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedUser(user)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-
-                      {user.is_suspended ? (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-500/10"
-                            >
-                              <UserCheck className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Unsuspend User</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to unsuspend {user.full_name || 'this user'}? 
-                                They will regain access to all platform features.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => toggleSuspension(user, false)}
-                                className="bg-green-600 hover:bg-green-700"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover">
+                        <DropdownMenuItem 
+                          onClick={() => setSelectedUser(user)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {user.is_suspended ? (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem 
+                                className="flex items-center gap-2 cursor-pointer text-green-600"
+                                onSelect={(e) => e.preventDefault()}
                               >
-                                Unsuspend
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      ) : (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <UserX className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Suspend User</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to suspend {user.full_name || 'this user'}? 
-                                They will lose access to platform features.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <div className="py-4">
-                              <Textarea
-                                placeholder="Reason for suspension (optional)"
-                                value={suspensionReason}
-                                onChange={(e) => setSuspensionReason(e.target.value)}
-                                className="min-h-[80px]"
-                              />
-                            </div>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setSuspensionReason('')}>
-                                Cancel
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => toggleSuspension(user, true, suspensionReason)}
-                                className="bg-destructive hover:bg-destructive/90"
+                                <UserCheck className="h-4 w-4" />
+                                Unsuspend User
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Unsuspend User</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to unsuspend {user.full_name || 'this user'}? 
+                                  They will regain access to all platform features.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => toggleSuspension(user, false)}
+                                  className="bg-green-600 hover:bg-green-700"
+                                >
+                                  Unsuspend
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        ) : (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem 
+                                className="flex items-center gap-2 cursor-pointer text-destructive"
+                                onSelect={(e) => e.preventDefault()}
                               >
+                                <UserX className="h-4 w-4" />
                                 Suspend User
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )}
-                    </div>
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Suspend User</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to suspend {user.full_name || 'this user'}? 
+                                  They will lose access to platform features.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <div className="py-4">
+                                <Textarea
+                                  placeholder="Reason for suspension (optional)"
+                                  value={suspensionReason}
+                                  onChange={(e) => setSuspensionReason(e.target.value)}
+                                  className="min-h-[80px]"
+                                />
+                              </div>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setSuspensionReason('')}>
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => toggleSuspension(user, true, suspensionReason)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Suspend User
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
