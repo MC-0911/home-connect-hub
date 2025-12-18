@@ -94,7 +94,7 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
           </div>
 
           {/* Content */}
-          <div className="p-5">
+          <div className="p-5 flex flex-col h-[200px]">
             <div className="flex items-start justify-between gap-4 mb-3">
               <h3 className="font-display text-lg font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
                 {property.title}
@@ -102,32 +102,36 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4">
-              <MapPin className="w-4 h-4 text-accent" />
+              <MapPin className="w-4 h-4 text-accent flex-shrink-0" />
               <span className="line-clamp-1">
                 {property.city}, {property.state}
               </span>
             </div>
 
-            {/* Features */}
-            {propertyType !== "land" && (
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                <div className="flex items-center gap-1.5">
-                  <Bed className="w-4 h-4" />
-                  <span>{property.bedrooms || 0} Beds</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Bath className="w-4 h-4" />
-                  <span>{property.bathrooms || 0} Baths</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Square className="w-4 h-4" />
-                  <span>{(property.square_feet || 0).toLocaleString()} sqft</span>
-                </div>
-              </div>
-            )}
+            {/* Features - always show space for consistent height */}
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 min-h-[24px]">
+              {propertyType !== "land" ? (
+                <>
+                  <div className="flex items-center gap-1.5">
+                    <Bed className="w-4 h-4" />
+                    <span>{property.bedrooms || 0} Beds</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Bath className="w-4 h-4" />
+                    <span>{property.bathrooms || 0} Baths</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Square className="w-4 h-4" />
+                    <span>{(property.square_feet || 0).toLocaleString()} sqft</span>
+                  </div>
+                </>
+              ) : (
+                <span className="text-muted-foreground/70">Land Property</span>
+              )}
+            </div>
 
-            {/* Price */}
-            <div className="flex items-center justify-between pt-4 border-t border-border">
+            {/* Price - pushed to bottom */}
+            <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
               <span className="font-display text-xl font-semibold text-accent">
                 {formatPrice(property.price, priceType)}
               </span>
