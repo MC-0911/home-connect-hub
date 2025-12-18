@@ -338,6 +338,7 @@ export type Database = {
       }
       property_offers: {
         Row: {
+          counter_amount: number | null
           created_at: string
           expires_at: string | null
           id: string
@@ -351,6 +352,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          counter_amount?: number | null
           created_at?: string
           expires_at?: string | null
           id?: string
@@ -364,6 +366,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          counter_amount?: number | null
           created_at?: string
           expires_at?: string | null
           id?: string

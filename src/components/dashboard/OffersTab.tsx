@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { format, formatDistanceToNow } from "date-fns";
-import { DollarSign, Clock, Check, X, MessageSquare } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { DollarSign, Clock, Check, X, MessageSquare, ArrowLeftRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +19,7 @@ interface Offer {
   user_id: string;
   seller_id: string;
   offer_amount: number;
+  counter_amount: number | null;
   status: string;
   message: string | null;
   seller_response: string | null;
@@ -41,6 +44,7 @@ export function OffersTab() {
   const [receivedOffers, setReceivedOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [sellerResponse, setSellerResponse] = useState("");
+  const [counterAmount, setCounterAmount] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -123,6 +127,63 @@ export function OffersTab() {
     }
   };
 
+  const submitCounterOffer = async (offerId: string, amount: number, message?: string) => {
+    try {
+      const { error } = await supabase
+        .from("property_offers")
+        .update({
+          status: "countered",
+          counter_amount: amount,
+          seller_response: message || null,
+        })
+        .eq("id", offerId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Counter Offer Sent",
+        description: `Counter offer of ${formatPrice(amount)} has been sent to the buyer.`,
+      });
+
+      fetchOffers();
+      setCounterAmount("");
+      setSellerResponse("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const acceptCounterOffer = async (offerId: string, counterAmount: number) => {
+    try {
+      const { error } = await supabase
+        .from("property_offers")
+        .update({
+          status: "accepted",
+          offer_amount: counterAmount,
+        })
+        .eq("id", offerId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Counter Offer Accepted",
+        description: "You've accepted the seller's counter offer.",
+      });
+
+      fetchOffers();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -139,11 +200,23 @@ export function OffersTab() {
       countered: "outline",
       withdrawn: "outline",
     };
-    return <Badge variant={variants[status] || "secondary"} className="capitalize">{status}</Badge>;
+    const colors: Record<string, string> = {
+      countered: "border-accent text-accent",
+    };
+    return (
+      <Badge 
+        variant={variants[status] || "secondary"} 
+        className={`capitalize ${colors[status] || ""}`}
+      >
+        {status}
+      </Badge>
+    );
   };
 
   const OfferCard = ({ offer, isSeller = false }: { offer: Offer; isSeller?: boolean }) => {
     const priceDiff = offer.property ? ((offer.offer_amount - offer.property.price) / offer.property.price) * 100 : 0;
+    const isCountered = offer.status === "countered";
+    const isBuyer = !isSeller;
 
     return (
       <Card className="bg-card border-border">
@@ -163,15 +236,26 @@ export function OffersTab() {
                 <div>
                   <h4 className="font-medium text-foreground truncate">{offer.property?.title || "Property"}</h4>
                   <p className="text-sm text-muted-foreground">{offer.property?.address}, {offer.property?.city}</p>
+                  {isSeller && offer.buyer?.full_name && (
+                    <p className="text-xs text-primary">From: {offer.buyer.full_name}</p>
+                  )}
                 </div>
                 {getStatusBadge(offer.status)}
               </div>
               
-              <div className="mt-3 flex items-center gap-4">
+              <div className="mt-3 flex flex-wrap items-center gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Your Offer</p>
-                  <p className="text-lg font-bold text-accent">{formatPrice(offer.offer_amount)}</p>
+                  <p className="text-xs text-muted-foreground">{isSeller ? "Their Offer" : "Your Offer"}</p>
+                  <p className={`text-lg font-bold ${isCountered ? "line-through text-muted-foreground" : "text-accent"}`}>
+                    {formatPrice(offer.offer_amount)}
+                  </p>
                 </div>
+                {isCountered && offer.counter_amount && (
+                  <div>
+                    <p className="text-xs text-accent">Counter Offer</p>
+                    <p className="text-lg font-bold text-accent">{formatPrice(offer.counter_amount)}</p>
+                  </div>
+                )}
                 {offer.property && (
                   <div>
                     <p className="text-xs text-muted-foreground">List Price</p>
@@ -196,9 +280,26 @@ export function OffersTab() {
               )}
 
               {offer.seller_response && (
-                <p className="text-sm text-primary mt-1">Seller response: {offer.seller_response}</p>
+                <p className="text-sm text-primary mt-1">Seller: {offer.seller_response}</p>
               )}
 
+              {/* Buyer actions for countered offers */}
+              {isBuyer && isCountered && offer.counter_amount && (
+                <div className="flex gap-2 mt-3 p-3 bg-accent/10 rounded-lg">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Counter offer received</p>
+                    <p className="text-xs text-muted-foreground">The seller has countered with {formatPrice(offer.counter_amount)}</p>
+                  </div>
+                  <Button size="sm" onClick={() => acceptCounterOffer(offer.id, offer.counter_amount!)}>
+                    <Check className="w-4 h-4 mr-1" /> Accept
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => updateOfferStatus(offer.id, "declined")}>
+                    <X className="w-4 h-4 mr-1" /> Decline
+                  </Button>
+                </div>
+              )}
+
+              {/* Seller actions for pending offers */}
               {isSeller && offer.status === "pending" && (
                 <div className="flex gap-2 mt-3">
                   <Dialog>
@@ -226,6 +327,60 @@ export function OffersTab() {
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="border-accent text-accent hover:bg-accent/10">
+                        <ArrowLeftRight className="w-4 h-4 mr-1" /> Counter
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Make Counter Offer</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="p-3 bg-secondary rounded-lg">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Their offer:</span>
+                            <span className="font-medium">{formatPrice(offer.offer_amount)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm mt-1">
+                            <span className="text-muted-foreground">List price:</span>
+                            <span className="font-medium">{formatPrice(offer.property?.price || 0)}</span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Your Counter Offer</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="text"
+                              value={counterAmount}
+                              onChange={(e) => setCounterAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                              className="pl-9"
+                              placeholder="Enter your counter amount"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Message (Optional)</Label>
+                          <Textarea
+                            placeholder="Explain your counter offer..."
+                            value={sellerResponse}
+                            onChange={(e) => setSellerResponse(e.target.value)}
+                          />
+                        </div>
+                        <Button 
+                          onClick={() => submitCounterOffer(offer.id, parseFloat(counterAmount), sellerResponse)} 
+                          disabled={!counterAmount}
+                          className="w-full"
+                        >
+                          Send Counter Offer
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="destructive">
