@@ -16,43 +16,73 @@ import {
   ChevronRight,
   MessageCircle,
   DollarSign,
+  Loader2,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockProperties, formatPrice } from "@/lib/mockData";
+import { formatPrice } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ScheduleVisitDialog } from "@/components/dashboard/ScheduleVisitDialog";
 import { MakeOfferDialog } from "@/components/dashboard/MakeOfferDialog";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Property = Tables<"properties"> & {
+  seller?: { full_name: string | null } | null;
+};
 
 export default function PropertyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const property = mockProperties.find((p) => p.id === id);
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [dbProperty, setDbProperty] = useState<{ user_id: string; price?: number } | null>(null);
   const [showVisitDialog, setShowVisitDialog] = useState(false);
   const [showOfferDialog, setShowOfferDialog] = useState(false);
 
-  // Try to get property from database to get seller's user_id
   useEffect(() => {
-    const fetchDbProperty = async () => {
+    const fetchProperty = async () => {
       if (!id) return;
-      const { data } = await supabase
+      setLoading(true);
+      
+      const { data, error } = await supabase
         .from('properties')
-        .select('user_id, price')
+        .select('*')
         .eq('id', id)
         .maybeSingle();
-      if (data) setDbProperty(data);
+      
+      if (data) {
+        // Fetch seller profile
+        const { data: sellerProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', data.user_id)
+          .maybeSingle();
+        
+        setProperty({ ...data, seller: sellerProfile });
+      }
+      setLoading(false);
     };
-    fetchDbProperty();
+    fetchProperty();
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-24 pb-16 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -76,6 +106,9 @@ export default function PropertyDetail() {
     );
   }
 
+  const images = property.images?.length ? property.images : ['/placeholder.svg'];
+  const sellerName = property.seller?.full_name || 'Property Owner';
+
   const handleContactSeller = () => {
     if (!user) {
       toast.error("Please sign in to contact the seller");
@@ -83,8 +116,8 @@ export default function PropertyDetail() {
       return;
     }
     
-    if (dbProperty?.user_id) {
-      navigate(`/messages?seller=${dbProperty.user_id}&property=${id}`);
+    if (property?.user_id) {
+      navigate(`/messages?seller=${property.user_id}&property=${id}`);
     } else {
       navigate('/dashboard?tab=messages');
     }
@@ -96,7 +129,7 @@ export default function PropertyDetail() {
       navigate('/auth');
       return;
     }
-    if (!dbProperty?.user_id) {
+    if (!property?.user_id) {
       toast.error("Unable to schedule visit for this property");
       return;
     }
@@ -109,7 +142,7 @@ export default function PropertyDetail() {
       navigate('/auth');
       return;
     }
-    if (!dbProperty?.user_id) {
+    if (!property?.user_id) {
       toast.error("Unable to make offer for this property");
       return;
     }
@@ -117,11 +150,11 @@ export default function PropertyDetail() {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
@@ -136,7 +169,7 @@ export default function PropertyDetail() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            src={property.images[currentImageIndex]}
+            src={images[currentImageIndex]}
             alt={property.title}
             className="w-full h-full object-cover"
           />
@@ -165,7 +198,7 @@ export default function PropertyDetail() {
           </div>
 
           {/* Image Navigation */}
-          {property.images.length > 1 && (
+          {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
@@ -184,7 +217,7 @@ export default function PropertyDetail() {
 
           {/* Image Indicators */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {property.images.map((_, index) => (
+            {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
@@ -204,7 +237,7 @@ export default function PropertyDetail() {
               <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>
             )}
             <Badge variant="secondary" className="bg-card/90 backdrop-blur-sm border-0">
-              {property.priceType === "rent" ? "For Rent" : "For Sale"}
+              {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </Badge>
           </div>
         </div>
@@ -225,14 +258,14 @@ export default function PropertyDetail() {
                   </h1>
                   <div className="text-right">
                     <span className="font-display text-3xl sm:text-4xl font-semibold text-accent">
-                      {formatPrice(property.price, property.priceType)}
+                      {formatPrice(property.price, property.listing_type)}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <MapPin className="w-5 h-5 text-accent" />
                   <span>
-                    {property.address}, {property.city}, {property.state} {property.zipCode}
+                    {property.address}, {property.city}, {property.state} {property.zip_code}
                   </span>
                 </div>
               </motion.div>
@@ -244,37 +277,37 @@ export default function PropertyDetail() {
                 transition={{ delay: 0.1 }}
                 className="grid grid-cols-2 sm:grid-cols-4 gap-4"
               >
-                {property.propertyType !== "land" && (
+                {property.property_type !== "land" && (
                   <>
                     <div className="bg-card rounded-xl p-4 border border-border text-center">
                       <Bed className="w-6 h-6 text-accent mx-auto mb-2" />
-                      <span className="block font-semibold text-foreground">{property.bedrooms}</span>
+                      <span className="block font-semibold text-foreground">{property.bedrooms || 0}</span>
                       <span className="text-sm text-muted-foreground">Bedrooms</span>
                     </div>
                     <div className="bg-card rounded-xl p-4 border border-border text-center">
                       <Bath className="w-6 h-6 text-accent mx-auto mb-2" />
-                      <span className="block font-semibold text-foreground">{property.bathrooms}</span>
+                      <span className="block font-semibold text-foreground">{property.bathrooms || 0}</span>
                       <span className="text-sm text-muted-foreground">Bathrooms</span>
                     </div>
                     <div className="bg-card rounded-xl p-4 border border-border text-center">
                       <Square className="w-6 h-6 text-accent mx-auto mb-2" />
                       <span className="block font-semibold text-foreground">
-                        {property.squareFeet.toLocaleString()}
+                        {(property.square_feet || 0).toLocaleString()}
                       </span>
                       <span className="text-sm text-muted-foreground">Sq Ft</span>
                     </div>
                   </>
                 )}
-                {property.yearBuilt && (
+                {property.year_built && (
                   <div className="bg-card rounded-xl p-4 border border-border text-center">
                     <CalendarIcon className="w-6 h-6 text-accent mx-auto mb-2" />
-                    <span className="block font-semibold text-foreground">{property.yearBuilt}</span>
+                    <span className="block font-semibold text-foreground">{property.year_built}</span>
                     <span className="text-sm text-muted-foreground">Year Built</span>
                   </div>
                 )}
                 <div className="bg-card rounded-xl p-4 border border-border text-center">
                   <Home className="w-6 h-6 text-accent mx-auto mb-2" />
-                  <span className="block font-semibold text-foreground capitalize">{property.propertyType}</span>
+                  <span className="block font-semibold text-foreground capitalize">{property.property_type}</span>
                   <span className="text-sm text-muted-foreground">Type</span>
                 </div>
               </motion.div>
@@ -290,25 +323,27 @@ export default function PropertyDetail() {
               </motion.div>
 
               {/* Amenities */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <h2 className="font-display text-xl font-semibold text-foreground mb-4">
-                  Features & Amenities
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {property.amenities.map((amenity) => (
-                    <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
-                      <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-accent" />
+              {property.amenities && property.amenities.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Features & Amenities
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {property.amenities.map((amenity) => (
+                      <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
+                        <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-accent" />
+                        </div>
+                        {amenity}
                       </div>
-                      {amenity}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -322,11 +357,11 @@ export default function PropertyDetail() {
                 <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
                   <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
                     <span className="font-display font-semibold text-accent text-lg">
-                      {property.sellerName.charAt(0)}
+                      {sellerName.charAt(0)}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">{property.sellerName}</h3>
+                    <h3 className="font-semibold text-foreground">{sellerName}</h3>
                     <p className="text-sm text-muted-foreground">Property Owner</p>
                   </div>
                 </div>
@@ -373,22 +408,22 @@ export default function PropertyDetail() {
       <Footer />
 
       {/* Dialogs */}
-      {dbProperty && id && (
+      {property && id && (
         <>
           <ScheduleVisitDialog
             open={showVisitDialog}
             onOpenChange={setShowVisitDialog}
             propertyId={id}
-            sellerId={dbProperty.user_id}
+            sellerId={property.user_id}
             propertyTitle={property.title}
           />
           <MakeOfferDialog
             open={showOfferDialog}
             onOpenChange={setShowOfferDialog}
             propertyId={id}
-            sellerId={dbProperty.user_id}
+            sellerId={property.user_id}
             propertyTitle={property.title}
-            listPrice={dbProperty.price || property.price}
+            listPrice={property.price}
           />
         </>
       )}
