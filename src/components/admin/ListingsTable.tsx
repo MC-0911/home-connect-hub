@@ -36,7 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Eye, Star, StarOff, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
+import { Search, Eye, Star, StarOff, MoreHorizontal, MoreVertical, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
@@ -389,11 +389,38 @@ export function ListingsTable() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
-                      <Link to={`/property/${listing.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover">
+                        <DropdownMenuItem asChild>
+                          <Link to={`/property/${listing.id}`} className="flex items-center gap-2 cursor-pointer">
+                            <Eye className="h-4 w-4" />
+                            View
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => toggleFeatured(listing.id, !listing.featured)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          {listing.featured ? (
+                            <>
+                              <StarOff className="h-4 w-4" />
+                              Unfeature
+                            </>
+                          ) : (
+                            <>
+                              <Star className="h-4 w-4" />
+                              Feature
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
