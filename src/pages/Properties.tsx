@@ -22,6 +22,7 @@ export default function Properties() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [bedrooms, setBedrooms] = useState("");
+  const [bathrooms, setBathrooms] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
 
@@ -63,6 +64,12 @@ export default function Properties() {
       result = result.filter((p) => p.bedrooms >= minBeds);
     }
 
+    // Bathrooms filter
+    if (bathrooms) {
+      const minBaths = parseInt(bathrooms);
+      result = result.filter((p) => p.bathrooms >= minBaths);
+    }
+
     // Amenities filter
     if (selectedAmenities.length > 0) {
       result = result.filter((p) =>
@@ -84,9 +91,9 @@ export default function Properties() {
     }
 
     return result;
-  }, [searchQuery, selectedType, listingType, minPrice, maxPrice, bedrooms, selectedAmenities, sortBy]);
+  }, [searchQuery, selectedType, listingType, minPrice, maxPrice, bedrooms, bathrooms, selectedAmenities, sortBy]);
 
-  const activeFiltersCount = [selectedType, listingType, minPrice || maxPrice, bedrooms, selectedAmenities.length > 0].filter(Boolean).length;
+  const activeFiltersCount = [selectedType, listingType, minPrice || maxPrice, bedrooms, bathrooms, selectedAmenities.length > 0].filter(Boolean).length;
 
   const clearFilters = () => {
     setSelectedType("");
@@ -94,6 +101,7 @@ export default function Properties() {
     setMinPrice("");
     setMaxPrice("");
     setBedrooms("");
+    setBathrooms("");
     setSelectedAmenities([]);
     setSearchQuery("");
     setSearchParams({});
@@ -199,6 +207,33 @@ export default function Properties() {
               onClick={() => setBedrooms(option.value)}
               className={`flex-1 px-3 py-2 text-sm font-medium rounded-full transition-colors ${
                 bedrooms === option.value
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Bathrooms */}
+      <div>
+        <label className="text-sm font-medium text-foreground mb-3 block">Bathrooms</label>
+        <div className="flex rounded-full bg-muted p-1">
+          {[
+            { value: "", label: "Any" },
+            { value: "1", label: "1+" },
+            { value: "2", label: "2+" },
+            { value: "3", label: "3+" },
+            { value: "4", label: "4+" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setBathrooms(option.value)}
+              className={`flex-1 px-3 py-2 text-sm font-medium rounded-full transition-colors ${
+                bathrooms === option.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
@@ -363,6 +398,12 @@ export default function Properties() {
                 <Badge variant="secondary" className="gap-1">
                   {bedrooms}+ Beds
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setBedrooms("")} />
+                </Badge>
+              )}
+              {bathrooms && (
+                <Badge variant="secondary" className="gap-1">
+                  {bathrooms}+ Baths
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setBathrooms("")} />
                 </Badge>
               )}
               {selectedAmenities.map((a) => (
