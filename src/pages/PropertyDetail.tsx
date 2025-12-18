@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -25,13 +25,32 @@ import { Input } from "@/components/ui/input";
 import { mockProperties, formatPrice } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function PropertyDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const property = mockProperties.find((p) => p.id === id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
+  const [dbProperty, setDbProperty] = useState<{ user_id: string } | null>(null);
+
+  // Try to get property from database to get seller's user_id
+  useEffect(() => {
+    const fetchDbProperty = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from('properties')
+        .select('user_id')
+        .eq('id', id)
+        .maybeSingle();
+      if (data) setDbProperty(data);
+    };
+    fetchDbProperty();
+  }, [id]);
 
   if (!property) {
     return (
@@ -57,8 +76,37 @@ export default function PropertyDetail() {
 
   const handleContact = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If user is logged in and property has a seller, redirect to messages
+    if (user && dbProperty?.user_id) {
+      navigate(`/messages?seller=${dbProperty.user_id}&property=${id}`);
+      return;
+    }
+    
+    // If not logged in, prompt to login
+    if (!user) {
+      toast.error("Please sign in to contact the seller");
+      navigate('/auth');
+      return;
+    }
+    
+    // Fallback for mock data
     toast.success("Message sent! The seller will contact you soon.");
     setContactForm({ name: "", email: "", message: "" });
+  };
+
+  const handleStartChat = () => {
+    if (!user) {
+      toast.error("Please sign in to message the seller");
+      navigate('/auth');
+      return;
+    }
+    
+    if (dbProperty?.user_id) {
+      navigate(`/messages?seller=${dbProperty.user_id}&property=${id}`);
+    } else {
+      toast.info("Direct messaging is not available for this property");
+    }
   };
 
   const nextImage = () => {
@@ -305,8 +353,20 @@ export default function PropertyDetail() {
                   </div>
                   <Button variant="gold" className="w-full" type="submit">
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    Contact Seller
+                    {user ? 'Start Chat' : 'Contact Seller'}
                   </Button>
+                  
+                  {user && dbProperty?.user_id && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-2" 
+                      type="button"
+                      onClick={handleStartChat}
+                    >
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      Open Direct Message
+                    </Button>
+                  )}
                 </form>
 
                 <p className="text-xs text-muted-foreground text-center mt-4">

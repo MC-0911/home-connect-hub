@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield } from "lucide-react";
+import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield, MessageSquare } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useMessages } from "@/hooks/useMessages";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,8 @@ export function Header() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin } = useAdmin();
+  const { getUnreadCount } = useMessages();
+  const unreadCount = getUnreadCount();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
 
@@ -126,6 +130,33 @@ export function Header() {
                 {location.pathname === "/dashboard" && (
                   <motion.div
                     layoutId="activeNavDashboard"
+                    className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full"
+                  />
+                )}
+              </Link>
+            )}
+            {user && (
+              <Link
+                to="/messages"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2",
+                  isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground",
+                  location.pathname === "/messages" &&
+                    (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground")
+                )}
+              >
+                <div className="relative">
+                  <MessageSquare className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] bg-destructive text-destructive-foreground">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
+                </div>
+                Messages
+                {location.pathname === "/messages" && (
+                  <motion.div
+                    layoutId="activeNavMessages"
                     className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full"
                   />
                 )}
@@ -250,6 +281,28 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
+              {user && (
+                <Link
+                  to="/messages"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                    location.pathname === "/messages"
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/50"
+                  )}
+                >
+                  <div className="relative">
+                    <MessageSquare className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] bg-destructive text-destructive-foreground">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </Badge>
+                    )}
+                  </div>
+                  Messages
+                </Link>
+              )}
               {isAdmin && (
                 <Link
                   to="/admin"
