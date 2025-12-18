@@ -100,9 +100,9 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-5xl mx-auto"
+            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-6xl mx-auto"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-9 gap-4">
               <div className="relative lg:col-span-2">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -130,7 +130,7 @@ export function HeroSection() {
                 </Select>
               </div>
 
-              <div className="relative lg:col-span-1">
+              <div className="relative lg:col-span-2">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="number"
@@ -141,7 +141,7 @@ export function HeroSection() {
                 />
               </div>
 
-              <div className="relative lg:col-span-1">
+              <div className="relative lg:col-span-2">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="number"
