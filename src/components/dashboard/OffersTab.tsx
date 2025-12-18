@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -286,13 +287,27 @@ export function OffersTab() {
               {/* Buyer actions for pending offers - withdraw */}
               {isBuyer && offer.status === "pending" && (
                 <div className="flex gap-2 mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => updateOfferStatus(offer.id, "withdrawn")}
-                  >
-                    <X className="w-4 h-4 mr-1" /> Withdraw Offer
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline">
+                        <X className="w-4 h-4 mr-1" /> Withdraw Offer
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Withdraw Offer?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to withdraw your offer of {formatPrice(offer.offer_amount)} for {offer.property?.title}? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => updateOfferStatus(offer.id, "withdrawn")}>
+                          Withdraw Offer
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               )}
 
