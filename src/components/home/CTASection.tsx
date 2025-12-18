@@ -18,7 +18,7 @@ const sellerStats = [
 
 export function CTASection() {
   return (
-    <section className="py-20 sm:py-28 bg-background">
+    <section className="py-20 sm:py-28 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Sellers CTA */}
         <motion.div
