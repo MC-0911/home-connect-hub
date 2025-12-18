@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,8 +30,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -54,7 +62,10 @@ export function UsersTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [suspensionReason, setSuspensionReason] = useState('');
-  const [userEmails, setUserEmails] = useState<Record<string, string>>({});
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkSuspendDialogOpen, setBulkSuspendDialogOpen] = useState(false);
+  const [bulkUnsuspendDialogOpen, setBulkUnsuspendDialogOpen] = useState(false);
+  const [bulkSuspensionReason, setBulkSuspensionReason] = useState('');
 
   const fetchUsers = async () => {
     try {
@@ -100,12 +111,80 @@ export function UsersTable() {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(filteredUsers.map(u => u.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkSuspend = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_suspended: true,
+          suspended_at: new Date().toISOString(),
+          suspension_reason: bulkSuspensionReason || 'Bulk suspension by admin',
+        })
+        .in('id', Array.from(selectedIds));
+
+      if (error) throw error;
+
+      toast.success(`${selectedIds.size} users suspended successfully`);
+      setSelectedIds(new Set());
+      setBulkSuspendDialogOpen(false);
+      setBulkSuspensionReason('');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error bulk suspending users:', error);
+      toast.error('Failed to suspend users');
+    }
+  };
+
+  const handleBulkUnsuspend = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_suspended: false,
+          suspended_at: null,
+          suspension_reason: null,
+        })
+        .in('id', Array.from(selectedIds));
+
+      if (error) throw error;
+
+      toast.success(`${selectedIds.size} users unsuspended successfully`);
+      setSelectedIds(new Set());
+      setBulkUnsuspendDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error bulk unsuspending users:', error);
+      toast.error('Failed to unsuspend users');
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.phone?.includes(searchTerm) ||
     user.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const allSelected = filteredUsers.length > 0 && filteredUsers.every(u => selectedIds.has(u.id));
+  const someSelected = selectedIds.size > 0;
 
   if (loading) {
     return (
@@ -129,15 +208,51 @@ export function UsersTable() {
             className="pl-10"
           />
         </div>
-        <Badge variant="secondary" className="whitespace-nowrap">
-          {filteredUsers.length} users
-        </Badge>
+        <div className="flex items-center gap-2">
+          {someSelected && (
+            <Badge variant="secondary" className="whitespace-nowrap">
+              {selectedIds.size} selected
+            </Badge>
+          )}
+          <Badge variant="secondary" className="whitespace-nowrap">
+            {filteredUsers.length} users
+          </Badge>
+          {someSelected && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Bulk Actions
+                  <MoreHorizontal className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem 
+                  onClick={() => setBulkSuspendDialogOpen(true)}
+                  className="text-destructive"
+                >
+                  <UserX className="mr-2 h-4 w-4" />
+                  Suspend Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setBulkUnsuspendDialogOpen(true)}>
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  Unsuspend Selected
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       <div className="rounded-lg border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
               <TableHead>User</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Location</TableHead>
@@ -149,13 +264,19 @@ export function UsersTable() {
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No users found
                 </TableCell>
               </TableRow>
             ) : (
               filteredUsers.map((user) => (
                 <TableRow key={user.id} className="hover:bg-muted/30">
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(user.id)}
+                      onCheckedChange={(checked) => handleSelectOne(user.id, checked as boolean)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
@@ -305,6 +426,56 @@ export function UsersTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Bulk Suspend Dialog */}
+      <AlertDialog open={bulkSuspendDialogOpen} onOpenChange={setBulkSuspendDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Suspend {selectedIds.size} Users</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to suspend {selectedIds.size} users? They will lose access to platform features.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Textarea
+              placeholder="Reason for suspension (optional)"
+              value={bulkSuspensionReason}
+              onChange={(e) => setBulkSuspensionReason(e.target.value)}
+              className="min-h-[80px]"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setBulkSuspensionReason('')}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkSuspend}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Suspend All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Unsuspend Dialog */}
+      <AlertDialog open={bulkUnsuspendDialogOpen} onOpenChange={setBulkUnsuspendDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsuspend {selectedIds.size} Users</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unsuspend {selectedIds.size} users? They will regain access to all platform features.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkUnsuspend}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Unsuspend All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* User Details Dialog */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>

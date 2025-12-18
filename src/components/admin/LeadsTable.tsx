@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -26,12 +27,23 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Eye, Mail, Phone, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Search, Eye, Mail, Phone, Download, FileSpreadsheet, FileText, MoreHorizontal, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -62,6 +74,10 @@ export function LeadsTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState<string>('');
 
   const fetchLeads = async () => {
     try {
@@ -100,6 +116,63 @@ export function LeadsTable() {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(filteredLeads.map(l => l.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from('buyer_requirements')
+        .delete()
+        .in('id', Array.from(selectedIds));
+
+      if (error) throw error;
+
+      toast.success(`${selectedIds.size} leads deleted successfully`);
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+      fetchLeads();
+    } catch (error) {
+      console.error('Error bulk deleting leads:', error);
+      toast.error('Failed to delete leads');
+    }
+  };
+
+  const handleBulkStatusUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('buyer_requirements')
+        .update({ status: bulkStatus })
+        .in('id', Array.from(selectedIds));
+
+      if (error) throw error;
+
+      toast.success(`${selectedIds.size} leads updated to ${bulkStatus}`);
+      setSelectedIds(new Set());
+      setBulkStatusDialogOpen(false);
+      setBulkStatus('');
+      fetchLeads();
+    } catch (error) {
+      console.error('Error bulk updating leads:', error);
+      toast.error('Failed to update leads');
+    }
+  };
+
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = 
       lead.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,41 +182,30 @@ export function LeadsTable() {
     return matchesSearch && matchesStatus;
   });
 
+  const allSelected = filteredLeads.length > 0 && filteredLeads.every(l => selectedIds.has(l.id));
+  const someSelected = selectedIds.size > 0;
+
   const exportToCSV = () => {
+    const dataToExport = someSelected 
+      ? filteredLeads.filter(l => selectedIds.has(l.id))
+      : filteredLeads;
+
     const headers = [
-      'Name',
-      'Email',
-      'Phone',
-      'Requirement Type',
-      'Property Type',
-      'Bedrooms',
-      'Bathrooms',
-      'Min Budget',
-      'Max Budget',
-      'Preferred Locations',
-      'Must Have Features',
-      'Move Timeline',
-      'Current Situation',
-      'Preferred Contact',
-      'Additional Requirements',
-      'Status',
-      'Submitted Date'
+      'Name', 'Email', 'Phone', 'Requirement Type', 'Property Type',
+      'Bedrooms', 'Bathrooms', 'Min Budget', 'Max Budget',
+      'Preferred Locations', 'Must Have Features', 'Move Timeline',
+      'Current Situation', 'Preferred Contact', 'Additional Requirements',
+      'Status', 'Submitted Date'
     ];
 
-    const csvData = filteredLeads.map(lead => [
-      lead.full_name,
-      lead.email,
-      lead.phone || '',
-      lead.requirement_type,
-      lead.property_type,
-      lead.min_bedrooms,
-      lead.min_bathrooms,
-      lead.min_budget || '',
-      lead.max_budget || '',
+    const csvData = dataToExport.map(lead => [
+      lead.full_name, lead.email, lead.phone || '',
+      lead.requirement_type, lead.property_type,
+      lead.min_bedrooms, lead.min_bathrooms,
+      lead.min_budget || '', lead.max_budget || '',
       lead.preferred_locations?.join('; ') || '',
       lead.must_have_features?.join('; ') || '',
-      lead.move_timeline || '',
-      lead.current_situation || '',
+      lead.move_timeline || '', lead.current_situation || '',
       lead.preferred_contact_method || '',
       lead.additional_requirements || '',
       lead.status || 'new',
@@ -160,30 +222,25 @@ export function LeadsTable() {
     link.download = `leads_export_${format(new Date(), 'yyyy-MM-dd')}.csv`;
     link.click();
     
-    toast.success(`Exported ${filteredLeads.length} leads to CSV`);
+    toast.success(`Exported ${dataToExport.length} leads to CSV`);
   };
 
   const exportToJSON = () => {
-    const jsonData = filteredLeads.map(lead => ({
-      name: lead.full_name,
-      email: lead.email,
-      phone: lead.phone,
-      requirementType: lead.requirement_type,
-      propertyType: lead.property_type,
-      bedrooms: lead.min_bedrooms,
-      bathrooms: lead.min_bathrooms,
-      budget: {
-        min: lead.min_budget,
-        max: lead.max_budget
-      },
+    const dataToExport = someSelected 
+      ? filteredLeads.filter(l => selectedIds.has(l.id))
+      : filteredLeads;
+
+    const jsonData = dataToExport.map(lead => ({
+      name: lead.full_name, email: lead.email, phone: lead.phone,
+      requirementType: lead.requirement_type, propertyType: lead.property_type,
+      bedrooms: lead.min_bedrooms, bathrooms: lead.min_bathrooms,
+      budget: { min: lead.min_budget, max: lead.max_budget },
       preferredLocations: lead.preferred_locations,
       mustHaveFeatures: lead.must_have_features,
-      moveTimeline: lead.move_timeline,
-      currentSituation: lead.current_situation,
+      moveTimeline: lead.move_timeline, currentSituation: lead.current_situation,
       preferredContact: lead.preferred_contact_method,
       additionalRequirements: lead.additional_requirements,
-      status: lead.status || 'new',
-      submittedDate: lead.created_at
+      status: lead.status || 'new', submittedDate: lead.created_at
     }));
 
     const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
@@ -192,7 +249,7 @@ export function LeadsTable() {
     link.download = `leads_export_${format(new Date(), 'yyyy-MM-dd')}.json`;
     link.click();
     
-    toast.success(`Exported ${filteredLeads.length} leads to JSON`);
+    toast.success(`Exported ${dataToExport.length} leads to JSON`);
   };
 
   const getStatusColor = (status: string | null) => {
@@ -244,10 +301,16 @@ export function LeadsTable() {
           </Select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {someSelected && (
+            <Badge variant="secondary" className="whitespace-nowrap">
+              {selectedIds.size} selected
+            </Badge>
+          )}
           <Badge variant="secondary" className="whitespace-nowrap">
             {filteredLeads.length} leads
           </Badge>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2">
@@ -258,14 +321,55 @@ export function LeadsTable() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={exportToCSV} className="gap-2 cursor-pointer">
                 <FileSpreadsheet className="h-4 w-4" />
-                Export as CSV
+                Export {someSelected ? 'Selected' : 'All'} as CSV
               </DropdownMenuItem>
               <DropdownMenuItem onClick={exportToJSON} className="gap-2 cursor-pointer">
                 <FileText className="h-4 w-4" />
-                Export as JSON
+                Export {someSelected ? 'Selected' : 'All'} as JSON
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {someSelected && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Bulk Actions
+                  <MoreHorizontal className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => { setBulkStatus('new'); setBulkStatusDialogOpen(true); }}>
+                  <CheckCircle className="mr-2 h-4 w-4 text-blue-600" />
+                  Set New
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setBulkStatus('contacted'); setBulkStatusDialogOpen(true); }}>
+                  <CheckCircle className="mr-2 h-4 w-4 text-yellow-600" />
+                  Set Contacted
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setBulkStatus('qualified'); setBulkStatusDialogOpen(true); }}>
+                  <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                  Set Qualified
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setBulkStatus('converted'); setBulkStatusDialogOpen(true); }}>
+                  <CheckCircle className="mr-2 h-4 w-4 text-purple-600" />
+                  Set Converted
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setBulkStatus('closed'); setBulkStatusDialogOpen(true); }}>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Set Closed
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                  className="text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Selected
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -273,6 +377,12 @@ export function LeadsTable() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Requirements</TableHead>
               <TableHead>Budget</TableHead>
@@ -284,13 +394,19 @@ export function LeadsTable() {
           <TableBody>
             {filteredLeads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No leads found
                 </TableCell>
               </TableRow>
             ) : (
               filteredLeads.map((lead) => (
                 <TableRow key={lead.id} className="hover:bg-muted/30">
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(lead.id)}
+                      onCheckedChange={(checked) => handleSelectOne(lead.id, checked as boolean)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="space-y-1">
                       <p className="font-medium">{lead.full_name}</p>
@@ -462,6 +578,45 @@ export function LeadsTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} Leads</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedIds.size} leads? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Status Update Dialog */}
+      <AlertDialog open={bulkStatusDialogOpen} onOpenChange={setBulkStatusDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update {selectedIds.size} Leads</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to set {selectedIds.size} leads to "{bulkStatus}"?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setBulkStatus('')}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkStatusUpdate}>
+              Update All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
