@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { MapPin, Heart, Filter, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, Heart, Filter, ArrowRight, Bed, Bath, Square } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +10,72 @@ const features = [
   { icon: Filter, text: "Filter by property type" },
 ];
 
+const propertyPins = [
+  {
+    id: 1,
+    price: "$250K",
+    position: { top: "25%", left: "33%" },
+    variant: "accent" as const,
+    delay: 0,
+    property: {
+      title: "Modern Family Home",
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=300&h=200&fit=crop",
+      beds: 3,
+      baths: 2,
+      sqft: 1850,
+      location: "Downtown"
+    }
+  },
+  {
+    id: 2,
+    price: "$180K",
+    position: { top: "50%", left: "50%" },
+    variant: "primary" as const,
+    delay: 0.2,
+    property: {
+      title: "Cozy Studio Apartment",
+      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&h=200&fit=crop",
+      beds: 1,
+      baths: 1,
+      sqft: 650,
+      location: "Midtown"
+    }
+  },
+  {
+    id: 3,
+    price: "$320K",
+    position: { top: "66%", left: "25%" },
+    variant: "accent" as const,
+    delay: 0.4,
+    property: {
+      title: "Spacious Townhouse",
+      image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop",
+      beds: 4,
+      baths: 3,
+      sqft: 2400,
+      location: "Suburbs"
+    }
+  },
+  {
+    id: 4,
+    price: "$450K",
+    position: { top: "33%", right: "25%" },
+    variant: "primary" as const,
+    delay: 0.3,
+    property: {
+      title: "Luxury Penthouse",
+      image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop",
+      beds: 3,
+      baths: 2,
+      sqft: 2100,
+      location: "City Center"
+    }
+  },
+];
+
 export function MapExplore() {
+  const [hoveredPin, setHoveredPin] = useState<number | null>(null);
+
   return (
     <section className="py-20 sm:py-28 bg-background overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,47 +145,76 @@ export function MapExplore() {
                   />
                 </div>
                 
-                {/* Animated Pins */}
-                <motion.div 
-                  className="absolute top-1/4 left-1/3"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-accent-foreground font-bold text-xs">$250K</span>
-                  </div>
-                </motion.div>
-                <motion.div 
-                  className="absolute top-1/2 left-1/2"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-                >
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary-foreground font-bold text-xs">$180K</span>
-                  </div>
-                </motion.div>
-                <motion.div 
-                  className="absolute top-2/3 left-1/4"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-                >
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-accent-foreground font-bold text-xs">$320K</span>
-                  </div>
-                </motion.div>
-                <motion.div 
-                  className="absolute top-1/3 right-1/4"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-                >
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary-foreground font-bold text-xs">$450K</span>
-                  </div>
-                </motion.div>
+                {/* Animated Pins with Hover Cards */}
+                {propertyPins.map((pin) => (
+                  <motion.div
+                    key={pin.id}
+                    className="absolute cursor-pointer z-10"
+                    style={pin.position}
+                    animate={{ y: hoveredPin === pin.id ? -4 : [0, -8, 0] }}
+                    transition={
+                      hoveredPin === pin.id 
+                        ? { duration: 0.2 } 
+                        : { duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: pin.delay }
+                    }
+                    onMouseEnter={() => setHoveredPin(pin.id)}
+                    onMouseLeave={() => setHoveredPin(null)}
+                  >
+                    <motion.div 
+                      className={`w-12 h-12 ${pin.variant === 'accent' ? 'bg-accent' : 'bg-primary'} rounded-full flex items-center justify-center shadow-lg transition-transform`}
+                      whileHover={{ scale: 1.15 }}
+                    >
+                      <span className={`${pin.variant === 'accent' ? 'text-accent-foreground' : 'text-primary-foreground'} font-bold text-xs`}>
+                        {pin.price}
+                      </span>
+                    </motion.div>
+
+                    {/* Property Preview Card */}
+                    <AnimatePresence>
+                      {hoveredPin === pin.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-52 bg-card rounded-lg shadow-xl overflow-hidden z-20"
+                        >
+                          <img 
+                            src={pin.property.image} 
+                            alt={pin.property.title}
+                            className="w-full h-24 object-cover"
+                          />
+                          <div className="p-3">
+                            <h4 className="font-semibold text-foreground text-sm truncate">
+                              {pin.property.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground mb-2">{pin.property.location}</p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Bed className="w-3 h-3" />
+                                {pin.property.beds}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Bath className="w-3 h-3" />
+                                {pin.property.baths}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Square className="w-3 h-3" />
+                                {pin.property.sqft}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Arrow */}
+                          <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 bg-card rotate-45" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
               </div>
               
               {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent pointer-events-none" />
             </div>
 
             {/* Floating card */}
