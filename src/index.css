@@ -21,9 +21,9 @@
     --primary: 228 76% 59%;
     --primary-foreground: 0 0% 100%;
     
-    /* Background - Dark Navy */
-    --background: 230 24% 14%;
-    --foreground: 220 20% 95%;
+    /* Background - White */
+    --background: 0 0% 100%;
+    --foreground: 230 24% 14%;
     
     /* Cards - Slightly Lighter Navy */
     --card: 230 22% 18%;
