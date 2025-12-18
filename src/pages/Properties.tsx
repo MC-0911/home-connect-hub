@@ -306,10 +306,10 @@ export default function Properties() {
 
               {/* View Mode */}
               <div className="hidden sm:flex border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setViewMode("grid")} className={`p-3 transition-colors ${viewMode === "grid" ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}>
+                <button onClick={() => setViewMode("grid")} className={`p-3 transition-colors ${viewMode === "grid" ? "bg-accent text-white" : "text-muted-foreground hover:bg-secondary/50"}`}>
                   <Grid3X3 className="w-5 h-5" />
                 </button>
-                <button onClick={() => setViewMode("list")} className={`p-3 transition-colors ${viewMode === "list" ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}>
+                <button onClick={() => setViewMode("list")} className={`p-3 transition-colors ${viewMode === "list" ? "bg-accent text-white" : "text-muted-foreground hover:bg-secondary/50"}`}>
                   <List className="w-5 h-5" />
                 </button>
               </div>
