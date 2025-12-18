@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
 import Dashboard from "./pages/Dashboard";
 import PropertyRequirements from "./pages/PropertyRequirements";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/property-requirements" element={<PropertyRequirements />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
