@@ -283,6 +283,19 @@ export function OffersTab() {
                 <p className="text-sm text-primary mt-1">Seller: {offer.seller_response}</p>
               )}
 
+              {/* Buyer actions for pending offers - withdraw */}
+              {isBuyer && offer.status === "pending" && (
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => updateOfferStatus(offer.id, "withdrawn")}
+                  >
+                    <X className="w-4 h-4 mr-1" /> Withdraw Offer
+                  </Button>
+                </div>
+              )}
+
               {/* Buyer actions for countered offers */}
               {isBuyer && isCountered && offer.counter_amount && (
                 <div className="flex gap-2 mt-3 p-3 bg-accent/10 rounded-lg">
