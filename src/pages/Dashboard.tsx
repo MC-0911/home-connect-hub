@@ -218,14 +218,14 @@ export default function Dashboard() {
               </TabsList>
 
               <TabsContent value="listings" className="mt-6">
-                <Card className="border-border bg-primary-foreground">
-                  <CardHeader className="bg-primary-foreground">
+                <Card className="bg-card border-border">
+                  <CardHeader>
                     <CardTitle className="font-display text-xl text-foreground">
                       Your Properties
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {loading ? <div className="flex items-center justify-center py-12 bg-primary-foreground">
+                    {loading ? <div className="flex items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
                       </div> : properties.length === 0 ? <div className="text-center py-12">
                         <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -245,17 +245,17 @@ export default function Dashboard() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="bg-sidebar-foreground">Property</TableHead>
-                              <TableHead className="bg-secondary-foreground">Type</TableHead>
-                              <TableHead className="bg-secondary-foreground">Price</TableHead>
-                              <TableHead className="bg-sidebar-foreground">Status</TableHead>
-                              <TableHead className="bg-secondary-foreground">Listed</TableHead>
-                              <TableHead className="text-right bg-secondary-foreground">Actions</TableHead>
+                              <TableHead>Property</TableHead>
+                              <TableHead>Type</TableHead>
+                              <TableHead>Price</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Listed</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {properties.map(property => <TableRow key={property.id}>
-                                <TableCell className="border-primary-foreground bg-primary-foreground">
+                                <TableCell>
                                   <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
                                       {property.images && property.images[0] ? <img src={property.images[0]} alt={property.title} className="w-full h-full object-cover" /> : <Building2 className="w-6 h-6 text-muted-foreground" />}
@@ -302,7 +302,7 @@ export default function Dashboard() {
                                         </Link>
                                       </DropdownMenuItem>
                                       <AlertDialog>
-                                        <AlertDialogTrigger asChild>
+                                        <AlertDialogTrigger asChild className="bg-primary-foreground">
                                           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive" onSelect={e => e.preventDefault()}>
                                             <Trash2 className="w-4 h-4" />
                                             Delete
