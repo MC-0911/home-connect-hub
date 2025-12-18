@@ -3,10 +3,55 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "@/components/property/PropertyCard";
-import { mockProperties } from "@/lib/mockData";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { Tables } from "@/integrations/supabase/types";
+
+type Property = Tables<"properties">;
 
 export function FeaturedProperties() {
-  const featuredProperties = mockProperties.filter((p) => p.featured).slice(0, 4);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedProperties = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'active')
+          .eq('featured', true)
+          .limit(4);
+
+        if (error) throw error;
+        setFeaturedProperties(data || []);
+      } catch (error) {
+        console.error('Error fetching featured properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProperties();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 sm:py-28 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-muted rounded-xl h-80 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (featuredProperties.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-20 sm:py-28 bg-background">

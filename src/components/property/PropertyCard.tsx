@@ -1,20 +1,27 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Heart, MapPin, Bed, Bath, Square, ArrowRight } from "lucide-react";
-import { Property, formatPrice } from "@/lib/mockData";
+import { formatPrice } from "@/lib/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Tables } from "@/integrations/supabase/types";
+
+type SupabaseProperty = Tables<"properties">;
 
 interface PropertyCardProps {
-  property: Property;
+  property: SupabaseProperty;
   index?: number;
 }
 
 export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  const imageUrl = property.images?.[0] || '/placeholder.svg';
+  const priceType = property.listing_type;
+  const propertyType = property.property_type;
 
   return (
     <motion.div
@@ -34,7 +41,7 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
               )}
             />
             <img
-              src={property.images[0]}
+              src={imageUrl}
               alt={property.title}
               className={cn(
                 "w-full h-full object-cover transition-transform duration-500 group-hover:scale-110",
@@ -55,7 +62,7 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
                 variant="secondary"
                 className="bg-card/90 backdrop-blur-sm border-0"
               >
-                {property.priceType === "rent" ? "For Rent" : "For Sale"}
+                {priceType === "rent" ? "For Rent" : "For Sale"}
               </Badge>
             </div>
 
@@ -102,19 +109,19 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
             </div>
 
             {/* Features */}
-            {property.propertyType !== "land" && (
+            {propertyType !== "land" && (
               <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                 <div className="flex items-center gap-1.5">
                   <Bed className="w-4 h-4" />
-                  <span>{property.bedrooms} Beds</span>
+                  <span>{property.bedrooms || 0} Beds</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Bath className="w-4 h-4" />
-                  <span>{property.bathrooms} Baths</span>
+                  <span>{property.bathrooms || 0} Baths</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Square className="w-4 h-4" />
-                  <span>{property.squareFeet.toLocaleString()} sqft</span>
+                  <span>{(property.square_feet || 0).toLocaleString()} sqft</span>
                 </div>
               </div>
             )}
@@ -122,10 +129,10 @@ export function PropertyCard({ property, index = 0 }: PropertyCardProps) {
             {/* Price */}
             <div className="flex items-center justify-between pt-4 border-t border-border">
               <span className="font-display text-xl font-semibold text-accent">
-                {formatPrice(property.price, property.priceType)}
+                {formatPrice(property.price, priceType)}
               </span>
               <span className="text-xs text-muted-foreground capitalize">
-                {property.propertyType}
+                {propertyType}
               </span>
             </div>
           </div>
