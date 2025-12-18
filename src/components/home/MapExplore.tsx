@@ -65,31 +65,81 @@ export function MapExplore() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-elegant">
-              <img
-                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&h=600&fit=crop"
-                alt="Interactive property map"
-                className="w-full h-[400px] lg:h-[500px] object-cover"
-              />
-              {/* Floating badge */}
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="absolute bottom-6 left-6 bg-card/95 backdrop-blur-sm rounded-xl p-4 shadow-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">5,000+</p>
-                    <p className="text-sm text-muted-foreground">Properties</p>
-                  </div>
+            <div className="aspect-[4/3] bg-muted rounded-2xl overflow-hidden shadow-elegant relative">
+              {/* Stylized map preview */}
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-secondary">
+                {/* Map grid lines */}
+                <div className="absolute inset-0 opacity-20">
+                  <div 
+                    className="h-full w-full" 
+                    style={{ 
+                      backgroundImage: 'linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)',
+                      backgroundSize: '40px 40px'
+                    }} 
+                  />
                 </div>
-              </motion.div>
+                
+                {/* Animated Pins */}
+                <motion.div 
+                  className="absolute top-1/4 left-1/3"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-accent-foreground font-bold text-xs">$250K</span>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="absolute top-1/2 left-1/2"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                >
+                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-primary-foreground font-bold text-xs">$180K</span>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="absolute top-2/3 left-1/4"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                >
+                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-accent-foreground font-bold text-xs">$320K</span>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="absolute top-1/3 right-1/4"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                >
+                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-primary-foreground font-bold text-xs">$450K</span>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Overlay gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent" />
             </div>
+
+            {/* Floating card */}
+            <motion.div 
+              initial={{ scale: 0, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="absolute -bottom-6 -right-6 bg-card rounded-xl shadow-elegant p-4 max-w-xs"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-accent" />
+                </div>
+                <div>
+                  <div className="font-bold text-foreground">500+ Properties</div>
+                  <div className="text-sm text-muted-foreground">In your area</div>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Decorative elements */}
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl" />
