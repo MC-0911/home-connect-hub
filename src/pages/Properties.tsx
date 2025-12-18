@@ -18,7 +18,8 @@ export default function Properties() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("location") || "");
   const [selectedType, setSelectedType] = useState(searchParams.get("type") || "");
-  const [priceRange, setPriceRange] = useState(searchParams.get("price") || "");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [bedrooms, setBedrooms] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
@@ -44,9 +45,10 @@ export default function Properties() {
     }
 
     // Price filter
-    if (priceRange) {
-      const [min, max] = priceRange.split("-").map((v) => (v === "+" ? Infinity : parseInt(v)));
-      result = result.filter((p) => p.price >= (min || 0) && p.price <= (max || Infinity));
+    const min = minPrice ? parseInt(minPrice) : 0;
+    const max = maxPrice ? parseInt(maxPrice) : Infinity;
+    if (minPrice || maxPrice) {
+      result = result.filter((p) => p.price >= min && p.price <= max);
     }
 
     // Bedrooms filter
@@ -76,13 +78,14 @@ export default function Properties() {
     }
 
     return result;
-  }, [searchQuery, selectedType, priceRange, bedrooms, selectedAmenities, sortBy]);
+  }, [searchQuery, selectedType, minPrice, maxPrice, bedrooms, selectedAmenities, sortBy]);
 
-  const activeFiltersCount = [selectedType, priceRange, bedrooms, selectedAmenities.length > 0].filter(Boolean).length;
+  const activeFiltersCount = [selectedType, minPrice || maxPrice, bedrooms, selectedAmenities.length > 0].filter(Boolean).length;
 
   const clearFilters = () => {
     setSelectedType("");
-    setPriceRange("");
+    setMinPrice("");
+    setMaxPrice("");
     setBedrooms("");
     setSelectedAmenities([]);
     setSearchQuery("");
@@ -112,19 +115,23 @@ export default function Properties() {
       {/* Price Range */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Price Range</label>
-        <Select value={priceRange || "any"} onValueChange={(v) => setPriceRange(v === "any" ? "" : v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Any Price" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any Price</SelectItem>
-            <SelectItem value="0-500000">Up to $500K</SelectItem>
-            <SelectItem value="500000-1000000">$500K - $1M</SelectItem>
-            <SelectItem value="1000000-2000000">$1M - $2M</SelectItem>
-            <SelectItem value="2000000-5000000">$2M - $5M</SelectItem>
-            <SelectItem value="5000000-+">$5M+</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            placeholder="Min"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="h-10"
+          />
+          <span className="text-muted-foreground">-</span>
+          <Input
+            type="number"
+            placeholder="Max"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="h-10"
+          />
+        </div>
       </div>
 
       {/* Bedrooms */}
@@ -283,10 +290,10 @@ export default function Properties() {
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedType("")} />
                 </Badge>
               )}
-              {priceRange && (
+              {(minPrice || maxPrice) && (
                 <Badge variant="secondary" className="gap-1">
-                  {priceRange.replace("-", " - $").replace("+", "+")}
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => setPriceRange("")} />
+                  {minPrice ? `$${parseInt(minPrice).toLocaleString()}` : "Any"} - {maxPrice ? `$${parseInt(maxPrice).toLocaleString()}` : "Any"}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => { setMinPrice(""); setMaxPrice(""); }} />
                 </Badge>
               )}
               {bedrooms && (
