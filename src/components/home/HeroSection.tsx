@@ -80,20 +80,19 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-primary-foreground leading-tight mb-6"
+            className="font-display italic text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-medium text-primary-foreground leading-[1.1] tracking-tight mb-8"
           >
-            Find Your Perfect
-            <br />
-            <span className="text-accent">Place to Call Home</span>
+            The premier marketplace to{" "}
+            <span className="text-accent">buy and sell</span> premium properties
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg sm:text-xl text-primary-foreground/70 max-w-2xl mx-auto mb-10"
+            className="text-lg sm:text-xl text-primary-foreground/50 max-w-2xl mx-auto mb-12 font-normal leading-relaxed"
           >
-            Connect with trusted sellers and explore exceptional properties. Your journey to the perfect home starts here.
+            Join thousands of buyers and sellers closing life-changing deals. Buy and sell houses, apartments, condos, villas, townhouses, and land.
           </motion.p>
 
           {/* Search Box */}
