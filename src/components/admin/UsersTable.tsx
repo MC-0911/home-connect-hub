@@ -41,6 +41,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useTableUtils } from '@/hooks/useTableUtils';
+import { TablePagination } from './TablePagination';
+import { SortableTableHead } from './SortableTableHead';
 
 interface Profile {
   id: string;
@@ -113,7 +116,7 @@ export function UsersTable() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(new Set(filteredUsers.map(u => u.id)));
+      setSelectedIds(new Set(paginatedData.map(u => u.id)));
     } else {
       setSelectedIds(new Set());
     }
@@ -183,7 +186,24 @@ export function UsersTable() {
     user.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const allSelected = filteredUsers.length > 0 && filteredUsers.every(u => selectedIds.has(u.id));
+  const {
+    paginatedData,
+    currentPage,
+    totalPages,
+    sortConfig,
+    handleSort,
+    goToPage,
+    totalItems,
+    startIndex,
+    endIndex,
+  } = useTableUtils({
+    data: filteredUsers,
+    itemsPerPage: 10,
+    defaultSortKey: 'created_at',
+    defaultSortDirection: 'desc',
+  });
+
+  const allSelected = paginatedData.length > 0 && paginatedData.every(u => selectedIds.has(u.id));
   const someSelected = selectedIds.size > 0;
 
   if (loading) {
@@ -250,26 +270,27 @@ export function UsersTable() {
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>User</TableHead>
+              <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Contact</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
+              <SortableTableHead label="Location" sortKey="location" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No users found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
+              paginatedData.map((user) => (
                 <TableRow key={user.id} className="hover:bg-muted/30">
                   <TableCell>
                     <Checkbox
@@ -432,6 +453,15 @@ export function UsersTable() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={goToPage}
+      />
 
       {/* Bulk Suspend Dialog */}
       <AlertDialog open={bulkSuspendDialogOpen} onOpenChange={setBulkSuspendDialogOpen}>
