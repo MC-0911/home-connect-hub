@@ -100,7 +100,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-6xl mx-auto"
+            className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl max-w-7xl mx-auto"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-10 gap-4">
               <div className="relative lg:col-span-2">
