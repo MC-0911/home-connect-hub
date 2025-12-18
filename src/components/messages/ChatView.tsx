@@ -182,7 +182,7 @@ export const ChatView = ({ conversation, messages, onSendMessage, onUploadAttach
         {conversation.property && (
           <Link
             to={`/property/${conversation.property.id}`}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors"
           >
             {conversation.property.images?.[0] && (
               <img

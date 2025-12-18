@@ -42,8 +42,8 @@ export const ConversationList = ({ conversations, activeId, onSelect }: Conversa
               key={conv.id}
               onClick={() => onSelect(conv)}
               className={cn(
-                "w-full p-4 text-left hover:bg-muted/50 transition-colors",
-                activeId === conv.id && "bg-muted"
+                "w-full p-4 text-left hover:bg-secondary/5 transition-colors",
+                activeId === conv.id && "bg-secondary/10"
               )}
             >
               <div className="flex gap-3">
