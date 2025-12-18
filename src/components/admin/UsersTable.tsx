@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,7 +37,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -307,8 +306,26 @@ export function UsersTable() {
           />
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => handleSelectAll(!allSelected)}
+            className="gap-1.5"
+          >
+            {allSelected ? (
+              <>
+                <CheckSquare className="h-4 w-4" />
+                Deselect All
+              </>
+            ) : (
+              <>
+                <Square className="h-4 w-4" />
+                Select All
+              </>
+            )}
+          </Button>
           {someSelected && (
-            <Badge variant="secondary" className="whitespace-nowrap">
+            <Badge variant="secondary" className="whitespace-nowrap bg-primary/10 text-primary">
               {selectedIds.size} selected
             </Badge>
           )}
@@ -345,13 +362,6 @@ export function UsersTable() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={allSelected}
-                  indeterminate={someSelected && !allSelected}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
               <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Ph No." sortKey="phone" sortConfig={sortConfig} onSort={handleSort} />
@@ -363,19 +373,13 @@ export function UsersTable() {
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                   No users found
                 </TableCell>
               </TableRow>
             ) : (
               paginatedData.map((user) => (
-                <TableRow key={user.id} className="hover:bg-muted/30">
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(user.id)}
-                      onCheckedChange={(checked) => handleSelectOne(user.id, checked as boolean)}
-                    />
-                  </TableCell>
+                <TableRow key={user.id} className={`hover:bg-muted/30 ${selectedIds.has(user.id) ? 'bg-primary/5' : ''}`}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
@@ -445,6 +449,22 @@ export function UsersTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-popover">
+                        <DropdownMenuItem 
+                          onClick={() => handleSelectOne(user.id, !selectedIds.has(user.id))}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          {selectedIds.has(user.id) ? (
+                            <>
+                              <CheckSquare className="h-4 w-4 text-primary" />
+                              Deselect
+                            </>
+                          ) : (
+                            <>
+                              <Square className="h-4 w-4" />
+                              Select
+                            </>
+                          )}
+                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => setSelectedUser(user)}
                           className="flex items-center gap-2 cursor-pointer"
