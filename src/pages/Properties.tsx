@@ -137,7 +137,7 @@ export default function Properties() {
       {/* Listing Type */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Listing Type</label>
-        <div className="flex rounded-full p-1 bg-cream">
+        <div className="flex rounded-full bg-muted p-1">
           <button type="button" onClick={() => setListingType("")} className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition-colors ${listingType === "" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
             All
           </button>
@@ -163,7 +163,7 @@ export default function Properties() {
       {/* Bedrooms */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Bedrooms</label>
-        <div className="flex rounded-full p-1 bg-cream">
+        <div className="flex rounded-full bg-muted p-1">
           {[{
           value: "",
           label: "Any"
@@ -191,7 +191,7 @@ export default function Properties() {
       {/* Bathrooms */}
       <div>
         <label className="text-sm font-medium text-foreground mb-3 block">Bathrooms</label>
-        <div className="flex rounded-full p-1 bg-sidebar-foreground">
+        <div className="flex rounded-full bg-muted p-1">
           {[{
           value: "",
           label: "Any"
@@ -238,7 +238,7 @@ export default function Properties() {
       <Header />
 
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 bg-primary text-primary-foreground">
           {/* Page Header */}
           <motion.div initial={{
           opacity: 0,
@@ -307,7 +307,7 @@ export default function Properties() {
               {/* View Mode */}
               <div className="hidden sm:flex border border-border rounded-lg overflow-hidden">
                 <button onClick={() => setViewMode("grid")} className={`p-3 transition-colors ${viewMode === "grid" ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}>
-                  <Grid3X3 className="w-5 h-5 bg-primary" />
+                  <Grid3X3 className="w-5 h-5" />
                 </button>
                 <button onClick={() => setViewMode("list")} className={`p-3 transition-colors ${viewMode === "list" ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}>
                   <List className="w-5 h-5" />
