@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -28,9 +29,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useMessages } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { formatDistanceToNow } from "date-fns";
 
 type Property = Tables<"properties">;
 
@@ -38,9 +41,11 @@ export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { conversations, getUnreadCount } = useMessages();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings");
+  const unreadCount = getUnreadCount();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -242,9 +247,11 @@ export default function Dashboard() {
                   className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative"
                 >
                   Messages
-                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
-                    1
-                  </Badge>
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="alerts" 
@@ -420,12 +427,66 @@ export default function Dashboard() {
 
               <TabsContent value="messages" className="mt-6">
                 <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No messages</h3>
-                      <p className="text-muted-foreground">Messages from buyers will appear here</p>
-                    </div>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="font-display text-xl text-foreground">Messages</CardTitle>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/messages">View All</Link>
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    {conversations.length === 0 ? (
+                      <div className="text-center py-12">
+                        <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium text-foreground mb-2">No messages</h3>
+                        <p className="text-muted-foreground">Messages from buyers will appear here</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-border">
+                        {conversations.slice(0, 5).map((conv) => {
+                          const initials = conv.other_user?.full_name
+                            ?.split(' ')
+                            .map(n => n[0])
+                            .join('')
+                            .toUpperCase() || '?';
+                          
+                          return (
+                            <Link
+                              key={conv.id}
+                              to="/messages"
+                              className="flex items-center gap-4 py-4 hover:bg-muted/50 -mx-4 px-4 transition-colors"
+                            >
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={conv.other_user?.avatar_url || undefined} />
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  {initials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="font-medium text-foreground truncate">
+                                    {conv.other_user?.full_name || 'Unknown User'}
+                                  </p>
+                                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
+                                  </span>
+                                </div>
+                                {conv.property && (
+                                  <p className="text-xs text-primary truncate">Re: {conv.property.title}</p>
+                                )}
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {conv.last_message?.content || 'No messages yet'}
+                                </p>
+                              </div>
+                              {conv.unread_count && conv.unread_count > 0 && (
+                                <Badge className="bg-primary text-primary-foreground h-5 min-w-5 flex items-center justify-center rounded-full text-xs">
+                                  {conv.unread_count}
+                                </Badge>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -131,6 +131,82 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          last_message_at: string | null
+          property_id: string | null
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          property_id?: string | null
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          property_id?: string | null
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          read_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          read_at?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -239,6 +315,27 @@ export type Database = {
           user_id?: string
           year_built?: number | null
           zip_code?: string
+        }
+        Relationships: []
+      }
+      user_presence: {
+        Row: {
+          is_online: boolean | null
+          last_seen: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          is_online?: boolean | null
+          last_seen?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          is_online?: boolean | null
+          last_seen?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }

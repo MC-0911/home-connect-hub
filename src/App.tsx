@@ -17,6 +17,7 @@ import PropertyRequirements from "./pages/PropertyRequirements";
 import Admin from "./pages/Admin";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/messages" element={<Messages />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
