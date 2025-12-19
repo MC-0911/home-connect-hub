@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield, MessageSquare } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useMessages } from "@/hooks/useMessages";
+import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ export function Header() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin } = useAdmin();
+  const { profile } = useProfile();
   const { getUnreadCount } = useMessages();
   const unreadCount = getUnreadCount();
   const location = useLocation();
@@ -191,7 +193,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                     <Avatar className="h-10 w-10 border-2 border-accent">
-                      <AvatarImage src="" alt={user.email || ''} />
+                      <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || user.email || ''} />
                       <AvatarFallback className="bg-primary text-primary-foreground font-display">
                         {user.email ? getInitials(user.email) : <User className="h-4 w-4" />}
                       </AvatarFallback>
