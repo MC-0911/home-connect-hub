@@ -16,7 +16,7 @@ const Index = () => {
         <HeroSection />
         <FeaturedProperties />
         <HowItWorks />
-        <PropertyTypes className="bg-secondary-foreground" />
+        <PropertyTypes className="bg-background" />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
