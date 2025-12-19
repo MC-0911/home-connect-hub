@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings");
+  const [unreadAlertsCount, setUnreadAlertsCount] = useState(0);
   const unreadCount = getUnreadCount();
   useEffect(() => {
     if (!authLoading && !user) {
@@ -47,8 +48,46 @@ export default function Dashboard() {
   useEffect(() => {
     if (user) {
       fetchProperties();
+      fetchUnreadAlertsCount();
+      
+      // Subscribe to alerts changes
+      const channel = supabase
+        .channel("dashboard-alerts")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "alerts",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            fetchUnreadAlertsCount();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
+
+  const fetchUnreadAlertsCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from("alerts")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user?.id)
+        .eq("is_read", false);
+
+      if (error) throw error;
+      setUnreadAlertsCount(count || 0);
+    } catch (error: any) {
+      console.error("Error fetching alerts count:", error);
+    }
+  };
+
   const fetchProperties = async () => {
     try {
       const {
@@ -213,8 +252,11 @@ export default function Dashboard() {
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </Badge>}
                 </TabsTrigger>
-                <TabsTrigger value="alerts" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                <TabsTrigger value="alerts" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   Alerts
+                  {unreadAlertsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                      {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
+                    </Badge>}
                 </TabsTrigger>
               </TabsList>
 
