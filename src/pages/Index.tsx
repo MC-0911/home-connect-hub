@@ -21,7 +21,7 @@ const Index = () => {
         <WhyChooseUs />
         <CTASection />
         <Resources className="bg-background" />
-        <Newsletter />
+        <Newsletter className="bg-secondary-foreground" />
       </main>
       <Footer />
     </div>;
