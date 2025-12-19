@@ -16,11 +16,11 @@ const Index = () => {
         <HeroSection />
         <FeaturedProperties />
         <HowItWorks />
-        <PropertyTypes />
+        <PropertyTypes className="bg-secondary-foreground" />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
-        <Resources />
+        <Resources className="bg-secondary-foreground" />
         <Newsletter />
       </main>
       <Footer />
