@@ -46,7 +46,7 @@ export function PropertyTypes() {
       }} transition={{
         duration: 0.5
       }} className="text-center mb-12">
-          <span className="font-medium text-sm tracking-wide uppercase mb-2 block text-primary-foreground">
+          <span className="font-medium text-sm tracking-wide uppercase mb-2 block text-primary">
             Browse by Category
           </span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground">

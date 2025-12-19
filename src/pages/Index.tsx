@@ -9,25 +9,21 @@ import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { CTASection } from "@/components/home/CTASection";
 import { Resources } from "@/components/home/Resources";
 import { Newsletter } from "@/components/home/Newsletter";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Header />
       <main>
         <HeroSection />
         <FeaturedProperties />
         <HowItWorks />
-        <PropertyTypes />
+        <PropertyTypes className="bg-sidebar-foreground" />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
-        <Resources />
+        <Resources className="bg-sidebar-foreground" />
         <Newsletter />
       </main>
-      <Footer />
-    </div>
-  );
+      <Footer className="bg-cream-dark" />
+    </div>;
 };
-
 export default Index;
