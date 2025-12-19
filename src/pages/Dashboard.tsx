@@ -5,6 +5,7 @@ import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Hear
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
+import { AlertsTab } from "@/components/dashboard/AlertsTab";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -404,15 +405,7 @@ export default function Dashboard() {
               </TabsContent>
 
               <TabsContent value="alerts" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <Bell className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No alerts</h3>
-                      <p className="text-muted-foreground">Important notifications will appear here</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <AlertsTab />
               </TabsContent>
             </Tabs>
           </motion.div>
