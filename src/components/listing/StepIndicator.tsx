@@ -33,15 +33,14 @@ const StepIndicator = ({ currentStep, totalSteps }: StepIndicatorProps) => {
                   initial={false}
                   animate={{
                     scale: isCurrent ? 1.1 : 1,
-                    backgroundColor: isCompleted || isCurrent 
-                      ? 'hsl(var(--primary))' 
-                      : 'hsl(var(--muted))',
                   }}
                   className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                    (isCompleted || isCurrent) 
-                      ? "text-primary-foreground" 
-                      : "text-muted-foreground"
+                    "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md",
+                    isCompleted 
+                      ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/30" 
+                      : isCurrent 
+                        ? "bg-gradient-to-br from-gold to-gold-dark text-primary-foreground shadow-gold/40 ring-4 ring-gold/20" 
+                        : "bg-muted/50 text-muted-foreground border-2 border-muted-foreground/20"
                   )}
                 >
                   {isCompleted ? (
