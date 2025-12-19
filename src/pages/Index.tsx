@@ -16,7 +16,7 @@ const Index = () => {
         <HeroSection />
         <FeaturedProperties />
         <HowItWorks />
-        <PropertyTypes />
+        <PropertyTypes className="bg-sidebar-foreground" />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
