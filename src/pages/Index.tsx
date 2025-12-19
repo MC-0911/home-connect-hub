@@ -16,14 +16,14 @@ const Index = () => {
         <HeroSection />
         <FeaturedProperties />
         <HowItWorks />
-        <PropertyTypes className="bg-sidebar-foreground" />
+        <PropertyTypes />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
-        <Resources className="bg-sidebar-foreground" />
+        <Resources />
         <Newsletter />
       </main>
-      <Footer className="bg-cream-dark" />
+      <Footer />
     </div>;
 };
 export default Index;
