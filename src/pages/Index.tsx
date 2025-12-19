@@ -20,7 +20,7 @@ const Index = () => {
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
-        <Resources className="bg-secondary-foreground" />
+        <Resources className="bg-primary-foreground" />
         <Newsletter />
       </main>
       <Footer />
