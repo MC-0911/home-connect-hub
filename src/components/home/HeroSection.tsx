@@ -155,7 +155,7 @@ export function HeroSection() {
         }} transition={{
           duration: 0.6,
           delay: 0.5
-        }} className="flex flex-wrap justify-center gap-8 sm:gap-16 mt-12">
+        }} className="flex flex-wrap justify-center gap-8 sm:gap-16 mt-12 my-[30px]">
             {[{
             value: "2,500+",
             label: "Active Listings"
@@ -166,7 +166,7 @@ export function HeroSection() {
             value: "98%",
             label: "Satisfaction Rate"
           }].map(stat => <div key={stat.label} className="text-center">
-                <div className="font-display text-3xl sm:text-4xl font-semibold text-blue-800">
+                <div className="font-display text-3xl sm:text-4xl font-semibold text-accent">
                   {stat.value}
                 </div>
                 <div className="text-primary-foreground/60 text-sm mt-1">
