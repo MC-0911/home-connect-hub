@@ -19,11 +19,8 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
-
-const App = () => (
-  <HelmetProvider>
+const App = () => <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
@@ -42,7 +39,7 @@ const App = () => (
               <Route path="/property-requirements" element={<PropertyRequirements />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/blog/:slug" element={<BlogPost />} className="bg-primary-foreground" />
               <Route path="/messages" element={<Messages />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -50,7 +47,5 @@ const App = () => (
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
-  </HelmetProvider>
-);
-
+  </HelmetProvider>;
 export default App;
