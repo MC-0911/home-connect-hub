@@ -1,23 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Heart,
-  Share2,
-  MapPin,
-  Bed,
-  Bath,
-  Square,
-  Calendar as CalendarIcon,
-  Home,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  MessageCircle,
-  DollarSign,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, ChevronLeft, ChevronRight, MessageCircle, DollarSign, Loader2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -30,63 +14,58 @@ import { supabase } from "@/integrations/supabase/client";
 import { ScheduleVisitDialog } from "@/components/dashboard/ScheduleVisitDialog";
 import { MakeOfferDialog } from "@/components/dashboard/MakeOfferDialog";
 import type { Tables } from "@/integrations/supabase/types";
-
 type Property = Tables<"properties"> & {
-  seller?: { full_name: string | null } | null;
+  seller?: {
+    full_name: string | null;
+  } | null;
 };
-
 export default function PropertyDetail() {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showVisitDialog, setShowVisitDialog] = useState(false);
   const [showOfferDialog, setShowOfferDialog] = useState(false);
-
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
       setLoading(true);
-      
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-      
+      const {
+        data,
+        error
+      } = await supabase.from('properties').select('*').eq('id', id).maybeSingle();
       if (data) {
         // Fetch seller profile
-        const { data: sellerProfile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('user_id', data.user_id)
-          .maybeSingle();
-        
-        setProperty({ ...data, seller: sellerProfile });
+        const {
+          data: sellerProfile
+        } = await supabase.from('profiles').select('full_name').eq('user_id', data.user_id).maybeSingle();
+        setProperty({
+          ...data,
+          seller: sellerProfile
+        });
       }
       setLoading(false);
     };
     fetchProperty();
   }, [id]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
+    return <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-24 pb-16 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-accent" />
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   if (!property) {
-    return (
-      <div className="min-h-screen bg-background">
+    return <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-4 text-center py-16">
@@ -102,27 +81,22 @@ export default function PropertyDetail() {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   const images = property.images?.length ? property.images : ['/placeholder.svg'];
   const sellerName = property.seller?.full_name || 'Property Owner';
-
   const handleContactSeller = () => {
     if (!user) {
       toast.error("Please sign in to contact the seller");
       navigate('/auth');
       return;
     }
-    
     if (property?.user_id) {
       navigate(`/messages?seller=${property.user_id}&property=${id}`);
     } else {
       navigate('/dashboard?tab=messages');
     }
   };
-
   const handleScheduleVisit = () => {
     if (!user) {
       toast.error("Please sign in to schedule a visit");
@@ -135,7 +109,6 @@ export default function PropertyDetail() {
     }
     setShowVisitDialog(true);
   };
-
   const handleMakeOffer = () => {
     if (!user) {
       toast.error("Please sign in to make an offer");
@@ -148,31 +121,25 @@ export default function PropertyDetail() {
     }
     setShowOfferDialog(true);
   };
-
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex(prev => (prev + 1) % images.length);
   };
-
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
 
       <main className="pt-20">
         {/* Image Gallery */}
         <div className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh] bg-secondary">
-          <motion.img
-            key={currentImageIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            src={images[currentImageIndex]}
-            alt={property.title}
-            className="w-full h-full object-cover"
-          />
+          <motion.img key={currentImageIndex} initial={{
+          opacity: 0
+        }} animate={{
+          opacity: 1
+        }} transition={{
+          duration: 0.3
+        }} src={images[currentImageIndex]} alt={property.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-foreground/20" />
 
           {/* Navigation */}
@@ -184,11 +151,7 @@ export default function PropertyDetail() {
               </Link>
             </Button>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={() => setIsFavorite(!isFavorite)}
-              >
+              <Button variant="secondary" size="icon" onClick={() => setIsFavorite(!isFavorite)}>
                 <Heart className={cn("w-5 h-5", isFavorite && "fill-destructive text-destructive")} />
               </Button>
               <Button variant="secondary" size="icon">
@@ -198,45 +161,24 @@ export default function PropertyDetail() {
           </div>
 
           {/* Image Navigation */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110"
-              >
+          {images.length > 1 && <>
+              <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110">
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110"
-              >
+              <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110">
                 <ChevronRight className="w-6 h-6" />
               </button>
-            </>
-          )}
+            </>}
 
           {/* Image Indicators */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={cn(
-                  "w-2 h-2 rounded-full transition-all",
-                  index === currentImageIndex
-                    ? "bg-accent w-6"
-                    : "bg-primary-foreground/50 hover:bg-primary-foreground/80"
-                )}
-              />
-            ))}
+            {images.map((_, index) => <button key={index} onClick={() => setCurrentImageIndex(index)} className={cn("w-2 h-2 rounded-full transition-all", index === currentImageIndex ? "bg-accent w-6" : "bg-primary-foreground/50 hover:bg-primary-foreground/80")} />)}
           </div>
 
           {/* Badges */}
           <div className="absolute bottom-6 left-6 flex gap-2">
-            {property.featured && (
-              <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>
-            )}
-            <Badge variant="secondary" className="bg-card/90 backdrop-blur-sm border-0">
+            {property.featured && <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>}
+            <Badge variant="secondary" className="backdrop-blur-sm border-0 bg-secondary">
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </Badge>
           </div>
@@ -248,10 +190,13 @@ export default function PropertyDetail() {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Title & Price */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }}>
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                   <h1 className="font-display text-3xl sm:text-4xl font-semibold text-foreground">
                     {property.title}
@@ -271,14 +216,16 @@ export default function PropertyDetail() {
               </motion.div>
 
               {/* Quick Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-              >
-                {property.property_type !== "land" && (
-                  <>
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.1
+            }} className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {property.property_type !== "land" && <>
                     <div className="bg-card rounded-xl p-4 border border-border text-center">
                       <Bed className="w-6 h-6 text-accent mx-auto mb-2" />
                       <span className="block font-semibold text-foreground">{property.bedrooms || 0}</span>
@@ -296,15 +243,12 @@ export default function PropertyDetail() {
                       </span>
                       <span className="text-sm text-muted-foreground">Sq Ft</span>
                     </div>
-                  </>
-                )}
-                {property.year_built && (
-                  <div className="bg-card rounded-xl p-4 border border-border text-center">
+                  </>}
+                {property.year_built && <div className="bg-card rounded-xl p-4 border border-border text-center">
                     <CalendarIcon className="w-6 h-6 text-accent mx-auto mb-2" />
                     <span className="block font-semibold text-foreground">{property.year_built}</span>
                     <span className="text-sm text-muted-foreground">Year Built</span>
-                  </div>
-                )}
+                  </div>}
                 <div className="bg-card rounded-xl p-4 border border-border text-center">
                   <Home className="w-6 h-6 text-accent mx-auto mb-2" />
                   <span className="block font-semibold text-foreground capitalize">{property.property_type}</span>
@@ -313,47 +257,54 @@ export default function PropertyDetail() {
               </motion.div>
 
               {/* Description */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.2
+            }}>
                 <h2 className="font-display text-xl font-semibold text-foreground mb-4">Description</h2>
                 <p className="text-muted-foreground leading-relaxed">{property.description}</p>
               </motion.div>
 
               {/* Amenities */}
-              {property.amenities && property.amenities.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
+              {property.amenities && property.amenities.length > 0 && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.3
+            }}>
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Features & Amenities
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {property.amenities.map((amenity) => (
-                      <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
+                    {property.amenities.map(amenity => <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
                         <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
                           <Check className="w-4 h-4 text-accent" />
                         </div>
                         {amenity}
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
-                </motion.div>
-              )}
+                </motion.div>}
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-card rounded-xl p-6 border border-border sticky top-28"
-              >
+              <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.2
+            }} className="bg-card rounded-xl p-6 border border-border sticky top-28">
                 <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
                   <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
                     <span className="font-display font-semibold text-accent text-lg">
@@ -368,29 +319,17 @@ export default function PropertyDetail() {
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-center gap-2 h-12"
-                    onClick={handleContactSeller}
-                  >
+                  <Button variant="outline" className="w-full justify-center gap-2 h-12" onClick={handleContactSeller}>
                     <MessageCircle className="w-5 h-5" />
                     Contact Seller
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-center gap-2 h-12"
-                    onClick={handleScheduleVisit}
-                  >
+                  <Button variant="outline" className="w-full justify-center gap-2 h-12" onClick={handleScheduleVisit}>
                     <CalendarIcon className="w-5 h-5" />
                     Schedule Visit
                   </Button>
                   
-                  <Button 
-                    variant="gold" 
-                    className="w-full justify-center gap-2 h-12"
-                    onClick={handleMakeOffer}
-                  >
+                  <Button variant="gold" className="w-full justify-center gap-2 h-12" onClick={handleMakeOffer}>
                     <DollarSign className="w-5 h-5" />
                     Make Offer
                   </Button>
@@ -408,25 +347,9 @@ export default function PropertyDetail() {
       <Footer />
 
       {/* Dialogs */}
-      {property && id && (
-        <>
-          <ScheduleVisitDialog
-            open={showVisitDialog}
-            onOpenChange={setShowVisitDialog}
-            propertyId={id}
-            sellerId={property.user_id}
-            propertyTitle={property.title}
-          />
-          <MakeOfferDialog
-            open={showOfferDialog}
-            onOpenChange={setShowOfferDialog}
-            propertyId={id}
-            sellerId={property.user_id}
-            propertyTitle={property.title}
-            listPrice={property.price}
-          />
-        </>
-      )}
-    </div>
-  );
+      {property && id && <>
+          <ScheduleVisitDialog open={showVisitDialog} onOpenChange={setShowVisitDialog} propertyId={id} sellerId={property.user_id} propertyTitle={property.title} />
+          <MakeOfferDialog open={showOfferDialog} onOpenChange={setShowOfferDialog} propertyId={id} sellerId={property.user_id} propertyTitle={property.title} listPrice={property.price} />
+        </>}
+    </div>;
 }
