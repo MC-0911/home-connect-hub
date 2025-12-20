@@ -39,7 +39,7 @@ const PropertyRequirements = () => {
 
           {/* Form Section */}
           <section className="py-12 sm:py-16">
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4 bg-primary-foreground">
               <div className="max-w-3xl mx-auto">
                 <RequirementsFormWizard />
               </div>
