@@ -49,45 +49,36 @@ export default function Dashboard() {
     if (user) {
       fetchProperties();
       fetchUnreadAlertsCount();
-      
-      // Subscribe to alerts changes
-      const channel = supabase
-        .channel("dashboard-alerts")
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "alerts",
-            filter: `user_id=eq.${user.id}`,
-          },
-          () => {
-            fetchUnreadAlertsCount();
-          }
-        )
-        .subscribe();
 
+      // Subscribe to alerts changes
+      const channel = supabase.channel("dashboard-alerts").on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "alerts",
+        filter: `user_id=eq.${user.id}`
+      }, () => {
+        fetchUnreadAlertsCount();
+      }).subscribe();
       return () => {
         supabase.removeChannel(channel);
       };
     }
   }, [user]);
-
   const fetchUnreadAlertsCount = async () => {
     try {
-      const { count, error } = await supabase
-        .from("alerts")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user?.id)
-        .eq("is_read", false);
-
+      const {
+        count,
+        error
+      } = await supabase.from("alerts").select("*", {
+        count: "exact",
+        head: true
+      }).eq("user_id", user?.id).eq("is_read", false);
       if (error) throw error;
       setUnreadAlertsCount(count || 0);
     } catch (error: any) {
       console.error("Error fetching alerts count:", error);
     }
   };
-
   const fetchProperties = async () => {
     try {
       const {
@@ -238,7 +229,7 @@ export default function Dashboard() {
                   My Listings <span className="ml-1 text-muted-foreground">({properties.length})</span>
                 </TabsTrigger>
                 <TabsTrigger value="saved" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  Saved <span className="ml-1 text-muted-foreground">(0)</span>
+                  Saved 
                 </TabsTrigger>
                 <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
                   Visits
