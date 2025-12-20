@@ -404,7 +404,7 @@ export default function Dashboard() {
                       </div> : <div className="divide-y divide-border">
                         {conversations.slice(0, 5).map(conv => {
                       const initials = conv.other_user?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
-                      return <Link key={conv.id} to="/messages" className="flex items-center gap-4 py-4 hover:bg-muted/50 -mx-4 px-4 transition-colors">
+                      return <Link key={conv.id} to="/messages" className="flex items-center gap-4 py-4 hover:bg-accent -mx-4 px-4 rounded-lg transition-all duration-200 group">
                               <Avatar className="h-10 w-10">
                                 <AvatarImage src={conv.other_user?.avatar_url || undefined} />
                                 <AvatarFallback className="bg-primary/10 text-primary">
