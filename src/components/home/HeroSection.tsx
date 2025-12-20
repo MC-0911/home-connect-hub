@@ -166,10 +166,10 @@ export function HeroSection() {
             value: "98%",
             label: "Satisfaction Rate"
           }].map(stat => <div key={stat.label} className="text-center">
-                <div className="font-display text-3xl sm:text-4xl font-semibold text-accent">
+                <div className="font-display text-3xl sm:text-4xl font-semibold text-blue-800">
                   {stat.value}
                 </div>
-                <div className="text-primary-foreground/60 text-sm mt-1">
+                <div className="text-sm mt-1 text-primary">
                   {stat.label}
                 </div>
               </div>)}
