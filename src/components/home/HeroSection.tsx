@@ -138,7 +138,7 @@ export function HeroSection() {
                 <Input type="number" placeholder="Max Price" className="h-11 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pl-4" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} />
               </div>
 
-              <Button variant="gold" size="lg" className="h-11 px-6 rounded-full shrink-0" onClick={handleSearch}>
+              <Button variant="gold" size="lg" onClick={handleSearch} className="h-11 px-6 shrink-0 rounded-2xl">
                 <Search className="w-4 h-4 mr-2" />
                 Search
               </Button>
