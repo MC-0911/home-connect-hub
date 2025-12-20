@@ -37,7 +37,7 @@ export function FeaturedProperties() {
 
   if (loading) {
     return (
-      <section className="py-20 sm:py-28 bg-background">
+    <section className="py-20 sm:py-28 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -54,7 +54,7 @@ export function FeaturedProperties() {
   }
 
   return (
-    <section className="py-20 sm:py-28 bg-background">
+    <section className="py-20 sm:py-28 bg-card">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
