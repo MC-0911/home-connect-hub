@@ -47,7 +47,7 @@ export function Footer() {
                 <li key={item.label}>
                   <Link
                     to={item.href}
-                    className="text-primary-foreground/70 hover:text-accent transition-colors text-sm"
+                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
                   >
                     {item.label}
                   </Link>
@@ -64,7 +64,7 @@ export function Footer() {
                 <li key={item}>
                   <Link
                     to="/properties"
-                    className="text-primary-foreground/70 hover:text-accent transition-colors text-sm"
+                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
                   >
                     {item}
                   </Link>
@@ -98,10 +98,10 @@ export function Footer() {
             © 2024 Royal Landmark. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link to="#" className="text-primary-foreground/50 hover:text-accent text-sm transition-colors">
+            <Link to="#" className="text-primary-foreground/50 hover:text-primary-foreground text-sm transition-colors">
               Privacy Policy
             </Link>
-            <Link to="#" className="text-primary-foreground/50 hover:text-accent text-sm transition-colors">
+            <Link to="#" className="text-primary-foreground/50 hover:text-primary-foreground text-sm transition-colors">
               Terms of Service
             </Link>
           </div>
