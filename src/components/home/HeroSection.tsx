@@ -105,7 +105,7 @@ export function HeroSection() {
             <div className="flex flex-col md:flex-row items-center gap-2">
               <div className="relative flex-1 w-full md:w-auto">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="City, neighborhood, or ZIP" className="pl-10 h-11 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" value={location} onChange={e => setLocation(e.target.value)} />
+                <Input className="pl-10 h-11 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" value={location} onChange={e => setLocation(e.target.value)} placeholder="City, State, or ZIP" />
               </div>
 
               <div className="hidden md:block w-px h-8 bg-border" />
