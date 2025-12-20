@@ -145,16 +145,16 @@ export default function PropertyDetail() {
           {/* Navigation */}
           <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
             <Button variant="secondary" size="sm" asChild>
-              <Link to="/properties" className="bg-primary">
+              <Link to="/properties">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Link>
             </Button>
             <div className="flex gap-2">
-              <Button variant="secondary" size="icon" onClick={() => setIsFavorite(!isFavorite)} className="bg-primary">
+              <Button variant="secondary" size="icon" onClick={() => setIsFavorite(!isFavorite)}>
                 <Heart className={cn("w-5 h-5", isFavorite && "fill-destructive text-destructive")} />
               </Button>
-              <Button variant="secondary" size="icon" className="bg-primary">
+              <Button variant="secondary" size="icon">
                 <Share2 className="w-5 h-5" />
               </Button>
             </div>
