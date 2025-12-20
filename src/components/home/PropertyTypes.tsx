@@ -33,7 +33,7 @@ const categories = [{
   image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=400&h=300&fit=crop"
 }];
 export function PropertyTypes() {
-  return <section className="py-20 sm:py-28 bg-secondary/50">
+  return <section className="py-20 sm:py-28 bg-card">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{
         opacity: 0,
