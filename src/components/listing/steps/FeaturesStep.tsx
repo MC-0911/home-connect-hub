@@ -107,7 +107,7 @@ const FeaturesStep = () => {
             <div>
               <Label htmlFor="annualTax" className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                Annual Tax (optional)
+                Annual Tax
               </Label>
               <Input
                 id="annualTax"
