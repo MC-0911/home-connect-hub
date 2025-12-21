@@ -185,7 +185,7 @@ export default function PropertyDetail() {
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-primary-foreground">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
