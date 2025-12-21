@@ -41,7 +41,7 @@ const App = () => <HelmetProvider>
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/messages" element={<Messages />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} className="bg-primary-foreground" />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
