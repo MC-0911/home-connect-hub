@@ -109,15 +109,18 @@ const FeaturesStep = () => {
                 <Calendar className="w-4 h-4 text-primary" />
                 Annual Tax
               </Label>
-              <Input
-                id="annualTax"
-                type="number"
-                min="0"
-                placeholder="5000"
-                value={formData.annualTax}
-                onChange={(e) => updateFormData({ annualTax: e.target.value })}
-                className="mt-1"
-              />
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  id="annualTax"
+                  type="number"
+                  min="0"
+                  placeholder="5000"
+                  value={formData.annualTax}
+                  onChange={(e) => updateFormData({ annualTax: e.target.value })}
+                  className="pl-7"
+                />
+              </div>
             </div>
           </>
         )}
