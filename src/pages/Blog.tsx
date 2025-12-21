@@ -55,7 +55,7 @@ export default function Blog() {
 
       <main className="min-h-screen bg-background pt-20">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary to-primary/80 py-16 lg:py-24">
+        <section className="bg-gradient-to-br from-primary to-primary/80 py-16 lg:py-[40px]">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="font-display text-4xl lg:text-5xl font-bold text-primary-foreground mb-4">
