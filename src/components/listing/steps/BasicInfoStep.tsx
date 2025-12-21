@@ -19,28 +19,6 @@ const BasicInfoStep = () => {
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="title">Property Title *</Label>
-          <Input
-            id="title"
-            placeholder="e.g., Elegant Victorian Estate"
-            value={formData.title}
-            onChange={(e) => updateFormData({ title: e.target.value })}
-            className="mt-1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="description">Description *</Label>
-          <Textarea
-            id="description"
-            placeholder="Describe your property in detail..."
-            value={formData.description}
-            onChange={(e) => updateFormData({ description: e.target.value })}
-            className="mt-1 min-h-[120px]"
-          />
-        </div>
-
-        <div>
           <Label>Property Type *</Label>
           <Select
             value={formData.propertyType}
