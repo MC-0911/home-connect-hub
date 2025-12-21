@@ -72,7 +72,7 @@ const FeaturesStep = () => {
         <div>
           <Label htmlFor="lotSize" className="flex items-center gap-2">
             <TreePine className="w-4 h-4 text-primary" />
-            Lot Size (sq ft) {isLand ? '*' : '(optional)'}
+            Lot Size (sq ft)
           </Label>
           <Input
             id="lotSize"
@@ -90,7 +90,7 @@ const FeaturesStep = () => {
             <div>
               <Label htmlFor="yearBuilt" className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                Year Built (optional)
+                Year Built
               </Label>
               <Input
                 id="yearBuilt"
