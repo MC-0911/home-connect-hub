@@ -86,22 +86,40 @@ const FeaturesStep = () => {
         </div>
 
         {!isLand && (
-          <div>
-            <Label htmlFor="yearBuilt" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              Year Built (optional)
-            </Label>
-            <Input
-              id="yearBuilt"
-              type="number"
-              min="1800"
-              max={new Date().getFullYear()}
-              placeholder="2020"
-              value={formData.yearBuilt}
-              onChange={(e) => updateFormData({ yearBuilt: e.target.value })}
-              className="mt-1"
-            />
-          </div>
+          <>
+            <div>
+              <Label htmlFor="yearBuilt" className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary" />
+                Year Built (optional)
+              </Label>
+              <Input
+                id="yearBuilt"
+                type="number"
+                min="1800"
+                max={new Date().getFullYear()}
+                placeholder="2020"
+                value={formData.yearBuilt}
+                onChange={(e) => updateFormData({ yearBuilt: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="annualTax" className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary" />
+                Annual Tax (optional)
+              </Label>
+              <Input
+                id="annualTax"
+                type="number"
+                min="0"
+                placeholder="5000"
+                value={formData.annualTax}
+                onChange={(e) => updateFormData({ annualTax: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+          </>
         )}
       </div>
 

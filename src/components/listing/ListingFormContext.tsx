@@ -20,6 +20,7 @@ export interface ListingFormData {
   squareFeet: string;
   lotSize: string;
   yearBuilt: string;
+  annualTax: string;
   
   // Step 4: Amenities
   amenities: string[];
@@ -53,6 +54,7 @@ const initialFormData: ListingFormData = {
   squareFeet: '',
   lotSize: '',
   yearBuilt: '',
+  annualTax: '',
   amenities: [],
   images: [],
   imagePreviewUrls: [],
