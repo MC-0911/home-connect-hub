@@ -39,7 +39,7 @@ const App = () => <HelmetProvider>
               <Route path="/property-requirements" element={<PropertyRequirements />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} className="bg-primary-foreground" />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
