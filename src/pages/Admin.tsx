@@ -12,39 +12,31 @@ import { LeadsTable } from '@/components/admin/LeadsTable';
 import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Home, 
-  FileText, 
-  MessageSquare, 
-  Shield,
-  Settings,
-  Crown
-} from 'lucide-react';
+import { LayoutDashboard, Users, Home, FileText, MessageSquare, Shield, Settings, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
-
 export default function Admin() {
   const navigate = useNavigate();
-  const { isAdmin, loading } = useAdmin();
+  const {
+    isAdmin,
+    loading
+  } = useAdmin();
   const [user, setUser] = useState<any>(null);
-
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       setUser(user);
-      
       if (!user) {
         navigate('/auth');
       }
     };
-    
     checkAuth();
   }, [navigate]);
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+    return <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="relative">
             <Shield className="w-16 h-16 text-primary" />
@@ -52,20 +44,19 @@ export default function Admin() {
           </div>
           <p className="text-muted-foreground font-medium">Verifying admin access...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex flex-col">
+    return <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center pt-20">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-4 p-8"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          scale: 0.9
+        }} animate={{
+          opacity: 1,
+          scale: 1
+        }} className="text-center space-y-4 p-8">
             <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
               <Shield className="w-10 h-10 text-destructive" />
             </div>
@@ -77,12 +68,9 @@ export default function Admin() {
           </motion.div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <>
+  return <>
       <Helmet>
         <title>Admin Dashboard - Royal Landmark</title>
         <meta name="robots" content="noindex, nofollow" />
@@ -91,14 +79,16 @@ export default function Admin() {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        <main className="flex-1 pt-24 pb-12">
+        <main className="flex-1 pt-24 pb-12 bg-primary-foreground">
           <div className="container mx-auto px-4">
             {/* Admin Header */}
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8"
-            >
+            <motion.div initial={{
+            opacity: 0,
+            y: -20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
                   <Crown className="h-6 w-6" />
@@ -116,45 +106,27 @@ export default function Admin() {
 
             <Tabs defaultValue="analytics" className="space-y-6">
               <TabsList className="bg-card border p-1 h-auto flex-wrap">
-                <TabsTrigger 
-                  value="analytics" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <LayoutDashboard className="h-4 w-4" />
                   <span className="hidden sm:inline">Analytics</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="users" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="users" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Users className="h-4 w-4" />
                   <span className="hidden sm:inline">Users</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="listings" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="listings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Home className="h-4 w-4" />
                   <span className="hidden sm:inline">Listings</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="blogs" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Blogs</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="leads" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="leads" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">Leads</span>
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="settings" 
-                  className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
+                <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Settings className="h-4 w-4" />
                   <span className="hidden sm:inline">Settings</span>
                 </TabsTrigger>
@@ -165,11 +137,11 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="users">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-card rounded-xl border shadow-sm overflow-hidden"
-                >
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -188,11 +160,11 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="listings">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-card rounded-xl border shadow-sm overflow-hidden"
-                >
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -211,11 +183,11 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="blogs">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-card rounded-xl border shadow-sm overflow-hidden"
-                >
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -234,11 +206,11 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="leads">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-card rounded-xl border shadow-sm overflow-hidden"
-                >
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -257,11 +229,11 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="settings">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="bg-card rounded-xl border shadow-sm overflow-hidden"
-                >
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -284,6 +256,5 @@ export default function Admin() {
 
         <Footer />
       </div>
-    </>
-  );
+    </>;
 }
