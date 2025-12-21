@@ -35,7 +35,7 @@ const ListingFormContent = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        if (!formData.title || !formData.description || !formData.propertyType || !formData.price) {
+        if (!formData.propertyType || !formData.price) {
           toast({
             title: "Missing Information",
             description: "Please fill in all required fields.",
