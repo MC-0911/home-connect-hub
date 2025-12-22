@@ -181,6 +181,10 @@ export function Header() {
                   <link.icon className="w-5 h-5" />
                   {link.label}
                 </Link>)}
+              {user && <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/dashboard" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
+                  <LayoutDashboard className="w-5 h-5" />
+                  Dashboard
+                </Link>}
               {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
                   <div className="relative">
                     <MessageSquare className="w-5 h-5" />
