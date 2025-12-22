@@ -178,7 +178,7 @@ export default function Dashboard() {
               <h1 className="font-display text-3xl font-bold text-foreground">
                 Seller Dashboard
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="mt-1 text-primary">
                 Manage your property listings
               </p>
             </div>
