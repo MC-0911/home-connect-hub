@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useListingForm, ListingFormProvider } from './ListingFormContext';
+import { useListingForm, ListingFormProvider, ListingFormData } from './ListingFormContext';
 import StepIndicator from './StepIndicator';
 import BasicInfoStep from './steps/BasicInfoStep';
 import LocationStep from './steps/LocationStep';
@@ -24,7 +24,7 @@ const stepComponents = [
 ];
 
 const ListingFormContent = () => {
-  const { formData, currentStep, setCurrentStep, totalSteps, resetForm } = useListingForm();
+  const { formData, currentStep, setCurrentStep, totalSteps, resetForm, editMode, propertyId } = useListingForm();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -76,7 +76,7 @@ const ListingFormContent = () => {
       case 4:
         return true; // Amenities are optional
       case 5:
-        if (formData.images.length === 0) {
+        if (formData.images.length === 0 && formData.existingImageUrls.length === 0) {
           toast({
             title: "No Images",
             description: "Please add at least one photo of your property.",
@@ -120,8 +120,8 @@ const ListingFormContent = () => {
     setIsSubmitting(true);
     
     try {
-      // Upload images to Supabase Storage
-      const imageUrls: string[] = [];
+      // Upload new images to Supabase Storage
+      const newImageUrls: string[] = [];
       
       for (const file of formData.images) {
         const fileExt = file.name.split('.').pop();
@@ -137,46 +137,69 @@ const ListingFormContent = () => {
           .from('property-images')
           .getPublicUrl(fileName);
         
-        imageUrls.push(publicUrl);
+        newImageUrls.push(publicUrl);
       }
 
-      // Insert property into database
-      const { error: insertError } = await supabase
-        .from('properties')
-        .insert({
-          user_id: user.id,
-          title: formData.title,
-          description: formData.description,
-          property_type: formData.propertyType as any,
-          listing_type: formData.listingType as any,
-          price: parseFloat(formData.price),
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          zip_code: formData.zipCode,
-          bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
-          bathrooms: formData.bathrooms ? parseFloat(formData.bathrooms) : 0,
-          square_feet: formData.squareFeet ? parseInt(formData.squareFeet) : 0,
-          lot_size: formData.lotSize ? parseInt(formData.lotSize) : null,
-          year_built: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
-          amenities: formData.amenities,
-          images: imageUrls,
-        });
+      // Combine existing and new image URLs
+      const allImageUrls = [...formData.existingImageUrls, ...newImageUrls];
 
-      if (insertError) throw insertError;
-    
-      toast({
-        title: "Listing Created!",
-        description: "Your property has been published successfully.",
-      });
+      const propertyData = {
+        title: formData.title,
+        description: formData.description,
+        property_type: formData.propertyType as any,
+        listing_type: formData.listingType as any,
+        price: parseFloat(formData.price),
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zipCode,
+        bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
+        bathrooms: formData.bathrooms ? parseFloat(formData.bathrooms) : 0,
+        square_feet: formData.squareFeet ? parseInt(formData.squareFeet) : 0,
+        lot_size: formData.lotSize ? parseInt(formData.lotSize) : null,
+        year_built: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
+        amenities: formData.amenities,
+        images: allImageUrls,
+      };
+
+      if (editMode && propertyId) {
+        // Update existing property
+        const { error: updateError } = await supabase
+          .from('properties')
+          .update(propertyData)
+          .eq('id', propertyId)
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      
+        toast({
+          title: "Listing Updated!",
+          description: "Your property has been updated successfully.",
+        });
+      } else {
+        // Insert new property
+        const { error: insertError } = await supabase
+          .from('properties')
+          .insert({
+            user_id: user.id,
+            ...propertyData,
+          });
+
+        if (insertError) throw insertError;
+      
+        toast({
+          title: "Listing Created!",
+          description: "Your property has been published successfully.",
+        });
+      }
       
       resetForm();
-      navigate('/properties');
+      navigate('/dashboard');
     } catch (error: any) {
-      console.error('Error creating listing:', error);
+      console.error('Error saving listing:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create listing. Please try again.",
+        description: error.message || "Failed to save listing. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -189,10 +212,10 @@ const ListingFormContent = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-            List Your Property
+            {editMode ? 'Edit Your Property' : 'List Your Property'}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Complete all steps to publish your listing
+            {editMode ? 'Update your property details' : 'Complete all steps to publish your listing'}
           </p>
         </div>
 
@@ -244,12 +267,12 @@ const ListingFormContent = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Submitting...
+                      {editMode ? 'Updating...' : 'Submitting...'}
                     </>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      Publish Listing
+                      {editMode ? 'Update Listing' : 'Publish Listing'}
                     </>
                   )}
                 </Button>
@@ -262,9 +285,15 @@ const ListingFormContent = () => {
   );
 };
 
-const ListingFormWizard = () => {
+interface ListingFormWizardProps {
+  editMode?: boolean;
+  propertyId?: string;
+  initialData?: Partial<ListingFormData>;
+}
+
+const ListingFormWizard = ({ editMode = false, propertyId, initialData }: ListingFormWizardProps) => {
   return (
-    <ListingFormProvider>
+    <ListingFormProvider editMode={editMode} propertyId={propertyId} initialData={initialData}>
       <ListingFormContent />
     </ListingFormProvider>
   );

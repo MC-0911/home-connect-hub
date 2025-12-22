@@ -14,13 +14,13 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <FeaturedProperties className="bg-primary-foreground" />
+        <FeaturedProperties />
         <HowItWorks />
         <PropertyTypes />
         <MapExplore />
         <WhyChooseUs />
         <CTASection />
-        <Resources className="bg-secondary-foreground" />
+        <Resources />
         <Newsletter />
       </main>
       <Footer />

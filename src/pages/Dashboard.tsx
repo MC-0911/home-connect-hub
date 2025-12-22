@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
@@ -14,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
@@ -118,6 +118,33 @@ export default function Dashboard() {
       });
     }
   };
+
+  const handleStatusChange = async (propertyId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("properties")
+        .update({ status: newStatus as any })
+        .eq("id", propertyId);
+      
+      if (error) throw error;
+      
+      setProperties(prev => 
+        prev.map(p => p.id === propertyId ? { ...p, status: newStatus as any } : p)
+      );
+      
+      toast({
+        title: "Status Updated",
+        description: `Property status changed to ${newStatus}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadge = (status: string | null) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       active: "default",
@@ -335,6 +362,44 @@ export default function Dashboard() {
                                           Edit
                                         </Link>
                                       </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                      <DropdownMenuSub>
+                                        <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-pointer">
+                                          <CheckCircle className="w-4 h-4" />
+                                          Change Status
+                                        </DropdownMenuSubTrigger>
+                                        <DropdownMenuSubContent className="bg-popover">
+                                          <DropdownMenuItem 
+                                            onClick={() => handleStatusChange(property.id, 'active')}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <Home className="w-4 h-4 text-green-500" />
+                                            Active
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem 
+                                            onClick={() => handleStatusChange(property.id, 'pending')}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <Clock className="w-4 h-4 text-yellow-500" />
+                                            Pending
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem 
+                                            onClick={() => handleStatusChange(property.id, 'sold')}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <CheckCircle className="w-4 h-4 text-red-500" />
+                                            Sold
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem 
+                                            onClick={() => handleStatusChange(property.id, 'rented')}
+                                            className="flex items-center gap-2 cursor-pointer"
+                                          >
+                                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                                            Rented
+                                          </DropdownMenuItem>
+                                        </DropdownMenuSubContent>
+                                      </DropdownMenuSub>
+                                      <DropdownMenuSeparator />
                                       <AlertDialog>
                                         <AlertDialogTrigger asChild className="bg-primary-foreground">
                                           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive" onSelect={e => e.preventDefault()}>
