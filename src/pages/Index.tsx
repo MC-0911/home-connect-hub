@@ -14,7 +14,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <FeaturedProperties />
+        <FeaturedProperties className="bg-primary-foreground" />
         <HowItWorks />
         <PropertyTypes />
         <MapExplore />
