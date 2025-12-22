@@ -74,7 +74,7 @@ export function PropertyCard({
 
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4">
               <MapPin className="w-4 h-4 text-accent flex-shrink-0" />
-              <span className="line-clamp-1 text-sm">
+              <span className="line-clamp-1 text-sm text-secondary">
                 {property.city}, {property.state}
               </span>
             </div>
