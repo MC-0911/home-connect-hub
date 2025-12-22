@@ -134,7 +134,7 @@ export default function Auth() {
   return <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-20 min-h-screen flex items-center justify-center px-4">
+      <main className="pt-20 min-h-screen flex items-center justify-center px-4 bg-primary-foreground">
         <div className="w-full max-w-md">
           <motion.div initial={{
           opacity: 0,
