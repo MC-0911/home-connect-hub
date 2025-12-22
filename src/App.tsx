@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
+import EditProperty from "./pages/EditProperty";
 import Dashboard from "./pages/Dashboard";
 import PropertyRequirements from "./pages/PropertyRequirements";
 import Admin from "./pages/Admin";
@@ -35,6 +36,7 @@ const App = () => <HelmetProvider>
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/add-property" element={<AddProperty />} />
+              <Route path="/edit-property/:id" element={<EditProperty />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/property-requirements" element={<PropertyRequirements />} />
               <Route path="/admin" element={<Admin />} />

@@ -28,6 +28,7 @@ export interface ListingFormData {
   // Step 5: Images
   images: File[];
   imagePreviewUrls: string[];
+  existingImageUrls: string[];
 }
 
 interface ListingFormContextType {
@@ -37,9 +38,11 @@ interface ListingFormContextType {
   setCurrentStep: (step: number) => void;
   totalSteps: number;
   resetForm: () => void;
+  editMode: boolean;
+  propertyId: string | undefined;
 }
 
-const initialFormData: ListingFormData = {
+export const initialFormData: ListingFormData = {
   title: '',
   description: '',
   propertyType: '',
@@ -58,12 +61,28 @@ const initialFormData: ListingFormData = {
   amenities: [],
   images: [],
   imagePreviewUrls: [],
+  existingImageUrls: [],
 };
 
 const ListingFormContext = createContext<ListingFormContextType | undefined>(undefined);
 
-export const ListingFormProvider = ({ children }: { children: ReactNode }) => {
-  const [formData, setFormData] = useState<ListingFormData>(initialFormData);
+interface ListingFormProviderProps {
+  children: ReactNode;
+  editMode?: boolean;
+  propertyId?: string;
+  initialData?: Partial<ListingFormData>;
+}
+
+export const ListingFormProvider = ({ 
+  children, 
+  editMode = false, 
+  propertyId,
+  initialData 
+}: ListingFormProviderProps) => {
+  const [formData, setFormData] = useState<ListingFormData>({
+    ...initialFormData,
+    ...initialData,
+  });
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
 
@@ -84,6 +103,8 @@ export const ListingFormProvider = ({ children }: { children: ReactNode }) => {
       setCurrentStep,
       totalSteps,
       resetForm,
+      editMode,
+      propertyId,
     }}>
       {children}
     </ListingFormContext.Provider>
