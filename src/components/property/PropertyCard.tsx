@@ -69,14 +69,12 @@ export function PropertyCard({
           {/* Content */}
           <div className="p-5 flex flex-col h-[200px]">
             <div className="flex items-start justify-between gap-4 mb-3">
-              <h3 className="font-display text-lg font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
-                {property.title}
-              </h3>
+              
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground text-sm mb-4">
               <MapPin className="w-4 h-4 text-accent flex-shrink-0" />
-              <span className="line-clamp-1">
+              <span className="line-clamp-1 text-sm">
                 {property.city}, {property.state}
               </span>
             </div>
