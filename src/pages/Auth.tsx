@@ -19,6 +19,9 @@ export default function Auth() {
     password: ""
   });
 
+  // Get redirect URL from query params, default to "/"
+  const redirectTo = searchParams.get("redirect") || "/";
+
   // Check if user is already logged in
   useEffect(() => {
     const {
@@ -27,7 +30,7 @@ export default function Auth() {
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate("/");
+        navigate(redirectTo);
       }
     });
     supabase.auth.getSession().then(({
@@ -36,11 +39,11 @@ export default function Auth() {
       }
     }) => {
       if (session?.user) {
-        navigate("/");
+        navigate(redirectTo);
       }
     });
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, redirectTo]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
@@ -99,7 +102,7 @@ export default function Auth() {
           }
         } else {
           toast.success("Welcome back!");
-          navigate("/");
+          navigate(redirectTo);
         }
       }
     } catch (error) {
@@ -116,7 +119,7 @@ export default function Auth() {
       } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}${redirectTo}`
         }
       });
       if (error) {

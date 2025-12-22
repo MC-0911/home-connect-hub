@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +10,7 @@ import { BasicRequirementsStep } from './steps/BasicRequirementsStep';
 import { LocationBudgetStep } from './steps/LocationBudgetStep';
 import { FeaturesAmenitiesStep } from './steps/FeaturesAmenitiesStep';
 import { ContactDetailsStep } from './steps/ContactDetailsStep';
-import { ArrowLeft, ArrowRight, Send, Check, Home, MapPin, Star, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Send, Check, Home, MapPin, Star, Calendar, LogIn } from 'lucide-react';
 const stepComponents = [BasicRequirementsStep, LocationBudgetStep, FeaturesAmenitiesStep, ContactDetailsStep];
 const stepInfo = [{
   icon: Home,
@@ -40,8 +40,53 @@ const RequirementsFormContent = () => {
   } = useToast();
   const navigate = useNavigate();
   const {
-    user
+    user,
+    loading
   } = useAuth();
+
+  // Show authentication required message if not logged in
+  if (!loading && !user) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center py-12 px-6"
+      >
+        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <LogIn className="w-10 h-10 text-primary" />
+        </div>
+        <h2 className="text-3xl font-display font-bold text-foreground mb-4">
+          Sign In Required
+        </h2>
+        <p className="text-lg text-muted-foreground mb-2">
+          Please sign in or create an account to submit your property requirements.
+        </p>
+        <p className="text-muted-foreground mb-8">
+          This helps us personalize your property matches and keep you updated.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button asChild className="bg-primary hover:bg-primary/90">
+            <Link to="/auth?mode=login&redirect=/property-requirements">
+              Sign In
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/auth?mode=signup&redirect=/property-requirements">
+              Create Account
+            </Link>
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
