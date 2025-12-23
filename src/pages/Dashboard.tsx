@@ -39,6 +39,12 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings");
   const [unreadAlertsCount, setUnreadAlertsCount] = useState(0);
+  const [statusChangeDialog, setStatusChangeDialog] = useState<{
+    isOpen: boolean;
+    propertyId: string | null;
+    propertyTitle: string;
+    newStatus: string;
+  }>({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" });
   const unreadCount = getUnreadCount();
   useEffect(() => {
     if (!authLoading && !user) {
@@ -119,22 +125,28 @@ export default function Dashboard() {
     }
   };
 
-  const handleStatusChange = async (propertyId: string, newStatus: string) => {
+  const openStatusChangeDialog = (propertyId: string, propertyTitle: string, newStatus: string) => {
+    setStatusChangeDialog({ isOpen: true, propertyId, propertyTitle, newStatus });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!statusChangeDialog.propertyId) return;
+    
     try {
       const { error } = await supabase
         .from("properties")
-        .update({ status: newStatus as any })
-        .eq("id", propertyId);
+        .update({ status: statusChangeDialog.newStatus as any })
+        .eq("id", statusChangeDialog.propertyId);
       
       if (error) throw error;
       
       setProperties(prev => 
-        prev.map(p => p.id === propertyId ? { ...p, status: newStatus as any } : p)
+        prev.map(p => p.id === statusChangeDialog.propertyId ? { ...p, status: statusChangeDialog.newStatus as any } : p)
       );
       
       toast({
         title: "Status Updated",
-        description: `Property status changed to ${newStatus}`,
+        description: `Property status changed to ${statusChangeDialog.newStatus}`,
       });
     } catch (error: any) {
       toast({
@@ -142,6 +154,8 @@ export default function Dashboard() {
         description: error.message || "Failed to update status",
         variant: "destructive",
       });
+    } finally {
+      setStatusChangeDialog({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" });
     }
   };
 
@@ -370,28 +384,28 @@ export default function Dashboard() {
                                         </DropdownMenuSubTrigger>
                                         <DropdownMenuSubContent className="bg-popover">
                                           <DropdownMenuItem 
-                                            onClick={() => handleStatusChange(property.id, 'active')}
+                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'active')}
                                             className="flex items-center gap-2 cursor-pointer"
                                           >
                                             <Home className="w-4 h-4 text-green-500" />
                                             Active
                                           </DropdownMenuItem>
                                           <DropdownMenuItem 
-                                            onClick={() => handleStatusChange(property.id, 'pending')}
+                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')}
                                             className="flex items-center gap-2 cursor-pointer"
                                           >
                                             <Clock className="w-4 h-4 text-yellow-500" />
                                             Pending
                                           </DropdownMenuItem>
                                           <DropdownMenuItem 
-                                            onClick={() => handleStatusChange(property.id, 'sold')}
+                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')}
                                             className="flex items-center gap-2 cursor-pointer"
                                           >
                                             <CheckCircle className="w-4 h-4 text-red-500" />
                                             Sold
                                           </DropdownMenuItem>
                                           <DropdownMenuItem 
-                                            onClick={() => handleStatusChange(property.id, 'rented')}
+                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'rented')}
                                             className="flex items-center gap-2 cursor-pointer"
                                           >
                                             <XCircle className="w-4 h-4 text-muted-foreground" />
@@ -510,5 +524,23 @@ export default function Dashboard() {
         </div>
       </main>
       <Footer />
+
+      {/* Status Change Confirmation Dialog */}
+      <AlertDialog open={statusChangeDialog.isOpen} onOpenChange={(open) => !open && setStatusChangeDialog({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change Listing Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to change the status of "{statusChangeDialog.propertyTitle}" to <span className="font-semibold capitalize">{statusChangeDialog.newStatus}</span>?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusChange}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 }
