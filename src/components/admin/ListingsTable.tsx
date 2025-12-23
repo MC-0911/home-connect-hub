@@ -1,41 +1,13 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Search, Eye, Star, StarOff, MoreHorizontal, MoreVertical, Trash2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -43,7 +15,6 @@ import { Link } from 'react-router-dom';
 import { useTableUtils } from '@/hooks/useTableUtils';
 import { TablePagination } from './TablePagination';
 import { SortableTableHead } from './SortableTableHead';
-
 interface Property {
   id: string;
   title: string;
@@ -56,7 +27,6 @@ interface Property {
   featured: boolean;
   created_at: string;
 }
-
 export function ListingsTable() {
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,16 +36,15 @@ export function ListingsTable() {
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [bulkStatus, setBulkStatus] = useState<string>('');
-
   const fetchListings = async () => {
     try {
-      let query = supabase
-        .from('properties')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
-
+      let query = supabase.from('properties').select('*').order('created_at', {
+        ascending: false
+      });
+      const {
+        data,
+        error
+      } = await query;
       if (error) throw error;
       setListings(data || []);
     } catch (error) {
@@ -84,20 +53,17 @@ export function ListingsTable() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchListings();
   }, []);
-
   const toggleFeatured = async (id: string, currentFeatured: boolean) => {
     try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ featured: !currentFeatured })
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('properties').update({
+        featured: !currentFeatured
+      }).eq('id', id);
       if (error) throw error;
-      
       toast.success(currentFeatured ? 'Removed from featured' : 'Added to featured');
       fetchListings();
     } catch (error) {
@@ -105,16 +71,14 @@ export function ListingsTable() {
       toast.error('Failed to update featured status');
     }
   };
-
   const updateStatus = async (id: string, newStatus: 'active' | 'pending' | 'sold' | 'rented') => {
     try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ status: newStatus })
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('properties').update({
+        status: newStatus
+      }).eq('id', id);
       if (error) throw error;
-      
       toast.success('Status updated successfully');
       fetchListings();
     } catch (error) {
@@ -122,7 +86,6 @@ export function ListingsTable() {
       toast.error('Failed to update status');
     }
   };
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(filteredListings.map(l => l.id)));
@@ -130,7 +93,6 @@ export function ListingsTable() {
       setSelectedIds(new Set());
     }
   };
-
   const handleSelectOne = (id: string, checked: boolean) => {
     const newSelected = new Set(selectedIds);
     if (checked) {
@@ -140,16 +102,12 @@ export function ListingsTable() {
     }
     setSelectedIds(newSelected);
   };
-
   const handleBulkDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .in('id', Array.from(selectedIds));
-
+      const {
+        error
+      } = await supabase.from('properties').delete().in('id', Array.from(selectedIds));
       if (error) throw error;
-
       toast.success(`${selectedIds.size} listings deleted successfully`);
       setSelectedIds(new Set());
       setBulkDeleteDialogOpen(false);
@@ -159,16 +117,14 @@ export function ListingsTable() {
       toast.error('Failed to delete listings');
     }
   };
-
   const handleBulkStatusUpdate = async () => {
     try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ status: bulkStatus as 'active' | 'pending' | 'sold' | 'rented' })
-        .in('id', Array.from(selectedIds));
-
+      const {
+        error
+      } = await supabase.from('properties').update({
+        status: bulkStatus as 'active' | 'pending' | 'sold' | 'rented'
+      }).in('id', Array.from(selectedIds));
       if (error) throw error;
-
       toast.success(`${selectedIds.size} listings updated to ${bulkStatus}`);
       setSelectedIds(new Set());
       setBulkStatusDialogOpen(false);
@@ -179,16 +135,14 @@ export function ListingsTable() {
       toast.error('Failed to update listings');
     }
   };
-
   const handleBulkFeature = async (featured: boolean) => {
     try {
-      const { error } = await supabase
-        .from('properties')
-        .update({ featured })
-        .in('id', Array.from(selectedIds));
-
+      const {
+        error
+      } = await supabase.from('properties').update({
+        featured
+      }).in('id', Array.from(selectedIds));
       if (error) throw error;
-
       toast.success(`${selectedIds.size} listings ${featured ? 'featured' : 'unfeatured'} successfully`);
       setSelectedIds(new Set());
       fetchListings();
@@ -197,14 +151,11 @@ export function ListingsTable() {
       toast.error('Failed to update listings');
     }
   };
-
   const filteredListings = listings.filter(listing => {
-    const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      listing.city.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) || listing.city.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || listing.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
   const {
     paginatedData,
     currentPage,
@@ -214,47 +165,40 @@ export function ListingsTable() {
     goToPage,
     totalItems,
     startIndex,
-    endIndex,
+    endIndex
   } = useTableUtils({
     data: filteredListings,
     itemsPerPage: 10,
     defaultSortKey: 'created_at',
-    defaultSortDirection: 'desc',
+    defaultSortDirection: 'desc'
   });
-
   const allSelected = paginatedData.length > 0 && paginatedData.every(l => selectedIds.has(l.id));
   const someSelected = selectedIds.size > 0;
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'pending': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-      case 'sold': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
-      case 'rented': return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
-      default: return 'bg-muted text-muted-foreground';
+      case 'active':
+        return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'pending':
+        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+      case 'sold':
+        return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
+      case 'rented':
+        return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
-
   if (loading) {
     return <div className="animate-pulse space-y-4">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-16 bg-muted rounded-lg" />
-      ))}
+      {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-muted rounded-lg" />)}
     </div>;
   }
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search listings by title or city..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+            <Input placeholder="Search listings by title or city..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-[150px]">
@@ -270,16 +214,13 @@ export function ListingsTable() {
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          {someSelected && (
-            <Badge variant="secondary" className="whitespace-nowrap">
+          {someSelected && <Badge variant="secondary" className="whitespace-nowrap">
               {selectedIds.size} selected
-            </Badge>
-          )}
+            </Badge>}
           <Badge variant="secondary" className="whitespace-nowrap">
             {filteredListings.length} listings
           </Badge>
-          {someSelected && (
-            <DropdownMenu>
+          {someSelected && <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   Bulk Actions
@@ -287,19 +228,31 @@ export function ListingsTable() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { setBulkStatus('active'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('active');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                   Set Active
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setBulkStatus('pending'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('pending');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-yellow-600" />
                   Set Pending
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setBulkStatus('sold'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('sold');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-blue-600" />
                   Set Sold
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setBulkStatus('rented'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('rented');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-purple-600" />
                   Set Rented
                 </DropdownMenuItem>
@@ -313,16 +266,12 @@ export function ListingsTable() {
                   Unfeature All
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setBulkDeleteDialogOpen(true)}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={() => setBulkDeleteDialogOpen(true)} className="text-destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Selected
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            </DropdownMenu>}
         </div>
       </div>
 
@@ -331,11 +280,7 @@ export function ListingsTable() {
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={allSelected}
-                  indeterminate={someSelected && !allSelected}
-                  onCheckedChange={handleSelectAll}
-                />
+                <Checkbox checked={allSelected} indeterminate={someSelected && !allSelected} onCheckedChange={handleSelectAll} />
               </TableHead>
               <SortableTableHead label="Property" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Price" sortKey="price" sortConfig={sortConfig} onSort={handleSort} />
@@ -347,25 +292,18 @@ export function ListingsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length === 0 ? (
-              <TableRow>
+            {paginatedData.length === 0 ? <TableRow>
                 <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                   No listings found
                 </TableCell>
-              </TableRow>
-            ) : (
-              paginatedData.map((listing) => (
-                <TableRow key={listing.id} className="hover:bg-muted/30">
+              </TableRow> : paginatedData.map(listing => <TableRow key={listing.id} className="hover:bg-muted/30">
                   <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(listing.id)}
-                      onCheckedChange={(checked) => handleSelectOne(listing.id, checked as boolean)}
-                    />
+                    <Checkbox checked={selectedIds.has(listing.id)} onCheckedChange={checked => handleSelectOne(listing.id, checked as boolean)} />
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium truncate max-w-[200px]">{listing.title}</p>
-                      <p className="text-sm text-muted-foreground">{listing.city}, {listing.state}</p>
+                      
+                      <p className="text-sm text-secondary">{listing.city}, {listing.state}</p>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">${listing.price.toLocaleString()}</TableCell>
@@ -375,10 +313,7 @@ export function ListingsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Select
-                      value={listing.status}
-                      onValueChange={(value) => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented')}
-                    >
+                    <Select value={listing.status} onValueChange={value => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented')}>
                       <SelectTrigger className={`w-[100px] h-8 text-xs border ${getStatusColor(listing.status)}`}>
                         <SelectValue />
                       </SelectTrigger>
@@ -391,17 +326,8 @@ export function ListingsTable() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleFeatured(listing.id, listing.featured)}
-                      className="h-8 w-8 p-0"
-                    >
-                      {listing.featured ? (
-                        <Star className="h-4 w-4 fill-accent text-accent" />
-                      ) : (
-                        <StarOff className="h-4 w-4 text-muted-foreground" />
-                      )}
+                    <Button variant="ghost" size="sm" onClick={() => toggleFeatured(listing.id, listing.featured)} className="h-8 w-8 p-0">
+                      {listing.featured ? <Star className="h-4 w-4 fill-accent text-accent" /> : <StarOff className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </TableCell>
                   <TableCell>
@@ -424,40 +350,24 @@ export function ListingsTable() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => toggleFeatured(listing.id, !listing.featured)}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
-                          {listing.featured ? (
-                            <>
+                        <DropdownMenuItem onClick={() => toggleFeatured(listing.id, !listing.featured)} className="flex items-center gap-2 cursor-pointer">
+                          {listing.featured ? <>
                               <StarOff className="h-4 w-4" />
                               Unfeature
-                            </>
-                          ) : (
-                            <>
+                            </> : <>
                               <Star className="h-4 w-4" />
                               Feature
-                            </>
-                          )}
+                            </>}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                </TableRow>
-              ))
-            )}
+                </TableRow>)}
           </TableBody>
         </Table>
       </div>
 
-      <TablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        onPageChange={goToPage}
-      />
+      <TablePagination currentPage={currentPage} totalPages={totalPages} totalItems={totalItems} startIndex={startIndex} endIndex={endIndex} onPageChange={goToPage} />
 
       {/* Bulk Delete Dialog */}
       <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
@@ -470,10 +380,7 @@ export function ListingsTable() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBulkDelete}
-              className="bg-destructive hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive hover:bg-destructive/90">
               Delete All
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -497,6 +404,5 @@ export function ListingsTable() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 }
