@@ -177,15 +177,15 @@ export function Header() {
         height: 0
       }} className="md:hidden bg-card border-b border-border overflow-hidden">
             <div className="container mx-auto px-4 py-4 space-y-2">
-              {navLinks.map(link => <Link key={link.href} to={link.href} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === link.href ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
+              {navLinks.map(link => <Link key={link.href} to={link.href} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === link.href ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <link.icon className="w-5 h-5" />
                   {link.label}
                 </Link>)}
-              {user && <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/dashboard" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
+              {user && <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/dashboard" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <LayoutDashboard className="w-5 h-5" />
                   Dashboard
                 </Link>}
-              {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
+              {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <div className="relative">
                     <MessageSquare className="w-5 h-5" />
                     {unreadCount > 0 && <Badge className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] bg-destructive text-destructive-foreground">
@@ -194,7 +194,7 @@ export function Header() {
                   </div>
                   Messages
                 </Link>}
-              {isAdmin && <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/admin" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-secondary/50")}>
+              {isAdmin && <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/admin" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <Shield className="w-5 h-5" />
                   Admin
                 </Link>}
