@@ -176,7 +176,7 @@ export function Header() {
         opacity: 0,
         height: 0
       }} className="md:hidden bg-card border-b border-border overflow-hidden">
-            <div className="container mx-auto px-4 py-4 space-y-2">
+            <div className="container mx-auto px-4 py-4 space-y-2 bg-current">
               {navLinks.map(link => <Link key={link.href} to={link.href} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === link.href ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <link.icon className="w-5 h-5" />
                   {link.label}
