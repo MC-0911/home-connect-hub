@@ -37,10 +37,10 @@ const StepIndicator = ({
               <div className="flex flex-col items-center">
                 <motion.div initial={false} animate={{
               scale: isCurrent ? 1.1 : 1
-            }} className={cn("w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-md", isCompleted ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/30" : isCurrent ? "bg-gradient-to-br from-gold to-gold-dark text-primary-foreground shadow-gold/40 ring-4 ring-gold/20" : "bg-muted/50 text-muted-foreground border-2 border-muted-foreground/20")}>
-                  {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+            }} className={cn("w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-md", isCompleted ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/30" : isCurrent ? "bg-gradient-to-br from-gold to-gold-dark text-primary-foreground shadow-gold/40 ring-4 ring-gold/20" : "bg-primary/15 text-primary border-2 border-primary/30")}>
+                  {isCompleted ? <Check className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
                 </motion.div>
-                <span className={cn("mt-2 text-sm font-medium hidden sm:block", isCurrent ? "text-primary" : "text-muted-foreground")}>
+                <span className={cn("mt-2 text-sm font-medium hidden sm:block", isCurrent ? "text-primary font-semibold" : "text-primary/70")}>
                   {step.label}
                 </span>
               </div>
