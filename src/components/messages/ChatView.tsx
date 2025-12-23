@@ -221,7 +221,7 @@ export const ChatView = ({
                               </a>}
                           </div>}
                         
-                        {message.content && !message.content.startsWith('Sent ') && <p className="text-sm whitespace-pre-wrap break-words">
+                        {message.content && !message.content.startsWith('Sent ') && <p className="text-sm whitespace-pre-wrap break-words text-primary-foreground">
                             {message.content}
                           </p>}
                         <div className={cn("flex items-center gap-1 mt-1", isMine ? "justify-end" : "justify-start")}>
