@@ -158,7 +158,7 @@ export function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden p-2 rounded-lg transition-colors hover:bg-secondary/50" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 rounded-lg transition-colors text-primary-foreground bg-secondary-foreground">
             {mobileMenuOpen ? <X className={cn("w-6 h-6", isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground")} /> : <Menu className={cn("w-6 h-6", isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground")} />}
           </button>
         </div>
