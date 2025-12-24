@@ -1,9 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, MapPin, FileText, Loader2, Upload } from 'lucide-react';
+import { User, Mail, Phone, MapPin, FileText, Loader2, Upload, Pencil, Trash2, MoreVertical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/layout/Header';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,9 +43,11 @@ const Profile = () => {
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -144,6 +153,44 @@ const Profile = () => {
       setSelectedImage(null);
     }
   };
+
+  const handleDeleteAvatar = async () => {
+    if (!user) return;
+    
+    setDeleting(true);
+    try {
+      const filePath = `${user.id}/avatar.jpg`;
+      
+      // Delete from Supabase Storage
+      const { error: deleteError } = await supabase.storage
+        .from('avatars')
+        .remove([filePath]);
+      
+      if (deleteError) throw deleteError;
+
+      // Update profile to remove avatar URL
+      setFormData(prev => ({
+        ...prev,
+        avatar_url: ''
+      }));
+      await updateProfile({ avatar_url: null });
+      
+      toast({
+        title: "Profile picture deleted",
+        description: "Your profile picture has been removed successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting avatar:', error.message);
+      toast({
+        title: "Error",
+        description: "Failed to delete profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -194,24 +241,67 @@ const Profile = () => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Avatar Section */}
                       <div className="flex items-center gap-6">
-                        <div className="relative">
+                        <div className="relative group">
                           <Avatar className="h-24 w-24 border-2 border-border">
                             <AvatarImage src={formData.avatar_url} alt={formData.full_name} />
                             <AvatarFallback className="bg-primary text-primary-foreground text-xl font-display">
                               {formData.full_name ? getInitials(formData.full_name) : <User className="h-8 w-8" />}
                             </AvatarFallback>
                           </Avatar>
-                          {uploading && <div className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-full">
+                          {(uploading || deleting) && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-full">
                               <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                            </div>}
+                            </div>
+                          )}
+                          {/* Edit/Delete Menu */}
+                          {formData.avatar_url && !uploading && !deleting && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="secondary"
+                                  className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                  <Pencil className="mr-2 h-4 w-4" />
+                                  Change Photo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={handleDeleteAvatar}
+                                  className="text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete Photo
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label>Profile Picture</Label>
                           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-                          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload Photo
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading || deleting}>
+                              <Upload className="mr-2 h-4 w-4" />
+                              {formData.avatar_url ? 'Change' : 'Upload'} Photo
+                            </Button>
+                            {formData.avatar_url && (
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={handleDeleteAvatar} 
+                                disabled={uploading || deleting}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground">
                             JPG, PNG or GIF. Max 5MB.
                           </p>
