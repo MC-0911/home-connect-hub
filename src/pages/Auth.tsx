@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -186,15 +187,18 @@ export default function Auth() {
               })} required disabled={loading} />
               </div>
 
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input type={showPassword ? "text" : "password"} placeholder="Password" className="pl-10 pr-10 h-12" value={formData.password} onChange={e => setFormData({
-                ...formData,
-                password: e.target.value
-              })} required disabled={loading} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+              <div className="space-y-0">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input type={showPassword ? "text" : "password"} placeholder="Password" className="pl-10 pr-10 h-12" value={formData.password} onChange={e => setFormData({
+                  ...formData,
+                  password: e.target.value
+                })} required disabled={loading} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {mode === "signup" && <PasswordStrengthIndicator password={formData.password} />}
               </div>
 
               {mode === "login" && <div className="flex justify-end">
