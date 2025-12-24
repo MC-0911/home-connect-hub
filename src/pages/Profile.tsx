@@ -10,6 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -22,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { ImageCropper } from '@/components/profile/ImageCropper';
+
 const Profile = () => {
   const navigate = useNavigate();
   const {
@@ -46,6 +57,7 @@ const Profile = () => {
   const [deleting, setDeleting] = useState(false);
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   useEffect(() => {
@@ -272,7 +284,7 @@ const Profile = () => {
                                   Change Photo
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
-                                  onClick={handleDeleteAvatar}
+                                  onClick={() => setDeleteDialogOpen(true)}
                                   className="text-destructive focus:text-destructive"
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />
@@ -294,7 +306,7 @@ const Profile = () => {
                               <Button 
                                 type="button" 
                                 variant="outline" 
-                                onClick={handleDeleteAvatar} 
+                                onClick={() => setDeleteDialogOpen(true)} 
                                 disabled={uploading || deleting}
                                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                               >
@@ -381,6 +393,26 @@ const Profile = () => {
       <Footer />
 
       <ImageCropper imageSrc={selectedImage} open={cropperOpen} onClose={handleCropperClose} onCropComplete={handleCropComplete} isUploading={uploading} />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Profile Picture</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete your profile picture? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAvatar}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 };
 export default Profile;
