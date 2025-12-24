@@ -228,21 +228,9 @@ const Profile = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone Number</Label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="pl-10" />
-                          </div>
-                        </div>
+                        
 
-                        <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="location">Location</Label>
-                          <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input id="location" name="location" value={formData.location} onChange={handleChange} placeholder="New York, NY" className="pl-10" />
-                          </div>
-                        </div>
+                        
 
                         <div className="space-y-2 md:col-span-2">
                           <Label htmlFor="bio">Bio</Label>
