@@ -216,8 +216,7 @@ const Profile = () => {
                             <Button
                               type="button"
                               size="icon"
-                              variant="secondary"
-                              className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
