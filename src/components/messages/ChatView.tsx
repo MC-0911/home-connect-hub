@@ -18,7 +18,7 @@ interface ChatViewProps {
     type: string;
     name: string;
   }) => Promise<void>;
-  onUploadAttachment: (file: File) => Promise<{
+  onUploadAttachment: (conversationId: string, file: File) => Promise<{
     url: string;
     type: string;
     name: string;
@@ -73,7 +73,7 @@ export const ChatView = ({
       name: string;
     } | undefined;
     if (selectedFile) {
-      const uploaded = await onUploadAttachment(selectedFile);
+      const uploaded = await onUploadAttachment(conversation.id, selectedFile);
       if (uploaded) {
         attachment = uploaded;
       }
