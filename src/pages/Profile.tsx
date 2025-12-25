@@ -283,7 +283,7 @@ const Profile = () => {
                       <Input 
                         value={user?.email || ''} 
                         disabled 
-                        className="pl-10 bg-muted cursor-not-allowed" 
+                        className="pl-10 bg-primary/10 text-foreground cursor-not-allowed" 
                       />
                     </div>
                     <p className="text-xs text-muted-foreground">Email cannot be changed</p>
