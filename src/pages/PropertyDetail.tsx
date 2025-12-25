@@ -207,7 +207,7 @@ export default function PropertyDetail() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-secondary">
                   <MapPin className="w-5 h-5 text-accent" />
                   <span>
                     {property.address}, {property.city}, {property.state} {property.zip_code}
