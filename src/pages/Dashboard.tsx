@@ -44,7 +44,12 @@ export default function Dashboard() {
     propertyId: string | null;
     propertyTitle: string;
     newStatus: string;
-  }>({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" });
+  }>({
+    isOpen: false,
+    propertyId: null,
+    propertyTitle: "",
+    newStatus: ""
+  });
   const unreadCount = getUnreadCount();
   useEffect(() => {
     if (!authLoading && !user) {
@@ -124,41 +129,46 @@ export default function Dashboard() {
       });
     }
   };
-
   const openStatusChangeDialog = (propertyId: string, propertyTitle: string, newStatus: string) => {
-    setStatusChangeDialog({ isOpen: true, propertyId, propertyTitle, newStatus });
+    setStatusChangeDialog({
+      isOpen: true,
+      propertyId,
+      propertyTitle,
+      newStatus
+    });
   };
-
   const confirmStatusChange = async () => {
     if (!statusChangeDialog.propertyId) return;
-    
     try {
-      const { error } = await supabase
-        .from("properties")
-        .update({ status: statusChangeDialog.newStatus as any })
-        .eq("id", statusChangeDialog.propertyId);
-      
+      const {
+        error
+      } = await supabase.from("properties").update({
+        status: statusChangeDialog.newStatus as any
+      }).eq("id", statusChangeDialog.propertyId);
       if (error) throw error;
-      
-      setProperties(prev => 
-        prev.map(p => p.id === statusChangeDialog.propertyId ? { ...p, status: statusChangeDialog.newStatus as any } : p)
-      );
-      
+      setProperties(prev => prev.map(p => p.id === statusChangeDialog.propertyId ? {
+        ...p,
+        status: statusChangeDialog.newStatus as any
+      } : p));
       toast({
         title: "Status Updated",
-        description: `Property status changed to ${statusChangeDialog.newStatus}`,
+        description: `Property status changed to ${statusChangeDialog.newStatus}`
       });
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to update status",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
-      setStatusChangeDialog({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" });
+      setStatusChangeDialog({
+        isOpen: false,
+        propertyId: null,
+        propertyTitle: "",
+        newStatus: ""
+      });
     }
   };
-
   const getStatusBadge = (status: string | null) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       active: "default",
@@ -219,9 +229,7 @@ export default function Dashboard() {
               <h1 className="font-display text-3xl font-bold text-foreground">
                 Seller Dashboard
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Manage your property listings
-              </p>
+              <p className="text-muted-foreground mt-1">Track the performance & Manage your property listings</p>
             </div>
             <Button variant="gold" asChild>
               <Link to="/add-property">
@@ -383,31 +391,19 @@ export default function Dashboard() {
                                           Change Status
                                         </DropdownMenuSubTrigger>
                                         <DropdownMenuSubContent className="bg-popover">
-                                          <DropdownMenuItem 
-                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'active')}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                          >
+                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'active')} className="flex items-center gap-2 cursor-pointer">
                                             <Home className="w-4 h-4 text-green-500" />
                                             Active
                                           </DropdownMenuItem>
-                                          <DropdownMenuItem 
-                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                          >
+                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')} className="flex items-center gap-2 cursor-pointer">
                                             <Clock className="w-4 h-4 text-yellow-500" />
                                             Pending
                                           </DropdownMenuItem>
-                                          <DropdownMenuItem 
-                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                          >
+                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')} className="flex items-center gap-2 cursor-pointer">
                                             <CheckCircle className="w-4 h-4 text-red-500" />
                                             Sold
                                           </DropdownMenuItem>
-                                          <DropdownMenuItem 
-                                            onClick={() => openStatusChangeDialog(property.id, property.title, 'rented')}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                          >
+                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'rented')} className="flex items-center gap-2 cursor-pointer">
                                             <XCircle className="w-4 h-4 text-muted-foreground" />
                                             Rented
                                           </DropdownMenuItem>
@@ -526,7 +522,12 @@ export default function Dashboard() {
       <Footer />
 
       {/* Status Change Confirmation Dialog */}
-      <AlertDialog open={statusChangeDialog.isOpen} onOpenChange={(open) => !open && setStatusChangeDialog({ isOpen: false, propertyId: null, propertyTitle: "", newStatus: "" })}>
+      <AlertDialog open={statusChangeDialog.isOpen} onOpenChange={open => !open && setStatusChangeDialog({
+      isOpen: false,
+      propertyId: null,
+      propertyTitle: "",
+      newStatus: ""
+    })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Change Listing Status</AlertDialogTitle>
