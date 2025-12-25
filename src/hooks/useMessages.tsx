@@ -181,13 +181,14 @@ export const useMessages = () => {
     }
   };
 
-  // Upload attachment
-  const uploadAttachment = async (file: File): Promise<{ url: string; type: string; name: string } | null> => {
+  // Upload attachment - now requires conversationId for secure storage
+  const uploadAttachment = async (conversationId: string, file: File): Promise<{ url: string; type: string; name: string } | null> => {
     if (!user) return null;
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      // Store files in conversation folder for RLS policy to work
+      const fileName = `${conversationId}/${Date.now()}_${file.name}`;
 
       const { error: uploadError } = await supabase.storage
         .from('message-attachments')
@@ -195,12 +196,15 @@ export const useMessages = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Use signed URL since bucket is private - valid for 1 year
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('message-attachments')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+
+      if (signedUrlError) throw signedUrlError;
 
       return {
-        url: publicUrl,
+        url: signedUrlData.signedUrl,
         type: file.type,
         name: file.name,
       };
