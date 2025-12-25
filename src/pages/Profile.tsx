@@ -210,7 +210,7 @@ const Profile = () => {
                           <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         </div>
                       )}
-                      {formData.avatar_url && !uploading && !deleting && (
+                      {!uploading && !deleting && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -223,40 +223,23 @@ const Profile = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Change Photo
+                              {formData.avatar_url ? <Pencil className="mr-2 h-4 w-4" /> : <Upload className="mr-2 h-4 w-4" />}
+                              {formData.avatar_url ? 'Change Photo' : 'Upload Photo'}
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => setDeleteDialogOpen(true)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete Photo
-                            </DropdownMenuItem>
+                            {formData.avatar_url && (
+                              <DropdownMenuItem 
+                                onClick={() => setDeleteDialogOpen(true)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Photo
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
                     </div>
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-                    <div className="flex gap-2">
-                      <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading || deleting}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        {formData.avatar_url ? 'Change' : 'Upload'} Photo
-                      </Button>
-                      {formData.avatar_url && (
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setDeleteDialogOpen(true)} 
-                          disabled={uploading || deleting}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">JPG, PNG or GIF. Max 5MB.</p>
                   </div>
 
                   {/* Full Name */}
