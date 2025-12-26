@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
@@ -50,6 +50,7 @@ export default function Dashboard() {
     propertyTitle: "",
     newStatus: ""
   });
+  const [inquiriesData, setInquiriesData] = useState<{ total: number; weeklyNew: number }>({ total: 0, weeklyNew: 0 });
   const unreadCount = getUnreadCount();
   useEffect(() => {
     if (!authLoading && !user) {
@@ -60,6 +61,7 @@ export default function Dashboard() {
     if (user) {
       fetchProperties();
       fetchUnreadAlertsCount();
+      fetchInquiriesData();
 
       // Subscribe to alerts changes
       const channel = supabase.channel("dashboard-alerts").on("postgres_changes", {
@@ -75,6 +77,36 @@ export default function Dashboard() {
       };
     }
   }, [user]);
+
+  const fetchInquiriesData = async () => {
+    try {
+      // Get all conversations where the user is the seller (property owner)
+      const { data: allConversations, error: allError } = await supabase
+        .from("conversations")
+        .select("buyer_id, created_at")
+        .eq("seller_id", user?.id);
+
+      if (allError) throw allError;
+
+      // Count unique buyers
+      const uniqueBuyers = new Set(allConversations?.map(c => c.buyer_id) || []);
+      const total = uniqueBuyers.size;
+
+      // Count new inquiries from the past week
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      
+      const weeklyConversations = allConversations?.filter(c => 
+        new Date(c.created_at) >= oneWeekAgo
+      ) || [];
+      const weeklyUniqueBuyers = new Set(weeklyConversations.map(c => c.buyer_id));
+      const weeklyNew = weeklyUniqueBuyers.size;
+
+      setInquiriesData({ total, weeklyNew });
+    } catch (error: any) {
+      console.error("Error fetching inquiries data:", error);
+    }
+  };
   const fetchUnreadAlertsCount = async () => {
     try {
       const {
@@ -209,10 +241,11 @@ export default function Dashboard() {
     icon: DollarSign,
     color: "text-accent"
   }, {
-    title: "Messages",
-    value: unreadCount,
+    title: "Inquiries",
+    value: inquiriesData.total,
     icon: MessageSquare,
-    color: "text-accent"
+    color: "text-accent",
+    trend: inquiriesData.weeklyNew > 0 ? `+${inquiriesData.weeklyNew} new this week` : null
   }, {
     title: "Alerts",
     value: unreadAlertsCount,
@@ -277,6 +310,12 @@ export default function Dashboard() {
                           {i < stat.breakdown.length - 1 && ', '}
                         </span>
                       ))}
+                    </p>
+                  )}
+                  {'trend' in stat && stat.trend && (
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <ArrowUpRight className="h-3 w-3" />
+                      {stat.trend}
                     </p>
                   )}
                 </CardContent>
