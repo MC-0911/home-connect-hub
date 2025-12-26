@@ -187,26 +187,37 @@ export default function Dashboard() {
       maximumFractionDigits: 0
     }).format(price);
   };
+  const activeCount = properties.filter(p => p.status === "active").length;
+  const pendingCount = properties.filter(p => p.status === "pending").length;
+  const soldCount = properties.filter(p => p.status === "sold").length;
+  const rentedCount = properties.filter(p => p.status === "rented").length;
+
   const stats = [{
     title: "Total Listings",
     value: properties.length,
-    icon: Building2,
-    color: "text-accent"
-  }, {
-    title: "Active Listings",
-    value: properties.filter(p => p.status === "active").length,
-    icon: TrendingUp,
-    color: "text-green-500"
+    icon: Home,
+    color: "text-accent",
+    breakdown: [
+      { label: "active", count: activeCount, color: "text-green-600" },
+      { label: "pending", count: pendingCount, color: "text-yellow-600" },
+      { label: "sold", count: soldCount, color: "text-red-600" },
+      { label: "rented", count: rentedCount, color: "text-blue-600" }
+    ].filter(item => item.count > 0)
   }, {
     title: "Total Value",
     value: formatPrice(properties.reduce((acc, p) => acc + p.price, 0)),
     icon: DollarSign,
     color: "text-accent"
   }, {
-    title: "Pending",
-    value: properties.filter(p => p.status === "pending").length,
-    icon: Users,
-    color: "text-yellow-500"
+    title: "Messages",
+    value: unreadCount,
+    icon: MessageSquare,
+    color: "text-accent"
+  }, {
+    title: "Alerts",
+    value: unreadAlertsCount,
+    icon: Bell,
+    color: "text-accent"
   }];
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-background">
@@ -258,6 +269,16 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                  {'breakdown' in stat && stat.breakdown && stat.breakdown.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {stat.breakdown.map((item, i) => (
+                        <span key={item.label}>
+                          <span className={item.color}>{item.count} {item.label}</span>
+                          {i < stat.breakdown.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </CardContent>
               </Card>)}
           </motion.div>
