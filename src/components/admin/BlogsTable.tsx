@@ -44,6 +44,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from './RichTextEditor';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
@@ -405,12 +406,10 @@ export function BlogsTable() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Content</Label>
-                  <Textarea
-                    id="content"
+                  <RichTextEditor
                     value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={6}
-                    required
+                    onChange={(value) => setFormData({ ...formData, content: value })}
+                    placeholder="Write your blog content here..."
                   />
                 </div>
                 <div className="space-y-2">
