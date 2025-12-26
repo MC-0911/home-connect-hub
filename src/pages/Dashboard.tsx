@@ -51,6 +51,7 @@ export default function Dashboard() {
     newStatus: ""
   });
   const [inquiriesData, setInquiriesData] = useState<{ total: number; weeklyNew: number }>({ total: 0, weeklyNew: 0 });
+  const [propertyInquiries, setPropertyInquiries] = useState<Record<string, number>>({});
   const unreadCount = getUnreadCount();
   useEffect(() => {
     if (!authLoading && !user) {
@@ -83,7 +84,7 @@ export default function Dashboard() {
       // Get all conversations where the user is the seller (property owner)
       const { data: allConversations, error: allError } = await supabase
         .from("conversations")
-        .select("buyer_id, created_at")
+        .select("buyer_id, created_at, property_id")
         .eq("seller_id", user?.id);
 
       if (allError) throw allError;
@@ -103,6 +104,23 @@ export default function Dashboard() {
       const weeklyNew = weeklyUniqueBuyers.size;
 
       setInquiriesData({ total, weeklyNew });
+
+      // Count unique buyers per property
+      const propertyBuyerCounts: Record<string, Set<string>> = {};
+      allConversations?.forEach(c => {
+        if (c.property_id) {
+          if (!propertyBuyerCounts[c.property_id]) {
+            propertyBuyerCounts[c.property_id] = new Set();
+          }
+          propertyBuyerCounts[c.property_id].add(c.buyer_id);
+        }
+      });
+      
+      const counts: Record<string, number> = {};
+      Object.entries(propertyBuyerCounts).forEach(([propertyId, buyers]) => {
+        counts[propertyId] = buyers.size;
+      });
+      setPropertyInquiries(counts);
     } catch (error: any) {
       console.error("Error fetching inquiries data:", error);
     }
@@ -392,6 +410,12 @@ export default function Dashboard() {
                               <TableHead>Type</TableHead>
                               <TableHead>Price</TableHead>
                               <TableHead>Status</TableHead>
+                              <TableHead>
+                                <div className="flex items-center gap-1">
+                                  <MessageSquare className="w-4 h-4" />
+                                  Inquiries
+                                </div>
+                              </TableHead>
                               <TableHead>Listed</TableHead>
                               <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -421,6 +445,11 @@ export default function Dashboard() {
                                   {property.listing_type === "rent" && <span className="text-muted-foreground text-sm">/mo</span>}
                                 </TableCell>
                                 <TableCell>{getStatusBadge(property.status)}</TableCell>
+                                <TableCell>
+                                  <span className={propertyInquiries[property.id] > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
+                                    {propertyInquiries[property.id] || 0}
+                                  </span>
+                                </TableCell>
                                 <TableCell className="text-muted-foreground">
                                   {new Date(property.created_at).toLocaleDateString()}
                                 </TableCell>
