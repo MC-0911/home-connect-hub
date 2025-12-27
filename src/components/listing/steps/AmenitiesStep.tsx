@@ -40,8 +40,8 @@ const AmenitiesStep = () => {
   const customAmenities = formData.amenities.filter(a => !amenitiesList.includes(a));
   return <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-display font-semibold text-foreground">Amenities</h2>
-        <p className="text-muted-foreground mt-1">Select all amenities your property offers</p>
+        <h2 className="text-2xl font-display font-semibold text-foreground">Room & Interior Features</h2>
+        <p className="text-muted-foreground mt-1">Let's get into the nitty-gritty of your home's interior. What makes it special inside?</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
