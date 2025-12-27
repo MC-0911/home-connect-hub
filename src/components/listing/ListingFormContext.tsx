@@ -20,7 +20,11 @@ export interface ListingFormData {
   state: string;
   zipCode: string;
   
-  // Step 3: Amenities
+  // Step 3: Room & Interior Features
+  basement: string;
+  flooring: string[];
+  rooms: string[];
+  indoorFeatures: string[];
   amenities: string[];
   
   // Step 4: Images
@@ -56,6 +60,10 @@ export const initialFormData: ListingFormData = {
   lotSize: '',
   yearBuilt: '',
   annualTax: '',
+  basement: '',
+  flooring: [],
+  rooms: [],
+  indoorFeatures: [],
   amenities: [],
   images: [],
   imagePreviewUrls: [],
