@@ -44,7 +44,30 @@ const AmenitiesStep = () => {
         <p className="text-muted-foreground mt-1">Let's get into the nitty-gritty of your home's interior. What makes it special inside?</p>
       </div>
 
-      
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {amenitiesList.map((amenity, index) => {
+        const isSelected = formData.amenities.includes(amenity);
+        return <motion.div key={amenity} initial={{
+          opacity: 0,
+          y: 10
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          delay: index * 0.03
+        }}>
+              <div onClick={() => toggleAmenity(amenity)} className={`
+                  flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all
+                  ${isSelected ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/50 hover:bg-muted/50'}
+                `}>
+                <Checkbox id={amenity} checked={isSelected} onCheckedChange={() => toggleAmenity(amenity)} className="pointer-events-none" />
+                <Label htmlFor={amenity} className="cursor-pointer text-sm font-medium flex-1">
+                  {amenity}
+                </Label>
+              </div>
+            </motion.div>;
+      })}
+      </div>
 
       {/* Other - Custom Amenities */}
       <div className="border-t border-border pt-6">
