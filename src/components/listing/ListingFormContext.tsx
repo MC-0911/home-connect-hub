@@ -1,20 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface ListingFormData {
-  // Step 1: Basic Details
+  // Step 1: Basic Details & Features
   title: string;
   description: string;
   propertyType: string;
   listingType: 'sale' | 'rent';
   price: string;
-  
-  // Step 2: Location
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  
-  // Step 3: Property Features
   bedrooms: string;
   bathrooms: string;
   squareFeet: string;
@@ -22,10 +14,16 @@ export interface ListingFormData {
   yearBuilt: string;
   annualTax: string;
   
-  // Step 4: Amenities
+  // Step 2: Location
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  
+  // Step 3: Amenities
   amenities: string[];
   
-  // Step 5: Images
+  // Step 4: Images
   images: File[];
   imagePreviewUrls: string[];
   existingImageUrls: string[];
@@ -84,7 +82,7 @@ export const ListingFormProvider = ({
     ...initialData,
   });
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const updateFormData = (data: Partial<ListingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));

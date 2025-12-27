@@ -4,7 +4,6 @@ import { useListingForm, ListingFormProvider, ListingFormData } from './ListingF
 import StepIndicator from './StepIndicator';
 import BasicInfoStep from './steps/BasicInfoStep';
 import LocationStep from './steps/LocationStep';
-import FeaturesStep from './steps/FeaturesStep';
 import AmenitiesStep from './steps/AmenitiesStep';
 import ImagesStep from './steps/ImagesStep';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-const stepComponents = [BasicInfoStep, LocationStep, FeaturesStep, AmenitiesStep, ImagesStep];
+const stepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ImagesStep];
 const ListingFormContent = () => {
   const {
     formData,
@@ -45,18 +44,6 @@ const ListingFormContent = () => {
           });
           return false;
         }
-        return true;
-      case 2:
-        if (!formData.address || !formData.city || !formData.state || !formData.zipCode) {
-          toast({
-            title: "Missing Location",
-            description: "Please provide the complete property address.",
-            variant: "destructive"
-          });
-          return false;
-        }
-        return true;
-      case 3:
         const isLand = formData.propertyType === 'land';
         if (!isLand && (!formData.bedrooms || !formData.bathrooms || !formData.squareFeet)) {
           toast({
@@ -75,10 +62,20 @@ const ListingFormContent = () => {
           return false;
         }
         return true;
-      case 4:
+      case 2:
+        if (!formData.address || !formData.city || !formData.state || !formData.zipCode) {
+          toast({
+            title: "Missing Location",
+            description: "Please provide the complete property address.",
+            variant: "destructive"
+          });
+          return false;
+        }
+        return true;
+      case 3:
         return true;
       // Amenities are optional
-      case 5:
+      case 4:
         if (formData.images.length === 0 && formData.existingImageUrls.length === 0) {
           toast({
             title: "No Images",
