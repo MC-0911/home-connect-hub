@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -18,8 +18,11 @@ import {
   Heading3,
   Undo,
   Redo,
+  Image,
+  Type,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface RichTextEditorProps {
   value: string;
@@ -30,17 +33,31 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInternalChange = useRef(false);
+
+  // Sync external value changes to editor
+  useEffect(() => {
+    if (editorRef.current && !isInternalChange.current) {
+      if (editorRef.current.innerHTML !== value) {
+        editorRef.current.innerHTML = value;
+      }
+    }
+    isInternalChange.current = false;
+  }, [value]);
 
   const execCommand = useCallback((command: string, value?: string) => {
+    editorRef.current?.focus();
     document.execCommand(command, false, value);
     if (editorRef.current) {
+      isInternalChange.current = true;
       onChange(editorRef.current.innerHTML);
     }
-    editorRef.current?.focus();
   }, [onChange]);
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
+      isInternalChange.current = true;
       onChange(editorRef.current.innerHTML);
     }
   }, [onChange]);
@@ -52,11 +69,76 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   }, []);
 
   const insertLink = useCallback(() => {
-    const url = prompt('Enter URL:');
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || '';
+    const url = prompt('Enter URL:', 'https://');
     if (url) {
-      execCommand('createLink', url);
+      editorRef.current?.focus();
+      if (selectedText) {
+        document.execCommand('createLink', false, url);
+      } else {
+        const linkText = prompt('Enter link text:', 'Link');
+        if (linkText) {
+          document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${linkText}</a>`);
+        }
+      }
+      if (editorRef.current) {
+        isInternalChange.current = true;
+        onChange(editorRef.current.innerHTML);
+      }
     }
-  }, [execCommand]);
+  }, [onChange]);
+
+  const formatBlock = useCallback((tag: string) => {
+    editorRef.current?.focus();
+    document.execCommand('formatBlock', false, `<${tag}>`);
+    if (editorRef.current) {
+      isInternalChange.current = true;
+      onChange(editorRef.current.innerHTML);
+    }
+  }, [onChange]);
+
+  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      editorRef.current?.focus();
+      document.execCommand('insertHTML', false, `<img src="${dataUrl}" alt="Uploaded image" style="max-width: 100%; height: auto; margin: 8px 0;" />`);
+      if (editorRef.current) {
+        isInternalChange.current = true;
+        onChange(editorRef.current.innerHTML);
+      }
+      toast.success('Image inserted successfully');
+    };
+    reader.onerror = () => {
+      toast.error('Failed to load image');
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [onChange]);
+
+  const triggerImageUpload = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   const ToolbarButton = ({ 
     icon: Icon, 
@@ -85,6 +167,15 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
 
   return (
     <div className={cn("border rounded-md overflow-hidden", className)}>
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
+      
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1 bg-muted/50 border-b">
         {/* History */}
@@ -102,16 +193,17 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         <Separator orientation="vertical" className="h-6 mx-1" />
         
         {/* Headings */}
-        <ToolbarButton icon={Heading1} command="formatBlock" value="h1" title="Heading 1" />
-        <ToolbarButton icon={Heading2} command="formatBlock" value="h2" title="Heading 2" />
-        <ToolbarButton icon={Heading3} command="formatBlock" value="h3" title="Heading 3" />
+        <ToolbarButton icon={Heading1} title="Heading 1" onClick={() => formatBlock('h1')} />
+        <ToolbarButton icon={Heading2} title="Heading 2" onClick={() => formatBlock('h2')} />
+        <ToolbarButton icon={Heading3} title="Heading 3" onClick={() => formatBlock('h3')} />
+        <ToolbarButton icon={Type} title="Normal text" onClick={() => formatBlock('p')} />
         
         <Separator orientation="vertical" className="h-6 mx-1" />
         
         {/* Lists */}
         <ToolbarButton icon={List} command="insertUnorderedList" title="Bullet List" />
         <ToolbarButton icon={ListOrdered} command="insertOrderedList" title="Numbered List" />
-        <ToolbarButton icon={Quote} command="formatBlock" value="blockquote" title="Quote" />
+        <ToolbarButton icon={Quote} title="Quote" onClick={() => formatBlock('blockquote')} />
         
         <Separator orientation="vertical" className="h-6 mx-1" />
         
@@ -122,8 +214,9 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         
         <Separator orientation="vertical" className="h-6 mx-1" />
         
-        {/* Link */}
+        {/* Link & Image */}
         <ToolbarButton icon={Link} title="Insert Link" onClick={insertLink} />
+        <ToolbarButton icon={Image} title="Upload Image" onClick={triggerImageUpload} />
       </div>
       
       {/* Editor */}
@@ -134,15 +227,18 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           "min-h-[200px] p-3 outline-none",
           "prose prose-sm max-w-none",
           "prose-headings:mt-2 prose-headings:mb-1",
+          "prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg",
           "prose-p:my-1",
           "prose-ul:my-1 prose-ol:my-1",
-          "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic",
+          "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:my-2",
+          "prose-a:text-primary prose-a:underline",
+          "prose-img:rounded-md prose-img:my-2",
           "[&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:text-muted-foreground"
         )}
         data-placeholder={placeholder}
-        dangerouslySetInnerHTML={{ __html: value }}
         onInput={handleInput}
         onPaste={handlePaste}
+        suppressContentEditableWarning
       />
     </div>
   );
