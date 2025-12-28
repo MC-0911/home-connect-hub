@@ -213,6 +213,17 @@ const ImagesStep = () => {
           <p>{formData.description.length} characters</p>
         </div>
       </div>
+
+      {/* Ready Message */}
+      <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-5 text-center">
+        <p className="text-lg font-semibold text-primary mb-2">
+          Ready to Go Live? 🎉
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Click "Publish Listing" below to make your property visible to potential buyers. 
+          You can always edit your listing later if needed.
+        </p>
+      </div>
     </div>
   );
 };
