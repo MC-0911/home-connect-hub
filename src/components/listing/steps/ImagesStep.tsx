@@ -204,7 +204,7 @@ const ImagesStep = () => {
             value={formData.description}
             onChange={(e) => updateFormData({ description: e.target.value })}
             placeholder="Paint a picture for potential buyers! Describe what makes your home special, the neighborhood, nearby amenities, recent updates, and anything else that would make someone fall in love with your property..."
-            className="w-full min-h-[120px] p-4 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
+            className="w-full min-h-[120px] p-4 rounded-lg border border-input bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
             maxLength={2000}
           />
         </div>
