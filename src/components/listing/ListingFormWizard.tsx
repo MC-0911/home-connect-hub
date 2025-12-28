@@ -5,6 +5,7 @@ import StepIndicator from './StepIndicator';
 import BasicInfoStep from './steps/BasicInfoStep';
 import LocationStep from './steps/LocationStep';
 import AmenitiesStep from './steps/AmenitiesStep';
+import ExteriorFeaturesStep from './steps/ExteriorFeaturesStep';
 import ImagesStep from './steps/ImagesStep';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-const stepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ImagesStep];
+const stepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ExteriorFeaturesStep, ImagesStep];
 const ListingFormContent = () => {
   const {
     formData,
@@ -74,8 +75,11 @@ const ListingFormContent = () => {
         return true;
       case 3:
         return true;
-      // Amenities are optional
+      // Interior features are optional
       case 4:
+        return true;
+      // Exterior features are optional
+      case 5:
         if (formData.images.length === 0 && formData.existingImageUrls.length === 0) {
           toast({
             title: "No Images",

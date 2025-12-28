@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Home, MapPin, Ruler, Sparkles, ImageIcon } from 'lucide-react';
+import { Check, Home, MapPin, Ruler, Sparkles, Trees, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 interface StepIndicatorProps {
   currentStep: number;
@@ -13,11 +13,11 @@ const steps = [{
   label: 'Location',
   icon: MapPin
 }, {
-  label: 'Features',
+  label: 'Interior',
   icon: Ruler
 }, {
-  label: 'Amenities',
-  icon: Sparkles
+  label: 'Exterior',
+  icon: Trees
 }, {
   label: 'Photos',
   icon: ImageIcon

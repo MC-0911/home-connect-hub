@@ -27,7 +27,14 @@ export interface ListingFormData {
   indoorFeatures: string[];
   amenities: string[];
   
-  // Step 4: Images
+  // Step 4: Exterior Features
+  architecturalStyle: string;
+  parking: string[];
+  roofingType: string;
+  outdoorAmenities: string[];
+  views: string[];
+  
+  // Step 5: Images
   images: File[];
   imagePreviewUrls: string[];
   existingImageUrls: string[];
@@ -65,6 +72,11 @@ export const initialFormData: ListingFormData = {
   rooms: [],
   indoorFeatures: [],
   amenities: [],
+  architecturalStyle: '',
+  parking: [],
+  roofingType: '',
+  outdoorAmenities: [],
+  views: [],
   images: [],
   imagePreviewUrls: [],
   existingImageUrls: [],
@@ -90,7 +102,7 @@ export const ListingFormProvider = ({
     ...initialData,
   });
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const updateFormData = (data: Partial<ListingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
