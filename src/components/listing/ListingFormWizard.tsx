@@ -156,7 +156,18 @@ const ListingFormContent = () => {
         lot_size: formData.lotSize ? parseInt(formData.lotSize) : null,
         year_built: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
         amenities: formData.amenities,
-        images: allImageUrls
+        images: allImageUrls,
+        // Interior features
+        basement: formData.basement || null,
+        flooring: formData.flooring,
+        rooms: formData.rooms,
+        indoor_features: formData.indoorFeatures,
+        // Exterior features
+        architectural_style: formData.architecturalStyle || null,
+        parking: formData.parking,
+        roofing_type: formData.roofingType || null,
+        outdoor_amenities: formData.outdoorAmenities,
+        views: formData.views
       };
       if (editMode && propertyId) {
         // Update existing property
