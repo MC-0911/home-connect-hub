@@ -7,6 +7,7 @@ import LocationStep from './steps/LocationStep';
 import AmenitiesStep from './steps/AmenitiesStep';
 import ExteriorFeaturesStep from './steps/ExteriorFeaturesStep';
 import ImagesStep from './steps/ImagesStep';
+import SuccessStep from './steps/SuccessStep';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
@@ -33,6 +34,7 @@ const ListingFormContent = () => {
     user
   } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(false);
   const CurrentStepComponent = stepComponents[currentStep - 1];
   const validateStep = (step: number): boolean => {
     switch (step) {
@@ -179,6 +181,9 @@ const ListingFormContent = () => {
           title: "Listing Created!",
           description: "Your property has been published successfully."
         });
+        setShowSuccess(true);
+        resetForm();
+        return;
       }
       resetForm();
       navigate('/dashboard');
@@ -193,6 +198,10 @@ const ListingFormContent = () => {
       setIsSubmitting(false);
     }
   };
+  if (showSuccess) {
+    return <SuccessStep />;
+  }
+
   return <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-3xl mx-auto py-[60px]">
         <div className="text-center mb-8">
