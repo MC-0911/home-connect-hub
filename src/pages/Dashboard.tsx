@@ -220,14 +220,17 @@ export default function Dashboard() {
     }
   };
   const getStatusBadge = (status: string | null) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      active: "default",
-      pending: "secondary",
-      sold: "destructive",
-      rented: "outline"
+    const statusStyles: Record<string, string> = {
+      active: "bg-green-500/10 text-green-600 border-green-500/20",
+      pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+      sold: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+      rented: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+      under_review: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+      declined: "bg-red-500/10 text-red-600 border-red-500/20"
     };
-    return <Badge variant={variants[status || "active"] || "default"} className="capitalize">
-        {status || "active"}
+    const displayStatus = status === 'under_review' ? 'Under Review' : status || 'active';
+    return <Badge variant="outline" className={`capitalize ${statusStyles[status || "active"] || ""}`}>
+        {displayStatus}
       </Badge>;
   };
   const formatPrice = (price: number) => {
@@ -241,6 +244,8 @@ export default function Dashboard() {
   const pendingCount = properties.filter(p => p.status === "pending").length;
   const soldCount = properties.filter(p => p.status === "sold").length;
   const rentedCount = properties.filter(p => p.status === "rented").length;
+  const underReviewCount = properties.filter(p => p.status === "under_review").length;
+  const declinedCount = properties.filter(p => p.status === "declined").length;
 
   const stats = [{
     title: "Total Listings",
@@ -249,9 +254,11 @@ export default function Dashboard() {
     color: "text-accent",
     breakdown: [
       { label: "active", count: activeCount, color: "text-green-600" },
+      { label: "under review", count: underReviewCount, color: "text-orange-600" },
       { label: "pending", count: pendingCount, color: "text-yellow-600" },
-      { label: "sold", count: soldCount, color: "text-red-600" },
-      { label: "rented", count: rentedCount, color: "text-blue-600" }
+      { label: "sold", count: soldCount, color: "text-blue-600" },
+      { label: "rented", count: rentedCount, color: "text-purple-600" },
+      { label: "declined", count: declinedCount, color: "text-red-600" }
     ].filter(item => item.count > 0)
   }, {
     title: "Total Value",

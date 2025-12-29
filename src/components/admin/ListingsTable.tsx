@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Search, Eye, Star, StarOff, MoreHorizontal, MoreVertical, Trash2, CheckCircle } from 'lucide-react';
+import { Search, Eye, Star, StarOff, MoreHorizontal, MoreVertical, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
@@ -71,7 +71,7 @@ export function ListingsTable() {
       toast.error('Failed to update featured status');
     }
   };
-  const updateStatus = async (id: string, newStatus: 'active' | 'pending' | 'sold' | 'rented') => {
+  const updateStatus = async (id: string, newStatus: 'active' | 'pending' | 'sold' | 'rented' | 'under_review' | 'declined') => {
     try {
       const {
         error
@@ -85,6 +85,16 @@ export function ListingsTable() {
       console.error('Error updating status:', error);
       toast.error('Failed to update status');
     }
+  };
+
+  const handleApprove = async (id: string) => {
+    await updateStatus(id, 'active');
+    toast.success('Listing approved and now active');
+  };
+
+  const handleDecline = async (id: string) => {
+    await updateStatus(id, 'declined');
+    toast.success('Listing declined');
   };
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -184,6 +194,10 @@ export function ListingsTable() {
         return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
       case 'rented':
         return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
+      case 'under_review':
+        return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+      case 'declined':
+        return 'bg-red-500/10 text-red-600 border-red-500/20';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -206,10 +220,12 @@ export function ListingsTable() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="under_review">Under Review</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="sold">Sold</SelectItem>
               <SelectItem value="rented">Rented</SelectItem>
+              <SelectItem value="declined">Declined</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -313,17 +329,44 @@ export function ListingsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Select value={listing.status} onValueChange={value => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented')}>
-                      <SelectTrigger className={`w-[100px] h-8 text-xs border ${getStatusColor(listing.status)}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="sold">Sold</SelectItem>
-                        <SelectItem value="rented">Rented</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      {listing.status === 'under_review' ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleApprove(listing.id)}
+                            className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDecline(listing.id)}
+                            className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Decline
+                          </Button>
+                        </div>
+                      ) : (
+                        <Select value={listing.status} onValueChange={value => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented' | 'under_review' | 'declined')}>
+                          <SelectTrigger className={`w-[120px] h-8 text-xs border ${getStatusColor(listing.status)}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="sold">Sold</SelectItem>
+                            <SelectItem value="rented">Rented</SelectItem>
+                            <SelectItem value="under_review">Under Review</SelectItem>
+                            <SelectItem value="declined">Declined</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" onClick={() => toggleFeatured(listing.id, listing.featured)} className="h-8 w-8 p-0">
