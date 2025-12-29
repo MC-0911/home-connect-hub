@@ -17,12 +17,12 @@ const SuccessStep = () => {
           </h1>
           
           <p className="text-lg text-muted-foreground mb-2">
-            You're officially part of our real estate community! 🎉
+            Your listing is now under review! 🎉
           </p>
           
           <p className="text-muted-foreground">
-            Your property will now be available for potential buyers to discover. 
-            We'll notify you when someone shows interest. 🏡💛
+            Our team will review your property listing and once approved, 
+            it will be visible to potential buyers. 🏡💛
           </p>
         </div>
 

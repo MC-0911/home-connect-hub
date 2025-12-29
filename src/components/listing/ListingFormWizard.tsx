@@ -178,8 +178,8 @@ const ListingFormContent = () => {
         });
         if (insertError) throw insertError;
         toast({
-          title: "Listing Created!",
-          description: "Your property has been published successfully."
+          title: "Listing Submitted!",
+          description: "Your property is under review and will be published once approved."
         });
         setShowSuccess(true);
         resetForm();
