@@ -87,6 +87,17 @@ const EditProperty = () => {
               annualTax: '',
               amenities: property.amenities || [],
               existingImageUrls: property.images || [],
+              // Interior features
+              basement: property.basement || '',
+              flooring: property.flooring || [],
+              rooms: property.rooms || [],
+              indoorFeatures: property.indoor_features || [],
+              // Exterior features
+              architecturalStyle: property.architectural_style || '',
+              parking: property.parking || [],
+              roofingType: property.roofing_type || '',
+              outdoorAmenities: property.outdoor_amenities || [],
+              views: property.views || [],
             }}
           />
         )}

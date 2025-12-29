@@ -298,72 +298,99 @@ export type Database = {
         Row: {
           address: string
           amenities: string[] | null
+          architectural_style: string | null
+          basement: string | null
           bathrooms: number | null
           bedrooms: number | null
           city: string
           created_at: string
           description: string
           featured: boolean | null
+          flooring: string[] | null
           id: string
           images: string[] | null
+          indoor_features: string[] | null
           listing_type: Database["public"]["Enums"]["listing_type"]
           lot_size: number | null
+          outdoor_amenities: string[] | null
+          parking: string[] | null
           price: number
           property_type: Database["public"]["Enums"]["property_type"]
+          roofing_type: string | null
+          rooms: string[] | null
           square_feet: number | null
           state: string
           status: Database["public"]["Enums"]["property_status"] | null
           title: string
           updated_at: string
           user_id: string
+          views: string[] | null
           year_built: number | null
           zip_code: string
         }
         Insert: {
           address: string
           amenities?: string[] | null
+          architectural_style?: string | null
+          basement?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
           city: string
           created_at?: string
           description: string
           featured?: boolean | null
+          flooring?: string[] | null
           id?: string
           images?: string[] | null
+          indoor_features?: string[] | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           lot_size?: number | null
+          outdoor_amenities?: string[] | null
+          parking?: string[] | null
           price: number
           property_type: Database["public"]["Enums"]["property_type"]
+          roofing_type?: string | null
+          rooms?: string[] | null
           square_feet?: number | null
           state: string
           status?: Database["public"]["Enums"]["property_status"] | null
           title: string
           updated_at?: string
           user_id: string
+          views?: string[] | null
           year_built?: number | null
           zip_code: string
         }
         Update: {
           address?: string
           amenities?: string[] | null
+          architectural_style?: string | null
+          basement?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
           city?: string
           created_at?: string
           description?: string
           featured?: boolean | null
+          flooring?: string[] | null
           id?: string
           images?: string[] | null
+          indoor_features?: string[] | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           lot_size?: number | null
+          outdoor_amenities?: string[] | null
+          parking?: string[] | null
           price?: number
           property_type?: Database["public"]["Enums"]["property_type"]
+          roofing_type?: string | null
+          rooms?: string[] | null
           square_feet?: number | null
           state?: string
           status?: Database["public"]["Enums"]["property_status"] | null
           title?: string
           updated_at?: string
           user_id?: string
+          views?: string[] | null
           year_built?: number | null
           zip_code?: string
         }
