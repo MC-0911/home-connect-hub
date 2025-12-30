@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Check, Home, Plus } from "lucide-react";
-
 const SuccessStep = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
-      <div className="max-w-lg w-full text-center">
+  return <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
+      <div className="max-w-lg w-full text-center py-[85px]">
         {/* Success Animation */}
         <div className="mb-8 animate-fade-in">
           <div className="w-24 h-24 mx-auto bg-secondary rounded-full flex items-center justify-center mb-6 animate-float">
@@ -70,7 +68,9 @@ const SuccessStep = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center animate-slide-up" style={{ animationDelay: "0.2s" }}>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center animate-slide-up" style={{
+        animationDelay: "0.2s"
+      }}>
           <Button asChild variant="outline" className="gap-2">
             <Link to="/">
               <Home className="h-4 w-4" />
@@ -86,8 +86,6 @@ const SuccessStep = () => {
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SuccessStep;
