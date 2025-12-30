@@ -480,31 +480,45 @@ export default function Dashboard() {
                                           Edit
                                         </Link>
                                       </DropdownMenuItem>
-                                      <DropdownMenuSeparator />
-                                      <DropdownMenuSub>
-                                        <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-pointer">
-                                          <CheckCircle className="w-4 h-4" />
-                                          Change Status
-                                        </DropdownMenuSubTrigger>
-                                        <DropdownMenuSubContent className="bg-popover">
-                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'active')} className="flex items-center gap-2 cursor-pointer">
-                                            <Home className="w-4 h-4 text-green-500" />
-                                            Active
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')} className="flex items-center gap-2 cursor-pointer">
-                                            <Clock className="w-4 h-4 text-yellow-500" />
-                                            Pending
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')} className="flex items-center gap-2 cursor-pointer">
-                                            <CheckCircle className="w-4 h-4 text-red-500" />
-                                            Sold
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'rented')} className="flex items-center gap-2 cursor-pointer">
-                                            <XCircle className="w-4 h-4 text-muted-foreground" />
-                                            Rented
-                                          </DropdownMenuItem>
-                                        </DropdownMenuSubContent>
-                                      </DropdownMenuSub>
+                                      {/* Only show Change Status for listings that are not under_review or declined */}
+                                      {property.status !== 'under_review' && property.status !== 'declined' && (
+                                        <>
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuSub>
+                                            <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-pointer">
+                                              <CheckCircle className="w-4 h-4" />
+                                              Change Status
+                                            </DropdownMenuSubTrigger>
+                                            <DropdownMenuSubContent className="bg-popover">
+                                              {/* Users can only set to Active if current status is sold or rented */}
+                                              {(property.status === 'sold' || property.status === 'rented') && (
+                                                <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'active')} className="flex items-center gap-2 cursor-pointer">
+                                                  <Home className="w-4 h-4 text-green-500" />
+                                                  Active
+                                                </DropdownMenuItem>
+                                              )}
+                                              {property.status !== 'pending' && (
+                                                <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')} className="flex items-center gap-2 cursor-pointer">
+                                                  <Clock className="w-4 h-4 text-yellow-500" />
+                                                  Pending
+                                                </DropdownMenuItem>
+                                              )}
+                                              {property.status !== 'sold' && (
+                                                <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')} className="flex items-center gap-2 cursor-pointer">
+                                                  <CheckCircle className="w-4 h-4 text-red-500" />
+                                                  Sold
+                                                </DropdownMenuItem>
+                                              )}
+                                              {property.status !== 'rented' && (
+                                                <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'rented')} className="flex items-center gap-2 cursor-pointer">
+                                                  <XCircle className="w-4 h-4 text-muted-foreground" />
+                                                  Rented
+                                                </DropdownMenuItem>
+                                              )}
+                                            </DropdownMenuSubContent>
+                                          </DropdownMenuSub>
+                                        </>
+                                      )}
                                       <DropdownMenuSeparator />
                                       <AlertDialog>
                                         <AlertDialogTrigger asChild className="bg-primary-foreground">
