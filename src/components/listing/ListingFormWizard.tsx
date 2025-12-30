@@ -216,7 +216,7 @@ const ListingFormContent = () => {
     return <SuccessStep />;
   }
   return <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-3xl mx-auto py-[80px]">
+      <div className="max-w-3xl mx-auto py-[60px]">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
             {editMode ? 'Edit Your Property' : 'List Your Property'}
