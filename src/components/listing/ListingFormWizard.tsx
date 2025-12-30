@@ -283,7 +283,7 @@ const ListingFormWizard = ({
   initialData
 }: ListingFormWizardProps) => {
   return <ListingFormProvider editMode={editMode} propertyId={propertyId} initialData={initialData}>
-      <ListingFormContent className="bg-accent-foreground" />
+      <ListingFormContent className="bg-primary-foreground" />
     </ListingFormProvider>;
 };
 export default ListingFormWizard;
