@@ -6,13 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { propertyTypes } from '@/lib/mockData';
 import { Bed, Bath, Ruler, TreePine, Calendar } from 'lucide-react';
-
 const BasicInfoStep = () => {
-  const { formData, updateFormData } = useListingForm();
+  const {
+    formData,
+    updateFormData
+  } = useListingForm();
   const isLand = formData.propertyType === 'land';
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-display font-semibold text-foreground">Basic Information</h2>
         <p className="text-muted-foreground mt-1">Tell us about your property</p>
@@ -21,30 +21,25 @@ const BasicInfoStep = () => {
       <div className="space-y-4">
         <div>
           <Label>Property Type *</Label>
-          <Select
-            value={formData.propertyType}
-            onValueChange={(value) => updateFormData({ propertyType: value })}
-          >
+          <Select value={formData.propertyType} onValueChange={value => updateFormData({
+          propertyType: value
+        })}>
             <SelectTrigger className="mt-1">
               <SelectValue placeholder="Select property type" />
             </SelectTrigger>
             <SelectContent>
-              {propertyTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
+              {propertyTypes.map(type => <SelectItem key={type.value} value={type.value}>
                   {type.label}
-                </SelectItem>
-              ))}
+                </SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label>Listing Type *</Label>
-          <RadioGroup
-            value={formData.listingType}
-            onValueChange={(value: 'sale' | 'rent') => updateFormData({ listingType: value })}
-            className="flex gap-6 mt-2"
-          >
+          <RadioGroup value={formData.listingType} onValueChange={(value: 'sale' | 'rent') => updateFormData({
+          listingType: value
+        })} className="flex gap-6 mt-2">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="sale" id="sale" />
               <Label htmlFor="sale" className="cursor-pointer">For Sale</Label>
@@ -62,41 +57,27 @@ const BasicInfoStep = () => {
           </Label>
           <div className="relative mt-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-            <Input
-              id="price"
-              type="number"
-              placeholder={formData.listingType === 'rent' ? '2500' : '500000'}
-              value={formData.price}
-              onChange={(e) => updateFormData({ price: e.target.value })}
-              className="pl-7"
-            />
+            <Input id="price" type="number" placeholder={formData.listingType === 'rent' ? '2500' : '500000'} value={formData.price} onChange={e => updateFormData({
+            price: e.target.value
+          })} className="pl-7" />
           </div>
-          {formData.listingType === 'rent' && (
-            <p className="text-sm text-muted-foreground mt-1">per month</p>
-          )}
+          {formData.listingType === 'rent' && <p className="text-sm text-muted-foreground mt-1">per month</p>}
         </div>
       </div>
 
       {/* Property Features Section */}
       <div className="pt-6 border-t border-border">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Property Features</h3>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {!isLand && (
-            <>
+          {!isLand && <>
               <div>
                 <Label htmlFor="bedrooms" className="flex items-center gap-2">
                   <Bed className="w-4 h-4 text-primary" />
                   Bedrooms *
                 </Label>
-                <Input
-                  id="bedrooms"
-                  type="number"
-                  min="0"
-                  placeholder="3"
-                  value={formData.bedrooms}
-                  onChange={(e) => updateFormData({ bedrooms: e.target.value })}
-                  className="mt-1"
-                />
+                <Input id="bedrooms" type="number" min="0" placeholder="3" value={formData.bedrooms} onChange={e => updateFormData({
+              bedrooms: e.target.value
+            })} className="mt-1" />
               </div>
 
               <div>
@@ -104,16 +85,9 @@ const BasicInfoStep = () => {
                   <Bath className="w-4 h-4 text-primary" />
                   Bathrooms *
                 </Label>
-                <Input
-                  id="bathrooms"
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  placeholder="2"
-                  value={formData.bathrooms}
-                  onChange={(e) => updateFormData({ bathrooms: e.target.value })}
-                  className="mt-1"
-                />
+                <Input id="bathrooms" type="number" min="0" step="0.5" placeholder="2" value={formData.bathrooms} onChange={e => updateFormData({
+              bathrooms: e.target.value
+            })} className="mt-1" />
               </div>
 
               <div>
@@ -121,52 +95,31 @@ const BasicInfoStep = () => {
                   <Ruler className="w-4 h-4 text-primary" />
                   Square Feet *
                 </Label>
-                <Input
-                  id="squareFeet"
-                  type="number"
-                  min="0"
-                  placeholder="2500"
-                  value={formData.squareFeet}
-                  onChange={(e) => updateFormData({ squareFeet: e.target.value })}
-                  className="mt-1"
-                />
+                <Input id="squareFeet" type="number" min="0" placeholder="2500" value={formData.squareFeet} onChange={e => updateFormData({
+              squareFeet: e.target.value
+            })} className="mt-1" />
               </div>
-            </>
-          )}
+            </>}
 
           <div>
             <Label htmlFor="lotSize" className="flex items-center gap-2">
               <TreePine className="w-4 h-4 text-primary" />
               Lot Size (sq ft)
             </Label>
-            <Input
-              id="lotSize"
-              type="number"
-              min="0"
-              placeholder="5000"
-              value={formData.lotSize}
-              onChange={(e) => updateFormData({ lotSize: e.target.value })}
-              className="mt-1"
-            />
+            <Input id="lotSize" type="number" min="0" placeholder="5000" value={formData.lotSize} onChange={e => updateFormData({
+            lotSize: e.target.value
+          })} className="mt-1" />
           </div>
 
-          {!isLand && (
-            <>
+          {!isLand && <>
               <div>
                 <Label htmlFor="yearBuilt" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
                   Year Built
                 </Label>
-                <Input
-                  id="yearBuilt"
-                  type="number"
-                  min="1800"
-                  max={new Date().getFullYear()}
-                  placeholder="2020"
-                  value={formData.yearBuilt}
-                  onChange={(e) => updateFormData({ yearBuilt: e.target.value })}
-                  className="mt-1"
-                />
+                <Input id="yearBuilt" type="number" min="1800" max={new Date().getFullYear()} placeholder="2020" value={formData.yearBuilt} onChange={e => updateFormData({
+              yearBuilt: e.target.value
+            })} className="mt-1" />
               </div>
 
               <div>
@@ -176,31 +129,20 @@ const BasicInfoStep = () => {
                 </Label>
                 <div className="relative mt-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input
-                    id="annualTax"
-                    type="number"
-                    min="0"
-                    placeholder="5000"
-                    value={formData.annualTax}
-                    onChange={(e) => updateFormData({ annualTax: e.target.value })}
-                    className="pl-7"
-                  />
+                  <Input id="annualTax" type="number" min="0" placeholder="5000" value={formData.annualTax} onChange={e => updateFormData({
+                annualTax: e.target.value
+              })} className="pl-7" />
                 </div>
               </div>
-            </>
-          )}
+            </>}
         </div>
 
-        {isLand && (
-          <div className="bg-muted/50 rounded-lg p-4 text-center mt-4">
+        {isLand && <div className="bg-muted/50 rounded-lg p-4 text-center mt-4">
             <p className="text-muted-foreground">
               For land properties, bedrooms, bathrooms, and square feet are not applicable.
             </p>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default BasicInfoStep;
