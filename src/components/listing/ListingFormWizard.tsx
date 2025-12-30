@@ -99,7 +99,10 @@ const ListingFormContent = () => {
     if (validateStep(currentStep)) {
       if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }
     }
   };
@@ -212,7 +215,6 @@ const ListingFormContent = () => {
   if (showSuccess) {
     return <SuccessStep />;
   }
-
   return <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-3xl mx-auto py-[60px]">
         <div className="text-center mb-8">
@@ -281,7 +283,7 @@ const ListingFormWizard = ({
   initialData
 }: ListingFormWizardProps) => {
   return <ListingFormProvider editMode={editMode} propertyId={propertyId} initialData={initialData}>
-      <ListingFormContent />
+      <ListingFormContent className="bg-accent-foreground" />
     </ListingFormProvider>;
 };
 export default ListingFormWizard;
