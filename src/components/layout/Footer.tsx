@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+
 export function Footer() {
-  return <footer className="bg-primary text-primary-foreground">
+  return (
+    <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
@@ -35,26 +37,22 @@ export function Footer() {
           <div>
             <h4 className="font-display font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              {[{
-              label: "Properties",
-              href: "/properties"
-            }, {
-              label: "About Us",
-              href: "#"
-            }, {
-              label: "Contact",
-              href: "#"
-            }, {
-              label: "Blog",
-              href: "/blog"
-            }, {
-              label: "Careers",
-              href: "#"
-            }].map(item => <li key={item.label}>
-                  <Link to={item.href} className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
+              {[
+                { label: "Properties", href: "/properties" },
+                { label: "About Us", href: "#" },
+                { label: "Contact", href: "#" },
+                { label: "Blog", href: "/blog" },
+                { label: "Careers", href: "#" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
+                  >
                     {item.label}
                   </Link>
-                </li>)}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -62,11 +60,16 @@ export function Footer() {
           <div>
             <h4 className="font-display font-semibold mb-4">Property Types</h4>
             <ul className="space-y-3">
-              {["Houses", "Apartments", "Condos", "Land", "Townhouses", "Villas"].map(item => <li key={item}>
-                  <Link to="/properties" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
+              {["Houses", "Apartments", "Condos", "Land", "Townhouses", "Villas"].map((item) => (
+                <li key={item}>
+                  <Link
+                    to="/properties"
+                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
+                  >
                     {item}
                   </Link>
-                </li>)}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -91,8 +94,8 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-primary-foreground/50 text-sm text-center">
-            © 2025 Royal Landmark. All rights reserved.
+          <p className="text-primary-foreground/50 text-sm">
+            © 2024 Royal Landmark. All rights reserved.
           </p>
           <div className="flex gap-6">
             <Link to="#" className="text-primary-foreground/50 hover:text-primary-foreground text-sm transition-colors">
@@ -104,5 +107,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 }
