@@ -299,7 +299,7 @@ export function OffersTab() {
                         <Check className="w-4 h-4 mr-1" /> Accept
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>Accept Offer</DialogTitle>
                       </DialogHeader>
@@ -321,7 +321,7 @@ export function OffersTab() {
                         <ArrowLeftRight className="w-4 h-4 mr-1" /> Counter
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>Make Counter Offer</DialogTitle>
                       </DialogHeader>
@@ -360,7 +360,7 @@ export function OffersTab() {
                         <X className="w-4 h-4 mr-1" /> Decline
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>Decline Offer</DialogTitle>
                       </DialogHeader>
