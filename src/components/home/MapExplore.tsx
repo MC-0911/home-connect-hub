@@ -73,7 +73,7 @@ const propertyPins = [
   },
 ];
 
-export function MapExplore() {
+export function MapExplore({ className }: { className?: string }) {
   const [hoveredPin, setHoveredPin] = useState<number | null>(null);
 
   return (

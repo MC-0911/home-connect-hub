@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 const stepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ExteriorFeaturesStep, ImagesStep];
-const ListingFormContent = () => {
+const ListingFormContent = ({ className }: { className?: string }) => {
   const {
     formData,
     currentStep,

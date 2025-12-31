@@ -9,7 +9,7 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Property = Tables<"properties">;
 
-export function FeaturedProperties() {
+export function FeaturedProperties({ className }: { className?: string }) {
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
