@@ -33,7 +33,11 @@ interface Visit {
   };
 }
 
-export function VisitsTab() {
+interface VisitsTabProps {
+  onDataChange?: () => void;
+}
+
+export function VisitsTab({ onDataChange }: VisitsTabProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [myRequests, setMyRequests] = useState<Visit[]>([]);
@@ -45,6 +49,30 @@ export function VisitsTab() {
   useEffect(() => {
     if (user) {
       fetchVisits();
+
+      // Real-time subscription for visits
+      const channel = supabase.channel("visits-realtime")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "property_visits",
+          filter: `seller_id=eq.${user.id}`
+        }, () => {
+          fetchVisits();
+        })
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "property_visits",
+          filter: `user_id=eq.${user.id}`
+        }, () => {
+          fetchVisits();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
@@ -113,6 +141,7 @@ export function VisitsTab() {
       });
 
       fetchVisits();
+      onDataChange?.();
       setSelectedVisit(null);
       setSellerNotes("");
     } catch (error: any) {
