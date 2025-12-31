@@ -22,7 +22,7 @@ const steps = [
   },
 ];
 
-export function HowItWorks() {
+export function HowItWorks({ className }: { className?: string }) {
   return (
     <section className="py-20 sm:py-28 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
