@@ -36,7 +36,11 @@ interface Offer {
     full_name: string | null;
   };
 }
-export function OffersTab() {
+interface OffersTabProps {
+  onDataChange?: () => void;
+}
+
+export function OffersTab({ onDataChange }: OffersTabProps) {
   const {
     user
   } = useAuth();
@@ -48,9 +52,34 @@ export function OffersTab() {
   const [loading, setLoading] = useState(true);
   const [sellerResponse, setSellerResponse] = useState("");
   const [counterAmount, setCounterAmount] = useState("");
+
   useEffect(() => {
     if (user) {
       fetchOffers();
+
+      // Real-time subscription for offers
+      const channel = supabase.channel("offers-realtime")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "property_offers",
+          filter: `seller_id=eq.${user.id}`
+        }, () => {
+          fetchOffers();
+        })
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "property_offers",
+          filter: `user_id=eq.${user.id}`
+        }, () => {
+          fetchOffers();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
   const fetchOffers = async () => {
@@ -112,6 +141,7 @@ export function OffersTab() {
         description: `Offer ${status}`
       });
       fetchOffers();
+      onDataChange?.();
       setSellerResponse("");
     } catch (error: any) {
       toast({
@@ -136,6 +166,7 @@ export function OffersTab() {
         description: `Counter offer of ${formatPrice(amount)} has been sent to the buyer.`
       });
       fetchOffers();
+      onDataChange?.();
       setCounterAmount("");
       setSellerResponse("");
     } catch (error: any) {
@@ -160,6 +191,7 @@ export function OffersTab() {
         description: "You've accepted the seller's counter offer."
       });
       fetchOffers();
+      onDataChange?.();
     } catch (error: any) {
       toast({
         title: "Error",

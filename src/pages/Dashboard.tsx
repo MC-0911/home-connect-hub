@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
@@ -39,6 +39,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("listings");
   const [unreadAlertsCount, setUnreadAlertsCount] = useState(0);
+  const [pendingVisitsCount, setPendingVisitsCount] = useState(0);
+  const [pendingOffersCount, setPendingOffersCount] = useState(0);
   const [statusChangeDialog, setStatusChangeDialog] = useState<{
     isOpen: boolean;
     propertyId: string | null;
@@ -58,14 +60,46 @@ export default function Dashboard() {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+  const fetchPendingVisitsCount = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { count, error } = await supabase
+        .from("property_visits")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("status", "pending");
+      if (error) throw error;
+      setPendingVisitsCount(count || 0);
+    } catch (error: any) {
+      console.error("Error fetching pending visits count:", error);
+    }
+  }, [user]);
+
+  const fetchPendingOffersCount = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { count, error } = await supabase
+        .from("property_offers")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("status", "pending");
+      if (error) throw error;
+      setPendingOffersCount(count || 0);
+    } catch (error: any) {
+      console.error("Error fetching pending offers count:", error);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (user) {
       fetchProperties();
       fetchUnreadAlertsCount();
       fetchInquiriesData();
+      fetchPendingVisitsCount();
+      fetchPendingOffersCount();
 
       // Subscribe to alerts changes
-      const channel = supabase.channel("dashboard-alerts").on("postgres_changes", {
+      const alertsChannel = supabase.channel("dashboard-alerts").on("postgres_changes", {
         event: "*",
         schema: "public",
         table: "alerts",
@@ -73,11 +107,48 @@ export default function Dashboard() {
       }, () => {
         fetchUnreadAlertsCount();
       }).subscribe();
+
+      // Subscribe to visits changes for real-time notifications
+      const visitsChannel = supabase.channel("dashboard-visits").on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "property_visits",
+        filter: `seller_id=eq.${user.id}`
+      }, (payload) => {
+        console.log("Visit change received:", payload);
+        fetchPendingVisitsCount();
+        if (payload.eventType === "INSERT") {
+          toast({
+            title: "New Visit Request",
+            description: "You have a new property visit request!",
+          });
+        }
+      }).subscribe();
+
+      // Subscribe to offers changes for real-time notifications
+      const offersChannel = supabase.channel("dashboard-offers").on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "property_offers",
+        filter: `seller_id=eq.${user.id}`
+      }, (payload) => {
+        console.log("Offer change received:", payload);
+        fetchPendingOffersCount();
+        if (payload.eventType === "INSERT") {
+          toast({
+            title: "New Offer Received",
+            description: "You have a new offer on your property!",
+          });
+        }
+      }).subscribe();
+
       return () => {
-        supabase.removeChannel(channel);
+        supabase.removeChannel(alertsChannel);
+        supabase.removeChannel(visitsChannel);
+        supabase.removeChannel(offersChannel);
       };
     }
-  }, [user]);
+  }, [user, fetchPendingVisitsCount, fetchPendingOffersCount, toast]);
 
   const fetchInquiriesData = async () => {
     try {
@@ -365,11 +436,17 @@ export default function Dashboard() {
                 <TabsTrigger value="saved" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
                   Saved 
                 </TabsTrigger>
-                <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   Visits
+                  {pendingVisitsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                      {pendingVisitsCount > 9 ? '9+' : pendingVisitsCount}
+                    </Badge>}
                 </TabsTrigger>
-                <TabsTrigger value="offers" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                <TabsTrigger value="offers" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   Offers
+                  {pendingOffersCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
+                      {pendingOffersCount > 9 ? '9+' : pendingOffersCount}
+                    </Badge>}
                 </TabsTrigger>
                 <TabsTrigger value="messages" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   Messages
@@ -566,11 +643,11 @@ export default function Dashboard() {
               </TabsContent>
 
               <TabsContent value="visits" className="mt-6">
-                <VisitsTab />
+                <VisitsTab onDataChange={fetchPendingVisitsCount} />
               </TabsContent>
 
               <TabsContent value="offers" className="mt-6">
-                <OffersTab />
+                <OffersTab onDataChange={fetchPendingOffersCount} />
               </TabsContent>
 
               <TabsContent value="messages" className="mt-6">
