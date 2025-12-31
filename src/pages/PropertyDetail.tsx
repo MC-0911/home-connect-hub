@@ -130,7 +130,7 @@ export default function PropertyDetail() {
   return <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-20">
+      <main className="pt-20 bg-primary-foreground">
         {/* Image Gallery */}
         <div className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh] bg-secondary">
           <motion.img key={currentImageIndex} initial={{
@@ -271,118 +271,96 @@ export default function PropertyDetail() {
               </motion.div>
 
               {/* Interior Features */}
-              {(property.basement || (property.flooring && property.flooring.length > 0) || 
-                (property.rooms && property.rooms.length > 0) || (property.indoor_features && property.indoor_features.length > 0)) && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              {(property.basement || property.flooring && property.flooring.length > 0 || property.rooms && property.rooms.length > 0 || property.indoor_features && property.indoor_features.length > 0) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.3
+            }}>
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Interior Features
                   </h2>
                   <div className="space-y-4">
-                    {property.basement && (
-                      <div>
+                    {property.basement && <div>
                         <span className="text-sm font-medium text-foreground">Basement:</span>
                         <span className="ml-2 text-muted-foreground capitalize">{property.basement}</span>
-                      </div>
-                    )}
-                    {property.flooring && property.flooring.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.flooring && property.flooring.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Flooring:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {property.flooring.map(floor => (
-                            <Badge key={floor} variant="secondary">{floor}</Badge>
-                          ))}
+                          {property.flooring.map(floor => <Badge key={floor} variant="secondary">{floor}</Badge>)}
                         </div>
-                      </div>
-                    )}
-                    {property.rooms && property.rooms.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.rooms && property.rooms.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Additional Rooms:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {property.rooms.map(room => (
-                            <Badge key={room} variant="secondary">{room}</Badge>
-                          ))}
+                          {property.rooms.map(room => <Badge key={room} variant="secondary">{room}</Badge>)}
                         </div>
-                      </div>
-                    )}
-                    {property.indoor_features && property.indoor_features.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.indoor_features && property.indoor_features.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Indoor Features:</span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-                          {property.indoor_features.map(feature => (
-                            <div key={feature} className="flex items-center gap-3 text-muted-foreground">
+                          {property.indoor_features.map(feature => <div key={feature} className="flex items-center gap-3 text-muted-foreground">
                               <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
                                 <Check className="w-4 h-4 text-accent" />
                               </div>
                               {feature}
-                            </div>
-                          ))}
+                            </div>)}
                         </div>
-                      </div>
-                    )}
+                      </div>}
                   </div>
-                </motion.div>
-              )}
+                </motion.div>}
 
               {/* Exterior Features */}
-              {(property.architectural_style || property.roofing_type || 
-                (property.parking && property.parking.length > 0) || 
-                (property.outdoor_amenities && property.outdoor_amenities.length > 0) || 
-                (property.views && property.views.length > 0)) && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+              {(property.architectural_style || property.roofing_type || property.parking && property.parking.length > 0 || property.outdoor_amenities && property.outdoor_amenities.length > 0 || property.views && property.views.length > 0) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.35
+            }}>
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Exterior Features
                   </h2>
                   <div className="space-y-4">
-                    {property.architectural_style && (
-                      <div>
+                    {property.architectural_style && <div>
                         <span className="text-sm font-medium text-foreground">Architectural Style:</span>
                         <span className="ml-2 text-muted-foreground">{property.architectural_style}</span>
-                      </div>
-                    )}
-                    {property.roofing_type && (
-                      <div>
+                      </div>}
+                    {property.roofing_type && <div>
                         <span className="text-sm font-medium text-foreground">Roofing:</span>
                         <span className="ml-2 text-muted-foreground">{property.roofing_type}</span>
-                      </div>
-                    )}
-                    {property.parking && property.parking.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.parking && property.parking.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Parking:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {property.parking.map(park => (
-                            <Badge key={park} variant="secondary">{park}</Badge>
-                          ))}
+                          {property.parking.map(park => <Badge key={park} variant="secondary">{park}</Badge>)}
                         </div>
-                      </div>
-                    )}
-                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Outdoor Amenities:</span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-                          {property.outdoor_amenities.map(amenity => (
-                            <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
+                          {property.outdoor_amenities.map(amenity => <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
                               <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
                                 <Check className="w-4 h-4 text-accent" />
                               </div>
                               {amenity}
-                            </div>
-                          ))}
+                            </div>)}
                         </div>
-                      </div>
-                    )}
-                    {property.views && property.views.length > 0 && (
-                      <div>
+                      </div>}
+                    {property.views && property.views.length > 0 && <div>
                         <span className="text-sm font-medium text-foreground">Views:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {property.views.map(view => (
-                            <Badge key={view} variant="secondary">{view}</Badge>
-                          ))}
+                          {property.views.map(view => <Badge key={view} variant="secondary">{view}</Badge>)}
                         </div>
-                      </div>
-                    )}
+                      </div>}
                   </div>
-                </motion.div>
-              )}
+                </motion.div>}
 
               {/* Amenities */}
               {property.amenities && property.amenities.length > 0 && <motion.div initial={{
