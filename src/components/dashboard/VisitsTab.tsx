@@ -33,6 +33,111 @@ interface Visit {
   };
 }
 
+interface VisitCardProps {
+  visit: Visit;
+  isSeller?: boolean;
+  isDialogOpen: boolean;
+  onDialogOpenChange: (open: boolean) => void;
+  sellerNotes: string;
+  onSellerNotesChange: (notes: string) => void;
+  onConfirm: () => void;
+  onDecline: () => void;
+}
+
+const getStatusBadge = (status: string) => {
+  const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+    pending: "secondary",
+    confirmed: "default",
+    declined: "destructive",
+    completed: "outline",
+  };
+  return <Badge variant={variants[status] || "secondary"} className="capitalize">{status}</Badge>;
+};
+
+const VisitCard = ({ 
+  visit, 
+  isSeller = false, 
+  isDialogOpen, 
+  onDialogOpenChange, 
+  sellerNotes, 
+  onSellerNotesChange, 
+  onConfirm, 
+  onDecline 
+}: VisitCardProps) => (
+  <Card className="bg-card border-border">
+    <CardContent className="p-4">
+      <div className="flex gap-4">
+        <div className="w-20 h-20 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
+          {visit.property?.images?.[0] ? (
+            <img src={visit.property.images[0]} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              <MapPin className="w-6 h-6" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h4 className="font-medium text-foreground truncate">{visit.property?.title || "Property"}</h4>
+              <p className="text-sm text-muted-foreground">{visit.property?.address}, {visit.property?.city}</p>
+            </div>
+            {getStatusBadge(visit.status)}
+          </div>
+          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <CalendarIcon className="w-4 h-4" />
+              {format(new Date(visit.preferred_date), "MMM d, yyyy")}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {visit.preferred_time}
+            </span>
+          </div>
+          {visit.message && (
+            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+              <MessageSquare className="w-3 h-3 inline mr-1" />
+              {visit.message}
+            </p>
+          )}
+          {visit.seller_notes && (
+            <p className="text-sm text-primary mt-1">Seller note: {visit.seller_notes}</p>
+          )}
+          {isSeller && visit.status === "pending" && (
+            <div className="flex gap-2 mt-3">
+              <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="default">
+                    <Check className="w-4 h-4 mr-1" /> Confirm
+                  </Button>
+                </DialogTrigger>
+                <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Visit</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <Textarea
+                      placeholder="Add a note for the buyer (optional)"
+                      value={sellerNotes}
+                      onChange={(e) => onSellerNotesChange(e.target.value)}
+                    />
+                    <Button onClick={onConfirm} className="w-full">
+                      Confirm Visit
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button size="sm" variant="destructive" onClick={onDecline}>
+                <X className="w-4 h-4 mr-1" /> Decline
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
 interface VisitsTabProps {
   onDataChange?: () => void;
 }
@@ -153,93 +258,13 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      pending: "secondary",
-      confirmed: "default",
-      declined: "destructive",
-      completed: "outline",
-    };
-    return <Badge variant={variants[status] || "secondary"} className="capitalize">{status}</Badge>;
+  const handleConfirm = (visitId: string) => {
+    updateVisitStatus(visitId, "confirmed", sellerNotes);
   };
 
-  const VisitCard = ({ visit, isSeller = false }: { visit: Visit; isSeller?: boolean }) => (
-    <Card className="bg-card border-border">
-      <CardContent className="p-4">
-        <div className="flex gap-4">
-          <div className="w-20 h-20 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
-            {visit.property?.images?.[0] ? (
-              <img src={visit.property.images[0]} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                <MapPin className="w-6 h-6" />
-              </div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h4 className="font-medium text-foreground truncate">{visit.property?.title || "Property"}</h4>
-                <p className="text-sm text-muted-foreground">{visit.property?.address}, {visit.property?.city}</p>
-              </div>
-              {getStatusBadge(visit.status)}
-            </div>
-            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <CalendarIcon className="w-4 h-4" />
-                {format(new Date(visit.preferred_date), "MMM d, yyyy")}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {visit.preferred_time}
-              </span>
-            </div>
-            {visit.message && (
-              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                <MessageSquare className="w-3 h-3 inline mr-1" />
-                {visit.message}
-              </p>
-            )}
-            {visit.seller_notes && (
-              <p className="text-sm text-primary mt-1">Seller note: {visit.seller_notes}</p>
-            )}
-            {isSeller && visit.status === "pending" && (
-              <div className="flex gap-2 mt-3">
-                <Dialog open={confirmDialogOpen === visit.id} onOpenChange={(open) => {
-                  setConfirmDialogOpen(open ? visit.id : null);
-                  if (!open) setSellerNotes("");
-                }}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="default">
-                      <Check className="w-4 h-4 mr-1" /> Confirm
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-                    <DialogHeader>
-                      <DialogTitle>Confirm Visit</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <Textarea
-                        placeholder="Add a note for the buyer (optional)"
-                        value={sellerNotes}
-                        onChange={(e) => setSellerNotes(e.target.value)}
-                      />
-                      <Button onClick={() => updateVisitStatus(visit.id, "confirmed", sellerNotes)} className="w-full">
-                        Confirm Visit
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-                <Button size="sm" variant="destructive" onClick={() => updateVisitStatus(visit.id, "declined")}>
-                  <X className="w-4 h-4 mr-1" /> Decline
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const handleDecline = (visitId: string) => {
+    updateVisitStatus(visitId, "declined");
+  };
 
   if (loading) {
     return (
@@ -272,7 +297,19 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
         ) : (
           <div className="space-y-4">
             {myRequests.map((visit) => (
-              <VisitCard key={visit.id} visit={visit} />
+              <VisitCard 
+                key={visit.id} 
+                visit={visit} 
+                isDialogOpen={confirmDialogOpen === visit.id}
+                onDialogOpenChange={(open) => {
+                  setConfirmDialogOpen(open ? visit.id : null);
+                  if (!open) setSellerNotes("");
+                }}
+                sellerNotes={sellerNotes}
+                onSellerNotesChange={setSellerNotes}
+                onConfirm={() => handleConfirm(visit.id)}
+                onDecline={() => handleDecline(visit.id)}
+              />
             ))}
           </div>
         )}
@@ -290,7 +327,20 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
         ) : (
           <div className="space-y-4">
             {incomingRequests.map((visit) => (
-              <VisitCard key={visit.id} visit={visit} isSeller />
+              <VisitCard 
+                key={visit.id} 
+                visit={visit} 
+                isSeller 
+                isDialogOpen={confirmDialogOpen === visit.id}
+                onDialogOpenChange={(open) => {
+                  setConfirmDialogOpen(open ? visit.id : null);
+                  if (!open) setSellerNotes("");
+                }}
+                sellerNotes={sellerNotes}
+                onSellerNotesChange={setSellerNotes}
+                onConfirm={() => handleConfirm(visit.id)}
+                onDecline={() => handleDecline(visit.id)}
+              />
             ))}
           </div>
         )}
