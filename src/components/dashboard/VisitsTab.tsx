@@ -44,7 +44,7 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
   const [incomingRequests, setIncomingRequests] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
   const [sellerNotes, setSellerNotes] = useState("");
-  const [selectedVisit, setSelectedVisit] = useState<string | null>(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -142,7 +142,7 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
 
       fetchVisits();
       onDataChange?.();
-      setSelectedVisit(null);
+      setConfirmDialogOpen(null);
       setSellerNotes("");
     } catch (error: any) {
       toast({
@@ -205,9 +205,12 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
             )}
             {isSeller && visit.status === "pending" && (
               <div className="flex gap-2 mt-3">
-                <Dialog>
+                <Dialog open={confirmDialogOpen === visit.id} onOpenChange={(open) => {
+                  setConfirmDialogOpen(open ? visit.id : null);
+                  if (!open) setSellerNotes("");
+                }}>
                   <DialogTrigger asChild>
-                    <Button size="sm" variant="default" onClick={() => setSelectedVisit(visit.id)}>
+                    <Button size="sm" variant="default">
                       <Check className="w-4 h-4 mr-1" /> Confirm
                     </Button>
                   </DialogTrigger>
