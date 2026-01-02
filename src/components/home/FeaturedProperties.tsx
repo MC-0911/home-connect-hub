@@ -79,7 +79,7 @@ export function FeaturedProperties({ className }: { className?: string }) {
 
   if (loading) {
     return (
-      <section className="py-20 sm:py-28 bg-secondary-foreground">
+      <section className="py-20 sm:py-28 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -152,12 +152,12 @@ export function FeaturedProperties({ className }: { className?: string }) {
         </div>
 
         {/* Carousel */}
-        <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
-          <div className="flex gap-6">
+        <div className="overflow-hidden cursor-grab active:cursor-grabbing -mx-3" ref={emblaRef}>
+          <div className="flex">
             {featuredProperties.map((property, index) => (
               <div
                 key={property.id}
-                className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_25%]"
+                className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_25%] px-3"
               >
                 <PropertyCard property={property} index={index} />
               </div>
