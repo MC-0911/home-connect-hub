@@ -98,6 +98,17 @@ const EditProperty = () => {
               roofingType: property.roofing_type || '',
               outdoorAmenities: property.outdoor_amenities || [],
               views: property.views || [],
+              neighborhoodAmenities: {
+                education: [],
+                dailyEssentials: [],
+                diningLeisure: [],
+                transportation: [],
+                parksRecreation: [],
+                healthWellness: [],
+                shopping: [],
+                cultureEntertainment: [],
+                communityServices: [],
+              },
             }}
           />
         )}

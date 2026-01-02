@@ -34,7 +34,20 @@ export interface ListingFormData {
   outdoorAmenities: string[];
   views: string[];
   
-  // Step 5: Images
+  // Step 5: Neighborhood
+  neighborhoodAmenities: {
+    education: string[];
+    dailyEssentials: string[];
+    diningLeisure: string[];
+    transportation: string[];
+    parksRecreation: string[];
+    healthWellness: string[];
+    shopping: string[];
+    cultureEntertainment: string[];
+    communityServices: string[];
+  };
+  
+  // Step 6: Images
   images: File[];
   imagePreviewUrls: string[];
   existingImageUrls: string[];
@@ -77,6 +90,17 @@ export const initialFormData: ListingFormData = {
   roofingType: '',
   outdoorAmenities: [],
   views: [],
+  neighborhoodAmenities: {
+    education: [],
+    dailyEssentials: [],
+    diningLeisure: [],
+    transportation: [],
+    parksRecreation: [],
+    healthWellness: [],
+    shopping: [],
+    cultureEntertainment: [],
+    communityServices: [],
+  },
   images: [],
   imagePreviewUrls: [],
   existingImageUrls: [],
@@ -102,7 +126,7 @@ export const ListingFormProvider = ({
     ...initialData,
   });
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const updateFormData = (data: Partial<ListingFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
