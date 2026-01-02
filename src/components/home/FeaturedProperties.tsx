@@ -16,32 +16,44 @@ export function FeaturedProperties({ className }: { className?: string }) {
   const [loading, setLoading] = useState(true);
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "start", skipSnaps: false },
-    [Autoplay({ delay: 4000, stopOnInteraction: false })]
+    { loop: true, align: "start", skipSnaps: false, dragFree: false },
+    [Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })]
   );
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollTo = useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setCanScrollPrev(emblaApi.canScrollPrev());
     setCanScrollNext(emblaApi.canScrollNext());
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  const onInit = useCallback(() => {
+    if (!emblaApi) return;
+    setScrollSnaps(emblaApi.scrollSnapList());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
+    onInit();
     onSelect();
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
+    emblaApi.on("reInit", onInit);
     return () => {
       emblaApi.off("select", onSelect);
       emblaApi.off("reInit", onSelect);
+      emblaApi.off("reInit", onInit);
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, onInit]);
 
   useEffect(() => {
     const fetchFeaturedProperties = async () => {
@@ -140,7 +152,7 @@ export function FeaturedProperties({ className }: { className?: string }) {
         </div>
 
         {/* Carousel */}
-        <div className="overflow-hidden" ref={emblaRef}>
+        <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex gap-6">
             {featuredProperties.map((property, index) => (
               <div
@@ -151,6 +163,22 @@ export function FeaturedProperties({ className }: { className?: string }) {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Dot Indicators */}
+        <div className="flex justify-center gap-2 mt-6">
+          {scrollSnaps.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollTo(index)}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                index === selectedIndex
+                  ? "bg-primary w-8"
+                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>
