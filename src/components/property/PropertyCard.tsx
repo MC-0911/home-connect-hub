@@ -32,7 +32,7 @@ export function PropertyCard({
     delay: index * 0.1
   }} className="group">
       <Link to={`/property/${property.id}`}>
-        <div className="bg-card rounded-xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div className="bg-card rounded-xl overflow-hidden border border-border shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           {/* Image */}
           <div className="relative aspect-[4/3] overflow-hidden">
             <div className={cn("absolute inset-0 bg-secondary animate-pulse", imageLoaded && "hidden")} />
