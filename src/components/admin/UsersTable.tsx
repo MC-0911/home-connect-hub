@@ -277,7 +277,7 @@ export function UsersTable() {
         </div>
       </div>
 
-      <div className="rounded-lg border overflow-hidden">
+      <div className="rounded-lg overflow-hidden border-0">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
