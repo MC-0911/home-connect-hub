@@ -188,7 +188,7 @@ export default function Admin() {
               }} animate={{
                 opacity: 1
               }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
+                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent bg-primary-foreground">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
                         <FileText className="h-5 w-5 text-primary" />
