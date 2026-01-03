@@ -1,48 +1,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
 import { Label } from '@/components/ui/label';
@@ -52,7 +18,6 @@ import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
 import { TablePagination } from './TablePagination';
 import { SortableTableHead } from './SortableTableHead';
-
 interface Blog {
   id: string;
   title: string;
@@ -64,7 +29,6 @@ interface Blog {
   published_at: string | null;
   created_at: string;
 }
-
 export function BlogsTable() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,16 +46,16 @@ export function BlogsTable() {
     excerpt: '',
     content: '',
     cover_image: '',
-    status: 'draft',
+    status: 'draft'
   });
-
   const fetchBlogs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('blogs')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('blogs').select('*').order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
       setBlogs(data || []);
     } catch (error) {
@@ -100,47 +64,45 @@ export function BlogsTable() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchBlogs();
   }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
       const blogData = {
         ...formData,
-        published_at: formData.status === 'published' ? new Date().toISOString() : null,
+        published_at: formData.status === 'published' ? new Date().toISOString() : null
       };
-
       if (editingBlog) {
-        const { error } = await supabase
-          .from('blogs')
-          .update(blogData)
-          .eq('id', editingBlog.id);
-
+        const {
+          error
+        } = await supabase.from('blogs').update(blogData).eq('id', editingBlog.id);
         if (error) throw error;
         toast.success('Blog updated successfully');
       } else {
-        const { error } = await supabase
-          .from('blogs')
-          .insert([blogData]);
-
+        const {
+          error
+        } = await supabase.from('blogs').insert([blogData]);
         if (error) throw error;
         toast.success('Blog created successfully');
       }
-
       setIsDialogOpen(false);
       setEditingBlog(null);
-      setFormData({ title: '', slug: '', excerpt: '', content: '', cover_image: '', status: 'draft' });
+      setFormData({
+        title: '',
+        slug: '',
+        excerpt: '',
+        content: '',
+        cover_image: '',
+        status: 'draft'
+      });
       fetchBlogs();
     } catch (error) {
       console.error('Error saving blog:', error);
       toast.error('Failed to save blog');
     }
   };
-
   const handleEdit = (blog: Blog) => {
     setEditingBlog(blog);
     setFormData({
@@ -149,20 +111,16 @@ export function BlogsTable() {
       excerpt: blog.excerpt || '',
       content: blog.content,
       cover_image: blog.cover_image || '',
-      status: blog.status,
+      status: blog.status
     });
     setIsDialogOpen(true);
   };
-
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this blog?')) return;
-    
     try {
-      const { error } = await supabase
-        .from('blogs')
-        .delete()
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('blogs').delete().eq('id', id);
       if (error) throw error;
       toast.success('Blog deleted successfully');
       fetchBlogs();
@@ -171,7 +129,6 @@ export function BlogsTable() {
       toast.error('Failed to delete blog');
     }
   };
-
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(filteredBlogs.map(b => b.id)));
@@ -179,7 +136,6 @@ export function BlogsTable() {
       setSelectedIds(new Set());
     }
   };
-
   const handleSelectOne = (id: string, checked: boolean) => {
     const newSelected = new Set(selectedIds);
     if (checked) {
@@ -189,16 +145,12 @@ export function BlogsTable() {
     }
     setSelectedIds(newSelected);
   };
-
   const handleBulkDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('blogs')
-        .delete()
-        .in('id', Array.from(selectedIds));
-
+      const {
+        error
+      } = await supabase.from('blogs').delete().in('id', Array.from(selectedIds));
       if (error) throw error;
-
       toast.success(`${selectedIds.size} blogs deleted successfully`);
       setSelectedIds(new Set());
       setBulkDeleteDialogOpen(false);
@@ -208,21 +160,18 @@ export function BlogsTable() {
       toast.error('Failed to delete blogs');
     }
   };
-
   const handleBulkStatusUpdate = async () => {
     try {
-      const updateData: any = { status: bulkStatus };
+      const updateData: any = {
+        status: bulkStatus
+      };
       if (bulkStatus === 'published') {
         updateData.published_at = new Date().toISOString();
       }
-
-      const { error } = await supabase
-        .from('blogs')
-        .update(updateData)
-        .in('id', Array.from(selectedIds));
-
+      const {
+        error
+      } = await supabase.from('blogs').update(updateData).in('id', Array.from(selectedIds));
       if (error) throw error;
-
       toast.success(`${selectedIds.size} blogs updated to ${bulkStatus}`);
       setSelectedIds(new Set());
       setBulkStatusDialogOpen(false);
@@ -233,20 +182,14 @@ export function BlogsTable() {
       toast.error('Failed to update blogs');
     }
   };
-
   const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '');
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   };
-
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || blog.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
   const {
     paginatedData,
     currentPage,
@@ -256,46 +199,38 @@ export function BlogsTable() {
     goToPage,
     totalItems,
     startIndex,
-    endIndex,
+    endIndex
   } = useTableUtils({
     data: filteredBlogs,
     itemsPerPage: 10,
     defaultSortKey: 'created_at',
-    defaultSortDirection: 'desc',
+    defaultSortDirection: 'desc'
   });
-
   const allSelected = paginatedData.length > 0 && paginatedData.every(b => selectedIds.has(b.id));
   const someSelected = selectedIds.size > 0;
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'draft': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-      case 'archived': return 'bg-muted text-muted-foreground border-muted';
-      default: return 'bg-muted text-muted-foreground';
+      case 'published':
+        return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'draft':
+        return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+      case 'archived':
+        return 'bg-muted text-muted-foreground border-muted';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
-
   if (loading) {
     return <div className="animate-pulse space-y-4">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-16 bg-muted rounded-lg" />
-      ))}
+      {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-muted rounded-lg" />)}
     </div>;
   }
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search blogs by title..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+            <Input placeholder="Search blogs by title..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-[150px]">
@@ -311,17 +246,14 @@ export function BlogsTable() {
         </div>
         
         <div className="flex items-center gap-2">
-          {someSelected && (
-            <Badge variant="secondary" className="whitespace-nowrap">
+          {someSelected && <Badge variant="secondary" className="whitespace-nowrap">
               {selectedIds.size} selected
-            </Badge>
-          )}
+            </Badge>}
           <Badge variant="secondary" className="whitespace-nowrap">
             {filteredBlogs.length} blogs
           </Badge>
 
-          {someSelected && (
-            <DropdownMenu>
+          {someSelected && <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   Bulk Actions
@@ -329,37 +261,49 @@ export function BlogsTable() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { setBulkStatus('published'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('published');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                   Publish All
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setBulkStatus('draft'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('draft');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4 text-yellow-600" />
                   Set Draft
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setBulkStatus('archived'); setBulkStatusDialogOpen(true); }}>
+                <DropdownMenuItem onClick={() => {
+              setBulkStatus('archived');
+              setBulkStatusDialogOpen(true);
+            }}>
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Archive All
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setBulkDeleteDialogOpen(true)}
-                  className="text-destructive"
-                >
+                <DropdownMenuItem onClick={() => setBulkDeleteDialogOpen(true)} className="text-destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Selected
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            </DropdownMenu>}
 
-          <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) {
-              setEditingBlog(null);
-              setFormData({ title: '', slug: '', excerpt: '', content: '', cover_image: '', status: 'draft' });
-            }
-          }}>
+          <Dialog open={isDialogOpen} onOpenChange={open => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setEditingBlog(null);
+            setFormData({
+              title: '',
+              slug: '',
+              excerpt: '',
+              content: '',
+              cover_image: '',
+              status: 'draft'
+            });
+          }
+        }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -373,59 +317,48 @@ export function BlogsTable() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => {
-                      setFormData({ 
-                        ...formData, 
-                        title: e.target.value,
-                        slug: editingBlog ? formData.slug : generateSlug(e.target.value)
-                      });
-                    }}
-                    required
-                  />
+                  <Input id="title" value={formData.title} onChange={e => {
+                  setFormData({
+                    ...formData,
+                    title: e.target.value,
+                    slug: editingBlog ? formData.slug : generateSlug(e.target.value)
+                  });
+                }} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="slug">Slug</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    required
-                  />
+                  <Input id="slug" value={formData.slug} onChange={e => setFormData({
+                  ...formData,
+                  slug: e.target.value
+                })} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="excerpt">Excerpt</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    rows={2}
-                  />
+                  <Textarea id="excerpt" value={formData.excerpt} onChange={e => setFormData({
+                  ...formData,
+                  excerpt: e.target.value
+                })} rows={2} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Content</Label>
-                  <RichTextEditor
-                    value={formData.content}
-                    onChange={(value) => setFormData({ ...formData, content: value })}
-                    placeholder="Write your blog content here..."
-                  />
+                  <RichTextEditor value={formData.content} onChange={value => setFormData({
+                  ...formData,
+                  content: value
+                })} placeholder="Write your blog content here..." />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cover_image">Cover Image URL</Label>
-                  <Input
-                    id="cover_image"
-                    value={formData.cover_image}
-                    onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                  />
+                  <Input id="cover_image" value={formData.cover_image} onChange={e => setFormData({
+                  ...formData,
+                  cover_image: e.target.value
+                })} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  >
+                  <Select value={formData.status} onValueChange={value => setFormData({
+                  ...formData,
+                  status: value
+                })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -450,17 +383,11 @@ export function BlogsTable() {
         </div>
       </div>
 
-      <div className="rounded-lg border overflow-hidden">
+      <div className="overflow-hidden border-0 rounded-none">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={allSelected}
-                  indeterminate={someSelected && !allSelected}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
+              
               <SortableTableHead label="Title" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Published" sortKey="published_at" sortConfig={sortConfig} onSort={handleSort} />
@@ -469,21 +396,12 @@ export function BlogsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length === 0 ? (
-              <TableRow>
+            {paginatedData.length === 0 ? <TableRow>
                 <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                   No blogs found
                 </TableCell>
-              </TableRow>
-            ) : (
-              paginatedData.map((blog) => (
-                <TableRow key={blog.id} className="hover:bg-muted/30">
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(blog.id)}
-                      onCheckedChange={(checked) => handleSelectOne(blog.id, checked as boolean)}
-                    />
-                  </TableCell>
+              </TableRow> : paginatedData.map(blog => <TableRow key={blog.id} className="hover:bg-muted/30">
+                  
                   <TableCell>
                     <div>
                       <p className="font-medium">{blog.title}</p>
@@ -497,10 +415,7 @@ export function BlogsTable() {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
-                      {blog.published_at 
-                        ? format(new Date(blog.published_at), 'MMM d, yyyy')
-                        : '-'
-                      }
+                      {blog.published_at ? format(new Date(blog.published_at), 'MMM d, yyyy') : '-'}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -516,39 +431,24 @@ export function BlogsTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-popover">
-                        <DropdownMenuItem 
-                          onClick={() => handleEdit(blog)}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
+                        <DropdownMenuItem onClick={() => handleEdit(blog)} className="flex items-center gap-2 cursor-pointer">
                           <Edit className="h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(blog.id)}
-                          className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
-                        >
+                        <DropdownMenuItem onClick={() => handleDelete(blog.id)} className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive">
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                </TableRow>
-              ))
-            )}
+                </TableRow>)}
           </TableBody>
         </Table>
       </div>
 
-      <TablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        onPageChange={goToPage}
-      />
+      <TablePagination currentPage={currentPage} totalPages={totalPages} totalItems={totalItems} startIndex={startIndex} endIndex={endIndex} onPageChange={goToPage} />
 
       {/* Bulk Delete Dialog */}
       <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
@@ -561,10 +461,7 @@ export function BlogsTable() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBulkDelete}
-              className="bg-destructive hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive hover:bg-destructive/90">
               Delete All
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -588,6 +485,5 @@ export function BlogsTable() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 }
