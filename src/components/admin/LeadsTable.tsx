@@ -322,13 +322,11 @@ export function LeadsTable() {
         </div>
       </div>
 
-      <div className="rounded-lg border overflow-hidden">
+      <div className="overflow-hidden border-0 rounded-none">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-[50px]">
-                <Checkbox checked={allSelected} indeterminate={someSelected && !allSelected} onCheckedChange={handleSelectAll} />
-              </TableHead>
+              
               <SortableTableHead label="Contact" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Requirements</TableHead>
               <SortableTableHead label="Budget" sortKey="max_budget" sortConfig={sortConfig} onSort={handleSort} />
@@ -343,9 +341,7 @@ export function LeadsTable() {
                   No leads found
                 </TableCell>
               </TableRow> : paginatedData.map(lead => <TableRow key={lead.id} className="hover:bg-muted/30">
-                  <TableCell>
-                    <Checkbox checked={selectedIds.has(lead.id)} onCheckedChange={checked => handleSelectOne(lead.id, checked as boolean)} />
-                  </TableCell>
+                  
                   <TableCell>
                     <div className="space-y-1">
                       <p className="font-medium">{lead.full_name}</p>
