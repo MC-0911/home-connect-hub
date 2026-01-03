@@ -149,7 +149,7 @@ export default function Admin() {
                       </div>
                       <div>
                         <h2 className="text-xl font-semibold">User Management</h2>
-                        <p className="text-sm text-muted-foreground">View, manage, and suspend users</p>
+                        <p className="text-sm text-muted-foreground">View and manage all registered users</p>
                       </div>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export default function Admin() {
               }} animate={{
                 opacity: 1
               }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent bg-primary-foreground">
+                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
                         <FileText className="h-5 w-5 text-primary" />
@@ -245,7 +245,7 @@ export default function Admin() {
                       </div>
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 border-0 rounded-none shadow-none">
                     <PropertyTypesManager />
                   </div>
                 </motion.div>
