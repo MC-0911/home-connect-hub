@@ -17,7 +17,7 @@ export function FeaturedProperties({ className }: { className?: string }) {
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start", skipSnaps: false, dragFree: false },
-    [Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })]
+    [Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: false })]
   );
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
