@@ -86,10 +86,12 @@ export function ListingsTable() {
       toast.error('Failed to update status');
     }
   };
+
   const handleApprove = async (id: string) => {
     await updateStatus(id, 'active');
     toast.success('Listing approved and now active');
   };
+
   const handleDecline = async (id: string) => {
     await updateStatus(id, 'declined');
     toast.success('Listing declined');
@@ -293,7 +295,9 @@ export function ListingsTable() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              
+              <TableHead className="w-[50px]">
+                <Checkbox checked={allSelected} indeterminate={someSelected && !allSelected} onCheckedChange={handleSelectAll} />
+              </TableHead>
               <SortableTableHead label="Property" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Price" sortKey="price" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Type</TableHead>
@@ -326,16 +330,29 @@ export function ListingsTable() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {listing.status === 'under_review' ? <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => handleApprove(listing.id)} className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50">
+                      {listing.status === 'under_review' ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleApprove(listing.id)}
+                            className="h-7 px-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
                             <CheckCircle className="h-4 w-4 mr-1" />
                             Approve
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleDecline(listing.id)} className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDecline(listing.id)}
+                            className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
                             <XCircle className="h-4 w-4 mr-1" />
                             Decline
                           </Button>
-                        </div> : <Select value={listing.status} onValueChange={value => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented' | 'under_review' | 'declined')}>
+                        </div>
+                      ) : (
+                        <Select value={listing.status} onValueChange={value => updateStatus(listing.id, value as 'active' | 'pending' | 'sold' | 'rented' | 'under_review' | 'declined')}>
                           <SelectTrigger className={`w-[120px] h-8 text-xs border ${getStatusColor(listing.status)}`}>
                             <SelectValue />
                           </SelectTrigger>
@@ -347,7 +364,8 @@ export function ListingsTable() {
                             <SelectItem value="under_review">Under Review</SelectItem>
                             <SelectItem value="declined">Declined</SelectItem>
                           </SelectContent>
-                        </Select>}
+                        </Select>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>

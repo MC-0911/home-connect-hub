@@ -141,7 +141,7 @@ export default function Admin() {
                 opacity: 0
               }} animate={{
                 opacity: 1
-              }} className="bg-card border shadow-sm overflow-hidden rounded-sm">
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
                   <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/10">
@@ -149,7 +149,7 @@ export default function Admin() {
                       </div>
                       <div>
                         <h2 className="text-xl font-semibold">User Management</h2>
-                        <p className="text-sm text-muted-foreground">View and manage all registered users</p>
+                        <p className="text-sm text-muted-foreground">View, manage, and suspend users</p>
                       </div>
                     </div>
                   </div>
