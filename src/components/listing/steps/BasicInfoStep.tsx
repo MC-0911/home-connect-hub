@@ -19,36 +19,38 @@ const BasicInfoStep = () => {
       </div>
 
       <div className="space-y-4">
-        <div>
-          <Label>Property Type *</Label>
-          <Select value={formData.propertyType} onValueChange={value => updateFormData({
-          propertyType: value
-        })}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select property type" />
-            </SelectTrigger>
-            <SelectContent>
-              {propertyTypes.map(type => <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Property Type *</Label>
+            <Select value={formData.propertyType} onValueChange={value => updateFormData({
+            propertyType: value
+          })}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select property type" />
+              </SelectTrigger>
+              <SelectContent>
+                {propertyTypes.map(type => <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div>
-          <Label>Listing Type *</Label>
-          <RadioGroup value={formData.listingType} onValueChange={(value: 'sale' | 'rent') => updateFormData({
-          listingType: value
-        })} className="flex gap-6 mt-2">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="sale" id="sale" />
-              <Label htmlFor="sale" className="cursor-pointer">For Sale</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="rent" id="rent" />
-              <Label htmlFor="rent" className="cursor-pointer">For Rent</Label>
-            </div>
-          </RadioGroup>
+          <div>
+            <Label>Listing Type *</Label>
+            <RadioGroup value={formData.listingType} onValueChange={(value: 'sale' | 'rent') => updateFormData({
+            listingType: value
+          })} className="flex gap-6 mt-2">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="sale" id="sale" />
+                <Label htmlFor="sale" className="cursor-pointer">For Sale</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="rent" id="rent" />
+                <Label htmlFor="rent" className="cursor-pointer">For Rent</Label>
+              </div>
+            </RadioGroup>
+          </div>
         </div>
 
         <div>
