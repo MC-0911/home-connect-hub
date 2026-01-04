@@ -147,6 +147,16 @@ const BasicInfoStep = () => {
               </div>
 
               <div>
+                <Label htmlFor="parcelNumber" className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Parcel No. (APN) *
+                </Label>
+                <Input id="parcelNumber" type="text" placeholder="e.g., 123-456-789" value={formData.parcelNumber} onChange={e => updateFormData({
+                parcelNumber: e.target.value
+              })} className="mt-1" />
+              </div>
+
+              <div>
                 <Label htmlFor="annualTax" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
                   Annual Tax
