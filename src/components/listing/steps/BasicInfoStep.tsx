@@ -95,7 +95,7 @@ const BasicInfoStep = () => {
               <div>
                 <Label htmlFor="squareFeet" className="flex items-center gap-2">
                   <Ruler className="w-4 h-4 text-primary" />
-                  Square Feet *
+                  Living Area (Sq Ft) *
                 </Label>
                 <Input id="squareFeet" type="number" min="0" placeholder="2500" value={formData.squareFeet} onChange={e => updateFormData({
               squareFeet: e.target.value
