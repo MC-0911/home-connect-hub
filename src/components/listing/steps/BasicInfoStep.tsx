@@ -106,11 +106,24 @@ const BasicInfoStep = () => {
           <div>
             <Label htmlFor="lotSize" className="flex items-center gap-2">
               <TreePine className="w-4 h-4 text-primary" />
-              Lot Size (sq ft)
+              Lot Size
             </Label>
-            <Input id="lotSize" type="number" min="0" placeholder="5000" value={formData.lotSize} onChange={e => updateFormData({
-            lotSize: e.target.value
-          })} className="mt-1" />
+            <div className="flex gap-2 mt-1">
+              <Input id="lotSize" type="number" min="0" placeholder="5000" value={formData.lotSize} onChange={e => updateFormData({
+              lotSize: e.target.value
+            })} className="flex-1" />
+              <Select value={formData.lotSizeUnit || 'sqft'} onValueChange={value => updateFormData({
+              lotSizeUnit: value
+            })}>
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sqft">Sq Ft</SelectItem>
+                  <SelectItem value="acres">Acres</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {!isLand && <>
