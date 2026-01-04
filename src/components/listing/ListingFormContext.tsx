@@ -11,6 +11,7 @@ export interface ListingFormData {
   bathrooms: string;
   squareFeet: string;
   lotSize: string;
+  lotSizeUnit: string;
   yearBuilt: string;
   annualTax: string;
   
@@ -78,6 +79,7 @@ export const initialFormData: ListingFormData = {
   bathrooms: '',
   squareFeet: '',
   lotSize: '',
+  lotSizeUnit: 'sqft',
   yearBuilt: '',
   annualTax: '',
   basement: '',
