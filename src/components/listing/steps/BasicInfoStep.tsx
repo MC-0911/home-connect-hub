@@ -137,6 +137,16 @@ const BasicInfoStep = () => {
               </div>
 
               <div>
+                <Label htmlFor="yearRenovated" className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Year Renovated
+                </Label>
+                <Input id="yearRenovated" type="number" min="1800" max={new Date().getFullYear()} placeholder="2022" value={formData.yearRenovated} onChange={e => updateFormData({
+                yearRenovated: e.target.value
+              })} className="mt-1" />
+              </div>
+
+              <div>
                 <Label htmlFor="annualTax" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
                   Annual Tax
