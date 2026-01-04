@@ -3,7 +3,7 @@ import { useListingForm } from '../ListingFormContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 import { propertyTypes } from '@/lib/mockData';
 import { Bed, Bath, Ruler, TreePine, Calendar } from 'lucide-react';
 const BasicInfoStep = () => {
@@ -38,18 +38,17 @@ const BasicInfoStep = () => {
 
           <div>
             <Label>Listing Type *</Label>
-            <RadioGroup value={formData.listingType} onValueChange={(value: 'sale' | 'rent') => updateFormData({
+            <Select value={formData.listingType} onValueChange={(value: 'sale' | 'rent') => updateFormData({
             listingType: value
-          })} className="flex gap-6 mt-2">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="sale" id="sale" />
-                <Label htmlFor="sale" className="cursor-pointer">For Sale</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="rent" id="rent" />
-                <Label htmlFor="rent" className="cursor-pointer">For Rent</Label>
-              </div>
-            </RadioGroup>
+          })}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select listing type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sale">For Sale</SelectItem>
+                <SelectItem value="rent">For Rent</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
