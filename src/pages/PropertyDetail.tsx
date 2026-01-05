@@ -362,6 +362,154 @@ export default function PropertyDetail() {
                   </div>
                 </motion.div>}
 
+              {/* Land Features - only for land properties */}
+              {property.property_type === "land" && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.3
+            }}>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Land Characteristics
+                  </h2>
+                  <div className="space-y-4">
+                    {(property as any).zoning_type && <div>
+                        <span className="text-sm font-medium text-foreground">Zoning Type:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).zoning_type}</span>
+                      </div>}
+                    {(property as any).allowed_uses?.length > 0 && <div>
+                        <span className="text-sm font-medium text-foreground">Allowed Uses:</span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {(property as any).allowed_uses.map((use: string) => <Badge key={use} variant="secondary">{use}</Badge>)}
+                        </div>
+                      </div>}
+                    {(property as any).buildable && <div>
+                        <span className="text-sm font-medium text-foreground">Buildable:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).buildable}</span>
+                      </div>}
+                    {(property as any).can_subdivide && <div>
+                        <span className="text-sm font-medium text-foreground">Can Subdivide:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).can_subdivide}</span>
+                      </div>}
+                    {(property as any).road_access && <div>
+                        <span className="text-sm font-medium text-foreground">Road Access:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).road_access}</span>
+                      </div>}
+                    {(property as any).utilities_available?.length > 0 && <div>
+                        <span className="text-sm font-medium text-foreground">Utilities Available:</span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {(property as any).utilities_available.map((util: string) => <Badge key={util} variant="secondary">{util}</Badge>)}
+                        </div>
+                      </div>}
+                    {(property as any).water_rights && <div>
+                        <span className="text-sm font-medium text-foreground">Water Rights:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).water_rights}</span>
+                      </div>}
+                  </div>
+                </motion.div>}
+
+              {/* Land Property Features - only for land properties */}
+              {property.property_type === "land" && ((property as any).topography || (property as any).land_views?.length > 0 || (property as any).fencing || (property as any).vegetation) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.35
+            }}>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Property Features
+                  </h2>
+                  <div className="space-y-4">
+                    {(property as any).topography && <div>
+                        <span className="text-sm font-medium text-foreground">Topography:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).topography}</span>
+                      </div>}
+                    {(property as any).land_views?.length > 0 && <div>
+                        <span className="text-sm font-medium text-foreground">Views:</span>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {(property as any).land_views.map((view: string) => <Badge key={view} variant="secondary">{view}</Badge>)}
+                        </div>
+                      </div>}
+                    {(property as any).fencing && <div>
+                        <span className="text-sm font-medium text-foreground">Fencing:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).fencing}</span>
+                      </div>}
+                    {(property as any).vegetation && <div>
+                        <span className="text-sm font-medium text-foreground">Trees & Vegetation:</span>
+                        <span className="ml-2 text-muted-foreground capitalize">{(property as any).vegetation}</span>
+                      </div>}
+                  </div>
+                </motion.div>}
+
+              {/* Land Nearby Amenities - only for land properties */}
+              {property.property_type === "land" && ((property as any).distance_to_town || (property as any).distance_to_grocery) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.4
+            }}>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Nearby Amenities
+                  </h2>
+                  <div className="space-y-4">
+                    {(property as any).distance_to_town && <div>
+                        <span className="text-sm font-medium text-foreground">Distance to Town:</span>
+                        <span className="ml-2 text-muted-foreground">{(property as any).distance_to_town}</span>
+                      </div>}
+                    {(property as any).distance_to_grocery && <div>
+                        <span className="text-sm font-medium text-foreground">Grocery/Supplies:</span>
+                        <span className="ml-2 text-muted-foreground">{(property as any).distance_to_grocery}</span>
+                      </div>}
+                  </div>
+                </motion.div>}
+
+              {/* Land Recreational Features - only for land properties */}
+              {property.property_type === "land" && (property as any).recreational_features?.length > 0 && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.45
+            }}>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Recreational Features
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {(property as any).recreational_features.map((feature: string) => <div key={feature} className="flex items-center gap-3 text-muted-foreground">
+                        <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-accent" />
+                        </div>
+                        {feature}
+                      </div>)}
+                  </div>
+                </motion.div>}
+
+              {/* Land Additional Notes - only for land properties */}
+              {property.property_type === "land" && (property as any).land_additional_notes && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.5
+            }}>
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Additional Notes
+                  </h2>
+                  <p className="text-muted-foreground leading-relaxed">{(property as any).land_additional_notes}</p>
+                </motion.div>}
+
               {/* Amenities */}
               {property.amenities && property.amenities.length > 0 && <motion.div initial={{
               opacity: 0,
