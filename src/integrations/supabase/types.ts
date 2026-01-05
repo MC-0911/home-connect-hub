@@ -297,102 +297,162 @@ export type Database = {
       properties: {
         Row: {
           address: string
+          allowed_uses: string[] | null
           amenities: string[] | null
+          annual_tax: number | null
           architectural_style: string | null
           basement: string | null
           bathrooms: number | null
           bedrooms: number | null
+          buildable: string | null
+          can_subdivide: string | null
           city: string
           created_at: string
           description: string
+          distance_to_grocery: string | null
+          distance_to_town: string | null
           featured: boolean | null
+          fencing: string | null
           flooring: string[] | null
           id: string
           images: string[] | null
           indoor_features: string[] | null
+          land_additional_notes: string | null
+          land_views: string[] | null
           listing_type: Database["public"]["Enums"]["listing_type"]
           lot_size: number | null
+          lot_size_unit: string | null
+          neighborhood_amenities: Json | null
           outdoor_amenities: string[] | null
+          parcel_number: string | null
           parking: string[] | null
           price: number
           property_type: Database["public"]["Enums"]["property_type"]
+          recreational_features: string[] | null
+          road_access: string | null
           roofing_type: string | null
           rooms: string[] | null
           square_feet: number | null
           state: string
           status: Database["public"]["Enums"]["property_status"] | null
           title: string
+          topography: string | null
           updated_at: string
           user_id: string
+          utilities_available: string[] | null
+          vegetation: string | null
           views: string[] | null
+          water_rights: string | null
           year_built: number | null
+          year_renovated: number | null
           zip_code: string
+          zoning_type: string | null
         }
         Insert: {
           address: string
+          allowed_uses?: string[] | null
           amenities?: string[] | null
+          annual_tax?: number | null
           architectural_style?: string | null
           basement?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
+          buildable?: string | null
+          can_subdivide?: string | null
           city: string
           created_at?: string
           description: string
+          distance_to_grocery?: string | null
+          distance_to_town?: string | null
           featured?: boolean | null
+          fencing?: string | null
           flooring?: string[] | null
           id?: string
           images?: string[] | null
           indoor_features?: string[] | null
+          land_additional_notes?: string | null
+          land_views?: string[] | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           lot_size?: number | null
+          lot_size_unit?: string | null
+          neighborhood_amenities?: Json | null
           outdoor_amenities?: string[] | null
+          parcel_number?: string | null
           parking?: string[] | null
           price: number
           property_type: Database["public"]["Enums"]["property_type"]
+          recreational_features?: string[] | null
+          road_access?: string | null
           roofing_type?: string | null
           rooms?: string[] | null
           square_feet?: number | null
           state: string
           status?: Database["public"]["Enums"]["property_status"] | null
           title: string
+          topography?: string | null
           updated_at?: string
           user_id: string
+          utilities_available?: string[] | null
+          vegetation?: string | null
           views?: string[] | null
+          water_rights?: string | null
           year_built?: number | null
+          year_renovated?: number | null
           zip_code: string
+          zoning_type?: string | null
         }
         Update: {
           address?: string
+          allowed_uses?: string[] | null
           amenities?: string[] | null
+          annual_tax?: number | null
           architectural_style?: string | null
           basement?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
+          buildable?: string | null
+          can_subdivide?: string | null
           city?: string
           created_at?: string
           description?: string
+          distance_to_grocery?: string | null
+          distance_to_town?: string | null
           featured?: boolean | null
+          fencing?: string | null
           flooring?: string[] | null
           id?: string
           images?: string[] | null
           indoor_features?: string[] | null
+          land_additional_notes?: string | null
+          land_views?: string[] | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           lot_size?: number | null
+          lot_size_unit?: string | null
+          neighborhood_amenities?: Json | null
           outdoor_amenities?: string[] | null
+          parcel_number?: string | null
           parking?: string[] | null
           price?: number
           property_type?: Database["public"]["Enums"]["property_type"]
+          recreational_features?: string[] | null
+          road_access?: string | null
           roofing_type?: string | null
           rooms?: string[] | null
           square_feet?: number | null
           state?: string
           status?: Database["public"]["Enums"]["property_status"] | null
           title?: string
+          topography?: string | null
           updated_at?: string
           user_id?: string
+          utilities_available?: string[] | null
+          vegetation?: string | null
           views?: string[] | null
+          water_rights?: string | null
           year_built?: number | null
+          year_renovated?: number | null
           zip_code?: string
+          zoning_type?: string | null
         }
         Relationships: []
       }

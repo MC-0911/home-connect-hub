@@ -83,8 +83,11 @@ const EditProperty = () => {
               bathrooms: property.bathrooms?.toString() || '',
               squareFeet: property.square_feet?.toString() || '',
               lotSize: property.lot_size?.toString() || '',
+              lotSizeUnit: (property as any).lot_size_unit || 'sqft',
               yearBuilt: property.year_built?.toString() || '',
-              annualTax: '',
+              yearRenovated: (property as any).year_renovated?.toString() || '',
+              parcelNumber: (property as any).parcel_number || '',
+              annualTax: (property as any).annual_tax?.toString() || '',
               amenities: property.amenities || [],
               existingImageUrls: property.images || [],
               // Interior features
@@ -98,7 +101,7 @@ const EditProperty = () => {
               roofingType: property.roofing_type || '',
               outdoorAmenities: property.outdoor_amenities || [],
               views: property.views || [],
-              neighborhoodAmenities: {
+              neighborhoodAmenities: (property as any).neighborhood_amenities || {
                 education: [],
                 dailyEssentials: [],
                 diningLeisure: [],
@@ -109,6 +112,22 @@ const EditProperty = () => {
                 cultureEntertainment: [],
                 communityServices: [],
               },
+              // Land-specific fields
+              zoningType: (property as any).zoning_type || '',
+              allowedUses: (property as any).allowed_uses || [],
+              buildable: (property as any).buildable || '',
+              canSubdivide: (property as any).can_subdivide || '',
+              roadAccess: (property as any).road_access || '',
+              utilitiesAvailable: (property as any).utilities_available || [],
+              waterRights: (property as any).water_rights || '',
+              topography: (property as any).topography || '',
+              landViews: (property as any).land_views || [],
+              fencing: (property as any).fencing || '',
+              vegetation: (property as any).vegetation || '',
+              distanceToTown: (property as any).distance_to_town || '',
+              distanceToGrocery: (property as any).distance_to_grocery || '',
+              recreationalFeatures: (property as any).recreational_features || [],
+              landAdditionalNotes: (property as any).land_additional_notes || '',
             }}
           />
         )}

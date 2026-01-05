@@ -171,7 +171,9 @@ const ListingFormContent = ({
 
       // Combine existing and new image URLs
       const allImageUrls = [...formData.existingImageUrls, ...newImageUrls];
-      const propertyData = {
+      const isLand = formData.propertyType === 'land';
+      
+      const propertyData: Record<string, any> = {
         title: formData.title,
         description: formData.description,
         property_type: formData.propertyType as any,
@@ -185,21 +187,47 @@ const ListingFormContent = ({
         bathrooms: formData.bathrooms ? parseFloat(formData.bathrooms) : 0,
         square_feet: formData.squareFeet ? parseInt(formData.squareFeet) : 0,
         lot_size: formData.lotSize ? parseInt(formData.lotSize) : null,
+        lot_size_unit: formData.lotSizeUnit || 'sqft',
         year_built: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
+        year_renovated: formData.yearRenovated ? parseInt(formData.yearRenovated) : null,
+        parcel_number: formData.parcelNumber || null,
+        annual_tax: formData.annualTax ? parseFloat(formData.annualTax) : null,
         amenities: formData.amenities,
         images: allImageUrls,
-        // Interior features
-        basement: formData.basement || null,
-        flooring: formData.flooring,
-        rooms: formData.rooms,
-        indoor_features: formData.indoorFeatures,
-        // Exterior features
-        architectural_style: formData.architecturalStyle || null,
-        parking: formData.parking,
-        roofing_type: formData.roofingType || null,
-        outdoor_amenities: formData.outdoorAmenities,
-        views: formData.views
       };
+
+      if (isLand) {
+        // Land-specific fields
+        propertyData.zoning_type = formData.zoningType || null;
+        propertyData.allowed_uses = formData.allowedUses;
+        propertyData.buildable = formData.buildable || null;
+        propertyData.can_subdivide = formData.canSubdivide || null;
+        propertyData.road_access = formData.roadAccess || null;
+        propertyData.utilities_available = formData.utilitiesAvailable;
+        propertyData.water_rights = formData.waterRights || null;
+        propertyData.topography = formData.topography || null;
+        propertyData.land_views = formData.landViews;
+        propertyData.fencing = formData.fencing || null;
+        propertyData.vegetation = formData.vegetation || null;
+        propertyData.distance_to_town = formData.distanceToTown || null;
+        propertyData.distance_to_grocery = formData.distanceToGrocery || null;
+        propertyData.recreational_features = formData.recreationalFeatures;
+        propertyData.land_additional_notes = formData.landAdditionalNotes || null;
+      } else {
+        // Interior features
+        propertyData.basement = formData.basement || null;
+        propertyData.flooring = formData.flooring;
+        propertyData.rooms = formData.rooms;
+        propertyData.indoor_features = formData.indoorFeatures;
+        // Exterior features
+        propertyData.architectural_style = formData.architecturalStyle || null;
+        propertyData.parking = formData.parking;
+        propertyData.roofing_type = formData.roofingType || null;
+        propertyData.outdoor_amenities = formData.outdoorAmenities;
+        propertyData.views = formData.views;
+        // Neighborhood amenities
+        propertyData.neighborhood_amenities = formData.neighborhoodAmenities;
+      }
       if (editMode && propertyId) {
         // Update existing property
         const {
@@ -217,7 +245,7 @@ const ListingFormContent = ({
         } = await supabase.from('properties').insert({
           user_id: user.id,
           ...propertyData
-        });
+        } as any);
         if (insertError) throw insertError;
         toast({
           title: "Listing Submitted!",
