@@ -23,21 +23,21 @@ export interface ListingFormData {
   state: string;
   zipCode: string;
   
-  // Step 3: Room & Interior Features
+  // Step 3: Room & Interior Features (non-land properties)
   basement: string;
   flooring: string[];
   rooms: string[];
   indoorFeatures: string[];
   amenities: string[];
   
-  // Step 4: Exterior Features
+  // Step 4: Exterior Features (non-land properties)
   architecturalStyle: string;
   parking: string[];
   roofingType: string;
   outdoorAmenities: string[];
   views: string[];
   
-  // Step 5: Neighborhood
+  // Step 5: Neighborhood (non-land properties)
   neighborhoodAmenities: {
     education: string[];
     dailyEssentials: string[];
@@ -50,7 +50,24 @@ export interface ListingFormData {
     communityServices: string[];
   };
   
-  // Step 6: Images
+  // Land-specific fields (Step 3 for land properties)
+  zoningType: string;
+  allowedUses: string[];
+  buildable: string;
+  canSubdivide: string;
+  roadAccess: string;
+  utilitiesAvailable: string[];
+  waterRights: string;
+  topography: string;
+  landViews: string[];
+  fencing: string;
+  vegetation: string;
+  distanceToTown: string;
+  distanceToGrocery: string;
+  recreationalFeatures: string[];
+  landAdditionalNotes: string;
+  
+  // Images
   images: File[];
   imagePreviewUrls: string[];
   existingImageUrls: string[];
@@ -107,6 +124,22 @@ export const initialFormData: ListingFormData = {
     cultureEntertainment: [],
     communityServices: [],
   },
+  // Land-specific defaults
+  zoningType: '',
+  allowedUses: [],
+  buildable: '',
+  canSubdivide: '',
+  roadAccess: '',
+  utilitiesAvailable: [],
+  waterRights: '',
+  topography: '',
+  landViews: [],
+  fencing: '',
+  vegetation: '',
+  distanceToTown: '',
+  distanceToGrocery: '',
+  recreationalFeatures: [],
+  landAdditionalNotes: '',
   images: [],
   imagePreviewUrls: [],
   existingImageUrls: [],

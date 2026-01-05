@@ -7,6 +7,7 @@ import LocationStep from './steps/LocationStep';
 import AmenitiesStep from './steps/AmenitiesStep';
 import ExteriorFeaturesStep from './steps/ExteriorFeaturesStep';
 import NeighborhoodStep from './steps/NeighborhoodStep';
+import LandFeaturesStep from './steps/LandFeaturesStep';
 import ImagesStep from './steps/ImagesStep';
 import SuccessStep from './steps/SuccessStep';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-const stepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ExteriorFeaturesStep, NeighborhoodStep, ImagesStep];
+
+// Steps for non-land properties
+const regularStepComponents = [BasicInfoStep, LocationStep, AmenitiesStep, ExteriorFeaturesStep, NeighborhoodStep, ImagesStep];
+// Steps for land properties (replace Interior, Exterior, Neighborhood with LandFeatures)
+const landStepComponents = [BasicInfoStep, LocationStep, LandFeaturesStep, ImagesStep];
+
 const ListingFormContent = ({
   className
 }: {
@@ -40,8 +46,14 @@ const ListingFormContent = ({
   } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
+  
+  const isLandProperty = formData.propertyType === 'land';
+  const stepComponents = isLandProperty ? landStepComponents : regularStepComponents;
+  const actualTotalSteps = isLandProperty ? 4 : 6;
   const CurrentStepComponent = stepComponents[currentStep - 1];
   const validateStep = (step: number): boolean => {
+    const isLand = formData.propertyType === 'land';
+    
     switch (step) {
       case 1:
         if (!formData.propertyType || !formData.price) {
@@ -52,7 +64,6 @@ const ListingFormContent = ({
           });
           return false;
         }
-        const isLand = formData.propertyType === 'land';
         if (!isLand && (!formData.bedrooms || !formData.bathrooms || !formData.squareFeet)) {
           toast({
             title: "Missing Features",
@@ -81,15 +92,24 @@ const ListingFormContent = ({
         }
         return true;
       case 3:
-        return true;
-      // Interior features are optional
+        return true; // Land features or Interior features are optional
       case 4:
+        // For land: this is Images step; for regular: this is Exterior step
+        if (isLand) {
+          if (formData.images.length === 0 && formData.existingImageUrls.length === 0) {
+            toast({
+              title: "No Images",
+              description: "Please add at least one photo of your property.",
+              variant: "destructive"
+            });
+            return false;
+          }
+        }
         return true;
-      // Exterior features are optional
       case 5:
-        return true;
-      // Neighborhood amenities are optional
+        return true; // Neighborhood amenities are optional
       case 6:
+        // Images step for regular properties
         if (formData.images.length === 0 && formData.existingImageUrls.length === 0) {
           toast({
             title: "No Images",
@@ -105,7 +125,7 @@ const ListingFormContent = ({
   };
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      if (currentStep < totalSteps) {
+      if (currentStep < actualTotalSteps) {
         setCurrentStep(currentStep + 1);
         window.scrollTo({
           top: 0,
@@ -234,7 +254,7 @@ const ListingFormContent = ({
           </p>
         </div>
 
-        <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
+        <StepIndicator currentStep={currentStep} totalSteps={actualTotalSteps} />
 
         <Card className="mt-8">
           <CardContent className="p-6 md:p-8">
@@ -262,7 +282,7 @@ const ListingFormContent = ({
                 Previous
               </Button>
 
-              {currentStep < totalSteps ? <Button type="button" onClick={handleNext} className="gap-2">
+              {currentStep < actualTotalSteps ? <Button type="button" onClick={handleNext} className="gap-2">
                   Next
                   <ArrowRight className="w-4 h-4" />
                 </Button> : <Button type="button" onClick={handleSubmit} disabled={isSubmitting} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
