@@ -254,7 +254,7 @@ const ListingFormContent = ({
           </p>
         </div>
 
-        <StepIndicator currentStep={currentStep} totalSteps={actualTotalSteps} />
+        <StepIndicator currentStep={currentStep} totalSteps={actualTotalSteps} isLandProperty={isLandProperty} />
 
         <Card className="mt-8">
           <CardContent className="p-6 md:p-8">
