@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, ChevronLeft, ChevronRight, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2 } from "lucide-react";
+import { ThumbnailCarousel } from "@/components/ui/thumbnail-carousel";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,6 @@ export default function PropertyDetail() {
   } = useAuth();
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showVisitDialog, setShowVisitDialog] = useState(false);
   const [showOfferDialog, setShowOfferDialog] = useState(false);
@@ -121,29 +121,19 @@ export default function PropertyDetail() {
     }
     setShowOfferDialog(true);
   };
-  const nextImage = () => {
-    setCurrentImageIndex(prev => (prev + 1) % images.length);
-  };
-  const prevImage = () => {
-    setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
-  };
   return <div className="min-h-screen bg-background">
       <Header />
 
       <main className="pt-20 bg-primary-foreground">
         {/* Image Gallery */}
-        <div className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh] bg-secondary">
-          <motion.img key={currentImageIndex} initial={{
-          opacity: 0
-        }} animate={{
-          opacity: 1
-        }} transition={{
-          duration: 0.3
-        }} src={images[currentImageIndex]} alt={property.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-foreground/20" />
+        <div className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh]">
+          <ThumbnailCarousel images={images} title={property.title} />
+          
+          {/* Overlay gradient for better button visibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-transparent to-transparent pointer-events-none h-24" />
 
           {/* Navigation */}
-          <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
+          <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
             <Button variant="secondary" size="sm" asChild>
               <Link to="/properties">
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -160,23 +150,8 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          {/* Image Navigation */}
-          {images.length > 1 && <>
-              <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110">
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center transition-all hover:bg-card hover:scale-110">
-                <ChevronRight className="w-6 h-6" />
-              </button>
-            </>}
-
-          {/* Image Indicators */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {images.map((_, index) => <button key={index} onClick={() => setCurrentImageIndex(index)} className={cn("w-2 h-2 rounded-full transition-all", index === currentImageIndex ? "bg-accent w-6" : "bg-primary-foreground/50 hover:bg-primary-foreground/80")} />)}
-          </div>
-
           {/* Badges */}
-          <div className="absolute bottom-6 left-6 flex gap-2">
+          <div className="absolute bottom-24 left-6 flex gap-2 z-20">
             {property.featured && <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>}
             <Badge variant="secondary" className="backdrop-blur-sm border-0 bg-secondary">
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
