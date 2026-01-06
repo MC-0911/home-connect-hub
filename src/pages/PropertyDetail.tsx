@@ -256,6 +256,39 @@ export default function PropertyDetail() {
                 </div>
               </motion.div>
 
+              {/* Additional Property Details - for non-land properties */}
+              {property.property_type !== "land" && (property.year_renovated || property.parcel_number || property.annual_tax) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                >
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">Property Details</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {property.year_renovated && (
+                      <div className="bg-card rounded-xl p-4 border border-border">
+                        <span className="text-sm text-muted-foreground">Year Renovated</span>
+                        <span className="block font-semibold text-foreground mt-1">{property.year_renovated}</span>
+                      </div>
+                    )}
+                    {property.parcel_number && (
+                      <div className="bg-card rounded-xl p-4 border border-border">
+                        <span className="text-sm text-muted-foreground">Parcel No. (APN)</span>
+                        <span className="block font-semibold text-foreground mt-1">{property.parcel_number}</span>
+                      </div>
+                    )}
+                    {property.annual_tax && (
+                      <div className="bg-card rounded-xl p-4 border border-border">
+                        <span className="text-sm text-muted-foreground">Annual Tax</span>
+                        <span className="block font-semibold text-foreground mt-1">
+                          ${property.annual_tax.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
               {/* Description */}
               <motion.div initial={{
               opacity: 0,
