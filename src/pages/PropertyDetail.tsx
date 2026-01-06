@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, ChevronLeft, ChevronRight, MessageCircle, DollarSign, Loader2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, ChevronLeft, ChevronRight, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -394,6 +394,62 @@ export default function PropertyDetail() {
                       </div>}
                   </div>
                 </motion.div>}
+
+              {/* Neighborhood Amenities */}
+              {property.neighborhood_amenities && Object.keys(property.neighborhood_amenities as object).some(key => 
+                Array.isArray((property.neighborhood_amenities as Record<string, string[]>)[key]) && 
+                (property.neighborhood_amenities as Record<string, string[]>)[key].length > 0
+              ) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Neighborhood Amenities
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {(() => {
+                      const amenities = property.neighborhood_amenities as Record<string, string[]>;
+                      const categoryConfig = [
+                        { id: 'education', icon: GraduationCap, title: 'Education' },
+                        { id: 'dailyEssentials', icon: ShoppingCart, title: 'Daily Essentials' },
+                        { id: 'diningLeisure', icon: Coffee, title: 'Dining & Leisure' },
+                        { id: 'transportation', icon: Train, title: 'Transportation' },
+                        { id: 'parksRecreation', icon: Trees, title: 'Parks & Recreation' },
+                        { id: 'healthWellness', icon: HeartIcon, title: 'Health & Wellness' },
+                        { id: 'shopping', icon: ShoppingBag, title: 'Shopping' },
+                        { id: 'cultureEntertainment', icon: Theater, title: 'Culture & Entertainment' },
+                        { id: 'communityServices', icon: Building2, title: 'Community Services' },
+                      ];
+                      
+                      return categoryConfig
+                        .filter(cat => amenities[cat.id]?.length > 0)
+                        .map(cat => {
+                          const Icon = cat.icon;
+                          return (
+                            <div key={cat.id} className="bg-card rounded-xl p-4 border border-border">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                                  <Icon className="w-4 h-4 text-accent" />
+                                </div>
+                                <span className="font-medium text-foreground">{cat.title}</span>
+                              </div>
+                              <div className="space-y-2">
+                                {amenities[cat.id].map((item: string) => (
+                                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Check className="w-3 h-3 text-accent" />
+                                    {item}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        });
+                    })()}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Land Features - only for land properties */}
               {property.property_type === "land" && <motion.div initial={{
