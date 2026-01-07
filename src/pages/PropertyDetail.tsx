@@ -213,6 +213,11 @@ export default function PropertyDetail() {
                       </span>
                       <span className="text-sm text-muted-foreground">Sq Ft</span>
                     </div>
+                    <div className="bg-card rounded-xl p-4 border border-border text-center">
+                      <Home className="w-6 h-6 text-accent mx-auto mb-2" />
+                      <span className="block font-semibold text-foreground capitalize">{property.property_type}</span>
+                      <span className="text-sm text-muted-foreground">Type</span>
+                    </div>
                   </>}
                 {property.year_built && <div className="bg-card rounded-xl p-4 border border-border text-center">
                     <CalendarIcon className="w-6 h-6 text-accent mx-auto mb-2" />
@@ -234,11 +239,6 @@ export default function PropertyDetail() {
                     <span className="block font-semibold text-foreground">${property.annual_tax.toLocaleString()}</span>
                     <span className="text-sm text-muted-foreground">Annual Tax</span>
                   </div>}
-                <div className="bg-card rounded-xl p-4 border border-border text-center">
-                  <Home className="w-6 h-6 text-accent mx-auto mb-2" />
-                  <span className="block font-semibold text-foreground capitalize">{property.property_type}</span>
-                  <span className="text-sm text-muted-foreground">Type</span>
-                </div>
               </motion.div>
 
               {/* Description */}
