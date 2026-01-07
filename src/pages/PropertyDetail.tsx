@@ -172,21 +172,16 @@ export default function PropertyDetail() {
               opacity: 1,
               y: 0
             }}>
-                <div className="flex items-center gap-2 text-secondary mb-2">
-                  <MapPin className="w-5 h-5 text-accent" />
-                  <span>
-                    {property.address}, {property.city}, {property.state} {property.zip_code}
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-                  <h1 className="font-display text-3xl sm:text-4xl font-semibold text-foreground">
-                    {property.title}
-                  </h1>
-                  <div className="text-right">
-                    <span className="font-display text-3xl sm:text-4xl font-semibold text-accent">
-                      {formatPrice(property.price, property.listing_type)}
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-2 text-foreground">
+                    <MapPin className="w-5 h-5 text-accent" />
+                    <span className="font-display text-2xl sm:text-3xl font-semibold">
+                      {property.address}, {property.city}, {property.state} {property.zip_code}
                     </span>
                   </div>
+                  <span className="font-display text-2xl sm:text-3xl font-semibold text-accent">
+                    {formatPrice(property.price, property.listing_type)}
+                  </span>
                 </div>
               </motion.div>
 
