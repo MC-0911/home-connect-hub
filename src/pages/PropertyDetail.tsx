@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText } from "lucide-react";
 import { ThumbnailCarousel } from "@/components/ui/thumbnail-carousel";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -219,41 +219,27 @@ export default function PropertyDetail() {
                     <span className="block font-semibold text-foreground">{property.year_built}</span>
                     <span className="text-sm text-muted-foreground">Year Built</span>
                   </div>}
+                {property.property_type !== "land" && property.year_renovated && <div className="bg-card rounded-xl p-4 border border-border text-center">
+                    <CalendarIcon className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <span className="block font-semibold text-foreground">{property.year_renovated}</span>
+                    <span className="text-sm text-muted-foreground">Year Renovated</span>
+                  </div>}
+                {property.property_type !== "land" && property.parcel_number && <div className="bg-card rounded-xl p-4 border border-border text-center">
+                    <FileText className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <span className="block font-semibold text-foreground">{property.parcel_number}</span>
+                    <span className="text-sm text-muted-foreground">Parcel No. (APN)</span>
+                  </div>}
+                {property.property_type !== "land" && property.annual_tax && <div className="bg-card rounded-xl p-4 border border-border text-center">
+                    <DollarSign className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <span className="block font-semibold text-foreground">${property.annual_tax.toLocaleString()}</span>
+                    <span className="text-sm text-muted-foreground">Annual Tax</span>
+                  </div>}
                 <div className="bg-card rounded-xl p-4 border border-border text-center">
                   <Home className="w-6 h-6 text-accent mx-auto mb-2" />
                   <span className="block font-semibold text-foreground capitalize">{property.property_type}</span>
                   <span className="text-sm text-muted-foreground">Type</span>
                 </div>
               </motion.div>
-
-              {/* Additional Property Details - for non-land properties */}
-              {property.property_type !== "land" && (property.year_renovated || property.parcel_number || property.annual_tax) && <motion.div initial={{
-              opacity: 0,
-              y: 20
-            }} animate={{
-              opacity: 1,
-              y: 0
-            }} transition={{
-              delay: 0.15
-            }}>
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">Property Details</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {property.year_renovated && <div className="bg-card rounded-xl p-4 border border-border">
-                        <span className="text-sm text-muted-foreground">Year Renovated</span>
-                        <span className="block font-semibold text-foreground mt-1">{property.year_renovated}</span>
-                      </div>}
-                    {property.parcel_number && <div className="bg-card rounded-xl p-4 border border-border">
-                        <span className="text-sm text-muted-foreground">Parcel No. (APN)</span>
-                        <span className="block font-semibold text-foreground mt-1">{property.parcel_number}</span>
-                      </div>}
-                    {property.annual_tax && <div className="bg-card rounded-xl p-4 border border-border">
-                        <span className="text-sm text-muted-foreground">Annual Tax</span>
-                        <span className="block font-semibold text-foreground mt-1">
-                          ${property.annual_tax.toLocaleString()}
-                        </span>
-                      </div>}
-                  </div>
-                </motion.div>}
 
               {/* Description */}
               <motion.div initial={{
