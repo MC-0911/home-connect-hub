@@ -175,11 +175,11 @@ export default function PropertyDetail() {
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                   <div className="flex items-center gap-2 text-foreground">
                     <MapPin className="w-5 h-5 text-accent" />
-                    <span className="font-display text-2xl sm:text-3xl font-semibold">
+                    <span className="font-display text-2xl font-semibold sm:text-xl">
                       {property.address}, {property.city}, {property.state} {property.zip_code}
                     </span>
                   </div>
-                  <span className="font-display text-2xl sm:text-3xl font-semibold text-accent">
+                  <span className="font-display text-2xl font-semibold text-accent sm:text-4xl">
                     {formatPrice(property.price, property.listing_type)}
                   </span>
                 </div>
@@ -227,37 +227,33 @@ export default function PropertyDetail() {
               </motion.div>
 
               {/* Additional Property Details - for non-land properties */}
-              {property.property_type !== "land" && (property.year_renovated || property.parcel_number || property.annual_tax) && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                >
+              {property.property_type !== "land" && (property.year_renovated || property.parcel_number || property.annual_tax) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.15
+            }}>
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">Property Details</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {property.year_renovated && (
-                      <div className="bg-card rounded-xl p-4 border border-border">
+                    {property.year_renovated && <div className="bg-card rounded-xl p-4 border border-border">
                         <span className="text-sm text-muted-foreground">Year Renovated</span>
                         <span className="block font-semibold text-foreground mt-1">{property.year_renovated}</span>
-                      </div>
-                    )}
-                    {property.parcel_number && (
-                      <div className="bg-card rounded-xl p-4 border border-border">
+                      </div>}
+                    {property.parcel_number && <div className="bg-card rounded-xl p-4 border border-border">
                         <span className="text-sm text-muted-foreground">Parcel No. (APN)</span>
                         <span className="block font-semibold text-foreground mt-1">{property.parcel_number}</span>
-                      </div>
-                    )}
-                    {property.annual_tax && (
-                      <div className="bg-card rounded-xl p-4 border border-border">
+                      </div>}
+                    {property.annual_tax && <div className="bg-card rounded-xl p-4 border border-border">
                         <span className="text-sm text-muted-foreground">Annual Tax</span>
                         <span className="block font-semibold text-foreground mt-1">
                           ${property.annual_tax.toLocaleString()}
                         </span>
-                      </div>
-                    )}
+                      </div>}
                   </div>
-                </motion.div>
-              )}
+                </motion.div>}
 
               {/* Description */}
               <motion.div initial={{
@@ -366,39 +362,61 @@ export default function PropertyDetail() {
                 </motion.div>}
 
               {/* Neighborhood Amenities */}
-              {property.neighborhood_amenities && Object.keys(property.neighborhood_amenities as object).some(key => 
-                Array.isArray((property.neighborhood_amenities as Record<string, string[]>)[key]) && 
-                (property.neighborhood_amenities as Record<string, string[]>)[key].length > 0
-              ) && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
+              {property.neighborhood_amenities && Object.keys(property.neighborhood_amenities as object).some(key => Array.isArray((property.neighborhood_amenities as Record<string, string[]>)[key]) && (property.neighborhood_amenities as Record<string, string[]>)[key].length > 0) && <motion.div initial={{
+              opacity: 0,
+              y: 20
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              delay: 0.4
+            }}>
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Neighborhood Amenities
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {(() => {
-                      const amenities = property.neighborhood_amenities as Record<string, string[]>;
-                      const categoryConfig = [
-                        { id: 'education', icon: GraduationCap, title: 'Education' },
-                        { id: 'dailyEssentials', icon: ShoppingCart, title: 'Daily Essentials' },
-                        { id: 'diningLeisure', icon: Coffee, title: 'Dining & Leisure' },
-                        { id: 'transportation', icon: Train, title: 'Transportation' },
-                        { id: 'parksRecreation', icon: Trees, title: 'Parks & Recreation' },
-                        { id: 'healthWellness', icon: HeartIcon, title: 'Health & Wellness' },
-                        { id: 'shopping', icon: ShoppingBag, title: 'Shopping' },
-                        { id: 'cultureEntertainment', icon: Theater, title: 'Culture & Entertainment' },
-                        { id: 'communityServices', icon: Building2, title: 'Community Services' },
-                      ];
-                      
-                      return categoryConfig
-                        .filter(cat => amenities[cat.id]?.length > 0)
-                        .map(cat => {
-                          const Icon = cat.icon;
-                          return (
-                            <div key={cat.id} className="bg-card rounded-xl p-4 border border-border">
+                  const amenities = property.neighborhood_amenities as Record<string, string[]>;
+                  const categoryConfig = [{
+                    id: 'education',
+                    icon: GraduationCap,
+                    title: 'Education'
+                  }, {
+                    id: 'dailyEssentials',
+                    icon: ShoppingCart,
+                    title: 'Daily Essentials'
+                  }, {
+                    id: 'diningLeisure',
+                    icon: Coffee,
+                    title: 'Dining & Leisure'
+                  }, {
+                    id: 'transportation',
+                    icon: Train,
+                    title: 'Transportation'
+                  }, {
+                    id: 'parksRecreation',
+                    icon: Trees,
+                    title: 'Parks & Recreation'
+                  }, {
+                    id: 'healthWellness',
+                    icon: HeartIcon,
+                    title: 'Health & Wellness'
+                  }, {
+                    id: 'shopping',
+                    icon: ShoppingBag,
+                    title: 'Shopping'
+                  }, {
+                    id: 'cultureEntertainment',
+                    icon: Theater,
+                    title: 'Culture & Entertainment'
+                  }, {
+                    id: 'communityServices',
+                    icon: Building2,
+                    title: 'Community Services'
+                  }];
+                  return categoryConfig.filter(cat => amenities[cat.id]?.length > 0).map(cat => {
+                    const Icon = cat.icon;
+                    return <div key={cat.id} className="bg-card rounded-xl p-4 border border-border">
                               <div className="flex items-center gap-2 mb-3">
                                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
                                   <Icon className="w-4 h-4 text-accent" />
@@ -406,20 +424,16 @@ export default function PropertyDetail() {
                                 <span className="font-medium text-foreground">{cat.title}</span>
                               </div>
                               <div className="space-y-2">
-                                {amenities[cat.id].map((item: string) => (
-                                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                {amenities[cat.id].map((item: string) => <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Check className="w-3 h-3 text-accent" />
                                     {item}
-                                  </div>
-                                ))}
+                                  </div>)}
                               </div>
-                            </div>
-                          );
-                        });
-                    })()}
+                            </div>;
+                  });
+                })()}
                   </div>
-                </motion.div>
-              )}
+                </motion.div>}
 
               {/* Land Features - only for land properties */}
               {property.property_type === "land" && <motion.div initial={{
