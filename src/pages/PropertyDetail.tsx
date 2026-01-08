@@ -247,7 +247,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.2
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                 <h2 className="font-display text-xl font-semibold text-foreground mb-4">About This Property</h2>
                 <p className="text-muted-foreground leading-relaxed">{property.description}</p>
               </motion.div>
