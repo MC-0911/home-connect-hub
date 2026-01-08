@@ -248,7 +248,7 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.2
             }}>
-                <h2 className="font-display text-xl font-semibold text-foreground mb-4">Description</h2>
+                <h2 className="font-display text-xl font-semibold text-foreground mb-4">About This Property</h2>
                 <p className="text-muted-foreground leading-relaxed">{property.description}</p>
               </motion.div>
 
