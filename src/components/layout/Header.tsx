@@ -24,10 +24,6 @@ const navLinks = [{
   href: "/property-requirements",
   label: "Find My Property",
   icon: ClipboardList
-}, {
-  href: "/favorites",
-  label: "Favorites",
-  icon: Heart
 }];
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
