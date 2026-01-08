@@ -261,7 +261,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.3
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Interior Features
                   </h2>
@@ -305,7 +305,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.35
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Exterior Features
                   </h2>
@@ -353,7 +353,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.4
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Neighborhood Amenities
                   </h2>
@@ -399,7 +399,7 @@ export default function PropertyDetail() {
                   }];
                   return categoryConfig.filter(cat => amenities[cat.id]?.length > 0).map(cat => {
                     const Icon = cat.icon;
-                    return <div key={cat.id} className="bg-card rounded-xl p-4 border border-border">
+                    return <div key={cat.id} className="bg-muted/50 rounded-xl p-4 border border-border/50">
                               <div className="flex items-center gap-2 mb-3">
                                 <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
                                   <Icon className="w-4 h-4 text-accent" />
@@ -427,7 +427,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.3
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Land Characteristics
                   </h2>
@@ -476,7 +476,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.35
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Property Features
                   </h2>
@@ -511,7 +511,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.4
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Nearby Amenities
                   </h2>
@@ -536,7 +536,7 @@ export default function PropertyDetail() {
               y: 0
             }} transition={{
               delay: 0.45
-            }}>
+            }} className="bg-card border border-border rounded-xl p-6">
                   <h2 className="font-display text-xl font-semibold text-foreground mb-4">
                     Recreational Features
                   </h2>
