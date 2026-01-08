@@ -9,7 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square, Home } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -29,6 +29,7 @@ interface Profile {
   suspension_reason: string | null;
   email?: string | null;
   is_admin?: boolean;
+  listings_count?: number;
 }
 export function UsersTable() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -63,6 +64,21 @@ export function UsersTable() {
         error: rolesError
       } = await supabase.from('user_roles').select('user_id, role').eq('role', 'admin');
 
+      // Fetch listings count per user
+      const {
+        data: listingsData,
+        error: listingsError
+      } = await supabase.from('properties').select('user_id');
+
+      // Create a map of user_id to listings count
+      const listingsCountMap = new Map<string, number>();
+      if (!listingsError && listingsData) {
+        listingsData.forEach((item: { user_id: string }) => {
+          const count = listingsCountMap.get(item.user_id) || 0;
+          listingsCountMap.set(item.user_id, count + 1);
+        });
+      }
+
       // Create a map of user_id to email
       const emailMap = new Map<string, string>();
       if (!emailsError && emailsData) {
@@ -84,11 +100,12 @@ export function UsersTable() {
         });
       }
 
-      // Merge emails and admin status into profiles
+      // Merge emails, admin status and listings count into profiles
       const usersWithEmails = (profilesData || []).map(profile => ({
         ...profile,
         email: emailMap.get(profile.user_id) || null,
-        is_admin: adminSet.has(profile.user_id)
+        is_admin: adminSet.has(profile.user_id),
+        listings_count: listingsCountMap.get(profile.user_id) || 0
       }));
       setUsers(usersWithEmails);
     } catch (error) {
@@ -285,13 +302,14 @@ export function UsersTable() {
               <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Ph No." sortKey="phone" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Listings" sortKey="listings_count" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No users found
                 </TableCell>
               </TableRow> : paginatedData.map(user => <TableRow key={user.id} className={`hover:bg-muted/30 ${selectedIds.has(user.id) ? 'bg-primary/5' : ''}`}>
@@ -337,6 +355,12 @@ export function UsersTable() {
                           Active
                         </Badge>}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="flex items-center gap-1.5 text-sm">
+                      <Home className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="font-medium">{user.listings_count || 0}</span>
+                    </span>
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
