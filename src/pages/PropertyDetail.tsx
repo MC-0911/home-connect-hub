@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText } from "lucide-react";
-import { ThumbnailCarousel } from "@/components/ui/thumbnail-carousel";
+import PropertyImageGallery from "@/components/property/PropertyImageGallery";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -126,14 +126,9 @@ export default function PropertyDetail() {
 
       <main className="pt-20 bg-primary-foreground">
         {/* Image Gallery */}
-        <div className="relative h-[50vh] sm:h-[60vh] lg:h-[70vh]">
-          <ThumbnailCarousel images={images} title={property.title} />
-          
-          {/* Overlay gradient for better button visibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-transparent to-transparent pointer-events-none h-24" />
-
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Navigation */}
-          <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-20">
+          <div className="flex justify-between items-center mb-4">
             <Button variant="secondary" size="sm" asChild>
               <Link to="/properties">
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -151,12 +146,14 @@ export default function PropertyDetail() {
           </div>
 
           {/* Badges */}
-          <div className="absolute bottom-24 left-6 flex gap-2 z-20">
+          <div className="flex gap-2 mb-4">
             {property.featured && <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>}
-            <Badge variant="secondary" className="backdrop-blur-sm border-0 bg-secondary">
+            <Badge variant="secondary" className="border-0 bg-secondary">
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </Badge>
           </div>
+
+          <PropertyImageGallery images={images} title={property.title} />
         </div>
 
         {/* Content */}
