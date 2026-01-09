@@ -68,12 +68,12 @@ const PropertyImageGallery = ({ images, title }: PropertyImageGalleryProps) => {
         </div>
 
         {/* Thumbnails */}
-        <div className="hidden lg:grid grid-rows-3 gap-3">
+        <div className="hidden lg:flex flex-col gap-3 h-full">
           {images.slice(1, 4).map((image, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx + 1)}
-              className={`relative aspect-[4/3] rounded-xl overflow-hidden transition-all ${
+              className={`relative flex-1 rounded-xl overflow-hidden transition-all ${
                 currentIndex === idx + 1 ? "ring-2 ring-primary" : "opacity-80 hover:opacity-100"
               }`}
             >
