@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText, Sofa, PaintBucket, MapPinned, Mountain, Compass, Tent } from "lucide-react";
 import PropertyImageGallery from "@/components/property/PropertyImageGallery";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -248,7 +248,10 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.2
             }} className="bg-card border border-border rounded-xl p-6">
-                <h2 className="font-display text-xl font-semibold text-foreground mb-4">About This Property</h2>
+                <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Home className="w-5 h-5 text-accent" />
+                  About This Property
+                </h2>
                 <p className="text-muted-foreground leading-relaxed">{property.description}</p>
               </motion.div>
 
@@ -262,7 +265,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.3
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Sofa className="w-5 h-5 text-accent" />
                     Interior Features
                   </h2>
                   <div className="space-y-4">
@@ -306,7 +310,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.35
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <PaintBucket className="w-5 h-5 text-accent" />
                     Exterior Features
                   </h2>
                   <div className="space-y-4">
@@ -354,7 +359,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.4
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <MapPinned className="w-5 h-5 text-accent" />
                     Neighborhood Amenities
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -428,7 +434,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.3
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Mountain className="w-5 h-5 text-accent" />
                     Land Characteristics
                   </h2>
                   <div className="space-y-4">
@@ -477,7 +484,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.35
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-accent" />
                     Property Features
                   </h2>
                   <div className="space-y-4">
@@ -512,7 +520,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.4
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <MapPinned className="w-5 h-5 text-accent" />
                     Nearby Amenities
                   </h2>
                   <div className="space-y-4">
@@ -537,7 +546,8 @@ export default function PropertyDetail() {
             }} transition={{
               delay: 0.45
             }} className="bg-card border border-border rounded-xl p-6">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Tent className="w-5 h-5 text-accent" />
                     Recreational Features
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
