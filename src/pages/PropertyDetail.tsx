@@ -145,15 +145,18 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          {/* Badges */}
-          <div className="flex gap-2 mb-4">
-            {property.featured && <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>}
-            <Badge variant="secondary" className="border-0 bg-secondary">
-              {property.listing_type === "rent" ? "For Rent" : "For Sale"}
-            </Badge>
-          </div>
-
-          <PropertyImageGallery images={images} title={property.title} />
+          <PropertyImageGallery 
+            images={images} 
+            title={property.title}
+            badges={
+              <div className="flex gap-2">
+                {property.featured && <Badge className="bg-accent text-accent-foreground border-0">Featured</Badge>}
+                <Badge variant="secondary" className="border-0 bg-secondary">
+                  {property.listing_type === "rent" ? "For Rent" : "For Sale"}
+                </Badge>
+              </div>
+            }
+          />
         </div>
 
         {/* Content */}

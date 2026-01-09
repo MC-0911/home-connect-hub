@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 
 interface PropertyImageGalleryProps {
   images: string[];
   title: string;
+  badges?: ReactNode;
 }
 
-const PropertyImageGallery = ({ images, title }: PropertyImageGalleryProps) => {
+const PropertyImageGallery = ({ images, title, badges }: PropertyImageGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -37,6 +38,13 @@ const PropertyImageGallery = ({ images, title }: PropertyImageGalleryProps) => {
             alt={`${title} - Image ${currentIndex + 1}`}
             className="w-full h-full object-cover transition-transform duration-500"
           />
+          
+          {/* Badges */}
+          {badges && (
+            <div className="absolute top-4 left-4 z-10">
+              {badges}
+            </div>
+          )}
           
           {/* Navigation Arrows */}
           <button
