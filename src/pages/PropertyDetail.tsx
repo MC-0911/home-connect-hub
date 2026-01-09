@@ -272,24 +272,24 @@ export default function PropertyDetail() {
                     <Sofa className="w-5 h-5 text-accent" />
                     Interior Features
                   </h2>
-                  <div className="space-y-4">
-                    {property.basement && <div>
+                  <div className="space-y-4 divide-y divide-border">
+                    {property.basement && <div className="pb-4">
                         <span className="text-sm font-medium text-foreground">Basement:</span>
                         <span className="ml-2 text-muted-foreground capitalize">{property.basement}</span>
                       </div>}
-                    {property.flooring && property.flooring.length > 0 && <div>
+                    {property.flooring && property.flooring.length > 0 && <div className="pt-4 pb-4">
                         <span className="text-sm font-medium text-foreground">Flooring:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {property.flooring.map(floor => <Badge key={floor} variant="secondary">{floor}</Badge>)}
                         </div>
                       </div>}
-                    {property.rooms && property.rooms.length > 0 && <div>
+                    {property.rooms && property.rooms.length > 0 && <div className="pt-4 pb-4">
                         <span className="text-sm font-medium text-foreground">Additional Rooms:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {property.rooms.map(room => <Badge key={room} variant="secondary">{room}</Badge>)}
                         </div>
                       </div>}
-                    {property.indoor_features && property.indoor_features.length > 0 && <div>
+                    {property.indoor_features && property.indoor_features.length > 0 && <div className="pt-4">
                         <span className="text-sm font-medium text-foreground">Indoor Features:</span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                           {property.indoor_features.map(feature => <div key={feature} className="flex items-center gap-3 text-muted-foreground">
@@ -317,22 +317,22 @@ export default function PropertyDetail() {
                     <PaintBucket className="w-5 h-5 text-accent" />
                     Exterior Features
                   </h2>
-                  <div className="space-y-4">
-                    {property.architectural_style && <div>
+                  <div className="space-y-4 divide-y divide-border">
+                    {property.architectural_style && <div className="pb-4">
                         <span className="text-sm font-medium text-foreground">Architectural Style:</span>
                         <span className="ml-2 text-muted-foreground">{property.architectural_style}</span>
                       </div>}
-                    {property.roofing_type && <div>
+                    {property.roofing_type && <div className="pt-4 pb-4">
                         <span className="text-sm font-medium text-foreground">Roofing:</span>
                         <span className="ml-2 text-muted-foreground">{property.roofing_type}</span>
                       </div>}
-                    {property.parking && property.parking.length > 0 && <div>
+                    {property.parking && property.parking.length > 0 && <div className="pt-4 pb-4">
                         <span className="text-sm font-medium text-foreground">Parking:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {property.parking.map(park => <Badge key={park} variant="secondary">{park}</Badge>)}
                         </div>
                       </div>}
-                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div>
+                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div className="pt-4 pb-4">
                         <span className="text-sm font-medium text-foreground">Outdoor Amenities:</span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                           {property.outdoor_amenities.map(amenity => <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
@@ -343,7 +343,7 @@ export default function PropertyDetail() {
                             </div>)}
                         </div>
                       </div>}
-                    {property.views && property.views.length > 0 && <div>
+                    {property.views && property.views.length > 0 && <div className="pt-4">
                         <span className="text-sm font-medium text-foreground">Views:</span>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {property.views.map(view => <Badge key={view} variant="secondary">{view}</Badge>)}
