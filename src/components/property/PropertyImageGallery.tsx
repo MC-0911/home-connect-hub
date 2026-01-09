@@ -69,7 +69,7 @@ const PropertyImageGallery = ({ images, title }: PropertyImageGalleryProps) => {
 
         {/* Thumbnails */}
         <div className="hidden lg:flex flex-col gap-3 h-full">
-          {images.slice(1, 4).map((image, idx) => (
+          {images.slice(1, 3).map((image, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx + 1)}
@@ -82,9 +82,9 @@ const PropertyImageGallery = ({ images, title }: PropertyImageGalleryProps) => {
                 alt={`${title} - Thumbnail ${idx + 2}`}
                 className="w-full h-full object-cover"
               />
-              {idx === 2 && images.length > 4 && (
+              {idx === 1 && images.length > 3 && (
                 <div className="absolute inset-0 bg-foreground/60 flex items-center justify-center">
-                  <span className="text-primary-foreground font-semibold">+{images.length - 4} more</span>
+                  <span className="text-primary-foreground font-semibold">+{images.length - 3} more</span>
                 </div>
               )}
             </button>
