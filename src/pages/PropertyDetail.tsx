@@ -273,14 +273,14 @@ export default function PropertyDetail() {
                     Interior Features
                   </h2>
                   <div className="space-y-4 divide-y divide-border">
-                    {property.basement && <div className="pb-4">
+                    {property.basement && <div className="pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Warehouse className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Basement:</span>
                         </div>
                         <span className="ml-6 text-muted-foreground capitalize">{property.basement}</span>
                       </div>}
-                    {property.flooring && property.flooring.length > 0 && <div className="pt-4 pb-4">
+                    {property.flooring && property.flooring.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Layers className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Flooring:</span>
@@ -289,7 +289,7 @@ export default function PropertyDetail() {
                           {property.flooring.map(floor => <Badge key={floor} variant="secondary">{floor}</Badge>)}
                         </div>
                       </div>}
-                    {property.rooms && property.rooms.length > 0 && <div className="pt-4 pb-4">
+                    {property.rooms && property.rooms.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <DoorOpen className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Additional Rooms:</span>
@@ -298,7 +298,7 @@ export default function PropertyDetail() {
                           {property.rooms.map(room => <Badge key={room} variant="secondary">{room}</Badge>)}
                         </div>
                       </div>}
-                    {property.indoor_features && property.indoor_features.length > 0 && <div className="pt-4">
+                    {property.indoor_features && property.indoor_features.length > 0 && <div className="pt-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Indoor Features:</span>
@@ -330,21 +330,21 @@ export default function PropertyDetail() {
                     Exterior Features
                   </h2>
                   <div className="space-y-4 divide-y divide-border">
-                    {property.architectural_style && <div className="pb-4">
+                    {property.architectural_style && <div className="pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Landmark className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Architectural Style:</span>
                         </div>
                         <span className="ml-6 text-muted-foreground">{property.architectural_style}</span>
                       </div>}
-                    {property.roofing_type && <div className="pt-4 pb-4">
+                    {property.roofing_type && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <HardHat className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Roofing:</span>
                         </div>
                         <span className="ml-6 text-muted-foreground">{property.roofing_type}</span>
                       </div>}
-                    {property.parking && property.parking.length > 0 && <div className="pt-4 pb-4">
+                    {property.parking && property.parking.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Car className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Parking:</span>
@@ -353,7 +353,7 @@ export default function PropertyDetail() {
                           {property.parking.map(park => <Badge key={park} variant="secondary">{park}</Badge>)}
                         </div>
                       </div>}
-                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div className="pt-4 pb-4">
+                    {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <TreePine className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Outdoor Amenities:</span>
@@ -367,7 +367,7 @@ export default function PropertyDetail() {
                             </div>)}
                         </div>
                       </div>}
-                    {property.views && property.views.length > 0 && <div className="pt-4">
+                    {property.views && property.views.length > 0 && <div className="pt-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Eye className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Views:</span>
