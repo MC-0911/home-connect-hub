@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText, Sofa, PaintBucket, MapPinned, Mountain, Compass, Tent, Warehouse, Layers, DoorOpen, Sparkles, Landmark, HardHat, Car, TreePine, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Bed, Bath, Square, Calendar as CalendarIcon, Home, Check, MessageCircle, DollarSign, Loader2, GraduationCap, ShoppingCart, Coffee, Train, Trees, Heart as HeartIcon, ShoppingBag, Theater, Building2, FileText, Sofa, PaintBucket, MapPinned, Mountain, Compass, Tent, Warehouse, Layers, DoorOpen, Sparkles, Landmark, HardHat, Car, TreePine, Eye } from "lucide-react";
 import PropertyImageGallery from "@/components/property/PropertyImageGallery";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -33,26 +33,6 @@ export default function PropertyDetail() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showVisitDialog, setShowVisitDialog] = useState(false);
   const [showOfferDialog, setShowOfferDialog] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-
-  const ITEMS_LIMIT = 4;
-
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
-  };
-
-  const shouldShowExpand = (items: string[] | null | undefined) => {
-    return items && items.length > ITEMS_LIMIT;
-  };
-
-  const getVisibleItems = <T,>(items: T[] | null | undefined, sectionId: string): T[] => {
-    if (!items) return [];
-    if (expandedSections[sectionId] || items.length <= ITEMS_LIMIT) return items;
-    return items.slice(0, ITEMS_LIMIT);
-  };
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
@@ -304,78 +284,33 @@ export default function PropertyDetail() {
                         <div className="flex items-center gap-2">
                           <Layers className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Flooring:</span>
-                          {shouldShowExpand(property.flooring) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.flooring.length} items)</span>
-                          )}
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2 ml-6">
-                          {getVisibleItems(property.flooring, 'flooring').map(floor => <Badge key={floor} variant="secondary">{floor}</Badge>)}
+                          {property.flooring.map(floor => <Badge key={floor} variant="secondary">{floor}</Badge>)}
                         </div>
-                        {shouldShowExpand(property.flooring) && (
-                          <button
-                            onClick={() => toggleSection('flooring')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['flooring'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.flooring.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                     {property.rooms && property.rooms.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <DoorOpen className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Additional Rooms:</span>
-                          {shouldShowExpand(property.rooms) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.rooms.length} items)</span>
-                          )}
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2 ml-6">
-                          {getVisibleItems(property.rooms, 'rooms').map(room => <Badge key={room} variant="secondary">{room}</Badge>)}
+                          {property.rooms.map(room => <Badge key={room} variant="secondary">{room}</Badge>)}
                         </div>
-                        {shouldShowExpand(property.rooms) && (
-                          <button
-                            onClick={() => toggleSection('rooms')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['rooms'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.rooms.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                     {property.indoor_features && property.indoor_features.length > 0 && <div className="pt-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Indoor Features:</span>
-                          {shouldShowExpand(property.indoor_features) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.indoor_features.length} items)</span>
-                          )}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2 ml-6">
-                          {getVisibleItems(property.indoor_features, 'indoor_features').map(feature => <div key={feature} className="flex items-center gap-3 text-muted-foreground">
+                          {property.indoor_features.map(feature => <div key={feature} className="flex items-center gap-3 text-muted-foreground">
                               <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
                                 <Check className="w-4 h-4 text-accent" />
                               </div>
                               {feature}
                             </div>)}
                         </div>
-                        {shouldShowExpand(property.indoor_features) && (
-                          <button
-                            onClick={() => toggleSection('indoor_features')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['indoor_features'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.indoor_features.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                   </div>
                 </motion.div>}
@@ -413,78 +348,33 @@ export default function PropertyDetail() {
                         <div className="flex items-center gap-2">
                           <Car className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Parking:</span>
-                          {shouldShowExpand(property.parking) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.parking.length} items)</span>
-                          )}
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2 ml-6">
-                          {getVisibleItems(property.parking, 'parking').map(park => <Badge key={park} variant="secondary">{park}</Badge>)}
+                          {property.parking.map(park => <Badge key={park} variant="secondary">{park}</Badge>)}
                         </div>
-                        {shouldShowExpand(property.parking) && (
-                          <button
-                            onClick={() => toggleSection('parking')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['parking'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.parking.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                     {property.outdoor_amenities && property.outdoor_amenities.length > 0 && <div className="pt-4 pb-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <TreePine className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Outdoor Amenities:</span>
-                          {shouldShowExpand(property.outdoor_amenities) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.outdoor_amenities.length} items)</span>
-                          )}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2 ml-6">
-                          {getVisibleItems(property.outdoor_amenities, 'outdoor_amenities').map(amenity => <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
+                          {property.outdoor_amenities.map(amenity => <div key={amenity} className="flex items-center gap-3 text-muted-foreground">
                               <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
                                 <Check className="w-4 h-4 text-accent" />
                               </div>
                               {amenity}
                             </div>)}
                         </div>
-                        {shouldShowExpand(property.outdoor_amenities) && (
-                          <button
-                            onClick={() => toggleSection('outdoor_amenities')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['outdoor_amenities'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.outdoor_amenities.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                     {property.views && property.views.length > 0 && <div className="pt-4 -mx-2 px-2 rounded-lg transition-colors duration-200 hover:bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Eye className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm font-medium text-foreground">Views:</span>
-                          {shouldShowExpand(property.views) && (
-                            <span className="text-xs text-muted-foreground ml-auto">({property.views.length} items)</span>
-                          )}
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2 ml-6">
-                          {getVisibleItems(property.views, 'views').map(view => <Badge key={view} variant="secondary">{view}</Badge>)}
+                          {property.views.map(view => <Badge key={view} variant="secondary">{view}</Badge>)}
                         </div>
-                        {shouldShowExpand(property.views) && (
-                          <button
-                            onClick={() => toggleSection('views')}
-                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 mt-2 ml-6 transition-colors"
-                          >
-                            {expandedSections['views'] ? (
-                              <>Show less <ChevronUp className="w-3 h-3" /></>
-                            ) : (
-                              <>Show {property.views.length - ITEMS_LIMIT} more <ChevronDown className="w-3 h-3" /></>
-                            )}
-                          </button>
-                        )}
                       </div>}
                   </div>
                 </motion.div>}
