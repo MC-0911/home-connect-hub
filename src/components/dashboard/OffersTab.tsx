@@ -484,11 +484,20 @@ export function OffersTab({ onDataChange }: OffersTabProps) {
     );
   }
 
+  const pendingReceivedCount = receivedOffers.filter(o => o.status === "pending").length;
+
   return (
     <Tabs defaultValue="my-offers" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger value="my-offers">My Offers ({myOffers.length})</TabsTrigger>
-        <TabsTrigger value="received">Received ({receivedOffers.length})</TabsTrigger>
+        <TabsTrigger value="received" className="relative">
+          Received ({receivedOffers.length})
+          {pendingReceivedCount > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center h-5 min-w-5 px-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-full">
+              {pendingReceivedCount > 9 ? '9+' : pendingReceivedCount}
+            </span>
+          )}
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="my-offers">

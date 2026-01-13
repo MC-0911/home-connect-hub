@@ -278,11 +278,20 @@ export function VisitsTab({ onDataChange }: VisitsTabProps) {
     );
   }
 
+  const pendingIncomingCount = incomingRequests.filter(v => v.status === "pending").length;
+
   return (
     <Tabs defaultValue="my-requests" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger value="my-requests">My Requests ({myRequests.length})</TabsTrigger>
-        <TabsTrigger value="incoming">Incoming ({incomingRequests.length})</TabsTrigger>
+        <TabsTrigger value="incoming" className="relative">
+          Received ({incomingRequests.length})
+          {pendingIncomingCount > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center h-5 min-w-5 px-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-full">
+              {pendingIncomingCount > 9 ? '9+' : pendingIncomingCount}
+            </span>
+          )}
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="my-requests">
