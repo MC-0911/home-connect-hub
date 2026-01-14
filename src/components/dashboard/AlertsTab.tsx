@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Check, Trash2, Info, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Bell, Check, Trash2, Info, AlertTriangle, CheckCircle, XCircle, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +143,56 @@ export function AlertsTab() {
     }
   };
 
+  const createTestAlerts = async () => {
+    if (!user) return;
+    
+    const testAlerts = [
+      {
+        user_id: user.id,
+        title: "Welcome to LandMarket!",
+        message: "Your account has been set up successfully. Start exploring properties.",
+        type: "success",
+        link: "/properties",
+      },
+      {
+        user_id: user.id,
+        title: "Complete Your Profile",
+        message: "Add a profile photo and bio to help others trust you.",
+        type: "info",
+        link: "/profile",
+      },
+      {
+        user_id: user.id,
+        title: "Listing Needs Attention",
+        message: "One of your listings is missing important details. Please review.",
+        type: "warning",
+        link: "/dashboard",
+      },
+      {
+        user_id: user.id,
+        title: "Payment Failed",
+        message: "We couldn't process your last payment. Please update your billing info.",
+        type: "error",
+        link: null,
+      },
+    ];
+
+    try {
+      const { error } = await supabase.from("alerts").insert(testAlerts);
+      if (error) throw error;
+      toast({
+        title: "Test Alerts Created",
+        description: "4 test alerts with different types have been added",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create test alerts",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getAlertVariant = (type: string): "success" | "warning" | "destructive" | "info" | "secondary" => {
     switch (type) {
       case "success":
@@ -207,12 +257,18 @@ export function AlertsTab() {
             </Badge>
           )}
         </div>
-        {unreadCount > 0 && (
-          <Button variant="outline" size="sm" onClick={markAllAsRead}>
-            <Check className="w-4 h-4 mr-2" />
-            Mark all as read
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={createTestAlerts}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Test Alerts
           </Button>
-        )}
+          {unreadCount > 0 && (
+            <Button variant="outline" size="sm" onClick={markAllAsRead}>
+              <Check className="w-4 h-4 mr-2" />
+              Mark all as read
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {alerts.length === 0 ? (
