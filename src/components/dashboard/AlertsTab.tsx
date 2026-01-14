@@ -4,12 +4,13 @@ import { Bell, Check, Trash2, Info, AlertTriangle, CheckCircle, XCircle } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertContent, AlertIcon, AlertTitle, AlertDescription, AlertToolbar } from "@/components/ui/alert-1";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
-interface Alert {
+interface AlertItem {
   id: string;
   user_id: string;
   title: string;
@@ -24,7 +25,7 @@ export function AlertsTab() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export function AlertsTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setAlerts((data as Alert[]) || []);
+      setAlerts((data as AlertItem[]) || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -67,7 +68,7 @@ export function AlertsTab() {
           filter: `user_id=eq.${user?.id}`,
         },
         (payload) => {
-          setAlerts((prev) => [payload.new as Alert, ...prev]);
+          setAlerts((prev) => [payload.new as AlertItem, ...prev]);
         }
       )
       .subscribe();
@@ -142,36 +143,37 @@ export function AlertsTab() {
     }
   };
 
-  const getAlertIcon = (type: string) => {
+  const getAlertVariant = (type: string): "success" | "warning" | "destructive" | "info" | "secondary" => {
     switch (type) {
       case "success":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return "success";
       case "warning":
-        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+        return "warning";
       case "error":
-        return <XCircle className="w-5 h-5 text-destructive" />;
+        return "destructive";
+      case "info":
+        return "info";
       default:
-        return <Info className="w-5 h-5 text-accent" />;
+        return "secondary";
     }
   };
 
-  const getAlertBadge = (type: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      info: "default",
-      success: "secondary",
-      warning: "outline",
-      error: "destructive",
-    };
-    return (
-      <Badge variant={variants[type] || "default"} className="capitalize">
-        {type}
-      </Badge>
-    );
+  const getAlertIcon = (type: string) => {
+    switch (type) {
+      case "success":
+        return <CheckCircle className="w-5 h-5" />;
+      case "warning":
+        return <AlertTriangle className="w-5 h-5" />;
+      case "error":
+        return <XCircle className="w-5 h-5" />;
+      default:
+        return <Info className="w-5 h-5" />;
+    }
   };
 
   const unreadCount = alerts.filter((a) => !a.is_read).length;
 
-  const handleAlertClick = (alert: Alert) => {
+  const handleAlertClick = (alert: AlertItem) => {
     if (!alert.is_read) {
       markAsRead(alert.id);
     }
@@ -226,34 +228,34 @@ export function AlertsTab() {
         ) : (
           <div className="space-y-3">
             {alerts.map((alert) => (
-              <div
+              <Alert
                 key={alert.id}
-                className={`flex items-start gap-4 p-4 rounded-lg border transition-colors ${
-                  alert.is_read
-                    ? "bg-background border-border"
-                    : "bg-accent/5 border-accent/20"
-                } ${alert.link ? "cursor-pointer hover:bg-secondary/50" : ""}`}
+                variant={getAlertVariant(alert.type)}
+                appearance={alert.is_read ? "outline" : "light"}
+                size="md"
+                className={`transition-all ${alert.link ? "cursor-pointer hover:opacity-90" : ""} ${
+                  !alert.is_read ? "ring-1 ring-accent/20" : ""
+                }`}
                 onClick={() => handleAlertClick(alert)}
               >
-                <div className="flex-shrink-0 mt-0.5">
+                <AlertIcon>
                   {getAlertIcon(alert.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-foreground">{alert.title}</h4>
-                    {getAlertBadge(alert.type)}
+                </AlertIcon>
+                <AlertContent>
+                  <div className="flex items-center gap-2">
+                    <AlertTitle>{alert.title}</AlertTitle>
                     {!alert.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-accent" />
+                      <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{alert.message}</p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <AlertDescription>{alert.message}</AlertDescription>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {formatDistanceToNow(new Date(alert.created_at), {
                       addSuffix: true,
                     })}
                   </p>
-                </div>
-                <div className="flex-shrink-0 flex gap-1">
+                </AlertContent>
+                <AlertToolbar>
                   {!alert.is_read && (
                     <Button
                       variant="ghost"
@@ -278,8 +280,8 @@ export function AlertsTab() {
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
-                </div>
-              </div>
+                </AlertToolbar>
+              </Alert>
             ))}
           </div>
         )}
