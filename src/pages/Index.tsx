@@ -5,12 +5,15 @@ import { FeaturedProperties } from "@/components/home/FeaturedProperties";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PropertyTypes } from "@/components/home/PropertyTypes";
 import { MapExplore } from "@/components/home/MapExplore";
+import ServicesSection from "@/components/home/ServicesSection";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { CTASection } from "@/components/home/CTASection";
 import { Resources } from "@/components/home/Resources";
 import { Newsletter } from "@/components/home/Newsletter";
+
 const Index = () => {
-  return <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       <Header />
       <main>
         <HeroSection />
@@ -18,12 +21,15 @@ const Index = () => {
         <HowItWorks className="bg-secondary-foreground" />
         <PropertyTypes />
         <MapExplore className="bg-secondary-foreground" />
+        <ServicesSection className="bg-primary-foreground" />
         <WhyChooseUs />
         <CTASection />
         <Resources className="bg-primary-foreground" />
         <Newsletter className="bg-sidebar-foreground" />
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
