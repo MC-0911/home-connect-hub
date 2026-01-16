@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { format } from "date-fns";
 import { Calendar, Clock, ArrowLeft, Share2 } from "lucide-react";
@@ -23,6 +24,7 @@ interface BlogPost {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
+  const hasTrackedView = useRef(false);
 
   const { data: post, isLoading, error } = useQuery({
     queryKey: ["blog-post", slug],
@@ -39,6 +41,21 @@ export default function BlogPost() {
     },
     enabled: !!slug,
   });
+
+  // Track blog view when post is loaded
+  useEffect(() => {
+    if (post && slug && !hasTrackedView.current) {
+      hasTrackedView.current = true;
+      
+      fetch('https://sgrjjnjfllcbmchaxyyu.supabase.co/functions/v1/increment-blog-views', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slug }),
+      }).catch(err => console.error('Failed to track view:', err));
+    }
+  }, [post, slug]);
 
   const handleShare = async () => {
     try {
