@@ -26,7 +26,15 @@ import {
   PieChart,
   Pie,
   Cell,
+  AreaChart,
+  Area,
 } from 'recharts';
+
+interface BlogViewData {
+  title: string;
+  views: number;
+  slug: string;
+}
 
 interface AnalyticsData {
   totalUsers: number;
@@ -35,8 +43,10 @@ interface AnalyticsData {
   totalLeads: number;
   activeListings: number;
   newLeadsThisWeek: number;
+  totalBlogViews: number;
   listingsByType: { name: string; value: number }[];
   leadsByStatus: { name: string; value: number }[];
+  blogViewsData: BlogViewData[];
 }
 
 const COLORS = ['hsl(215, 50%, 23%)', 'hsl(38, 75%, 55%)', 'hsl(215, 40%, 35%)', 'hsl(38, 80%, 65%)', 'hsl(215, 55%, 15%)'];
@@ -49,8 +59,10 @@ export function AdminAnalytics() {
     totalLeads: 0,
     activeListings: 0,
     newLeadsThisWeek: 0,
+    totalBlogViews: 0,
     listingsByType: [],
     leadsByStatus: [],
+    blogViewsData: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +72,7 @@ export function AdminAnalytics() {
         const [usersRes, listingsRes, blogsRes, leadsRes] = await Promise.all([
           supabase.from('profiles').select('id', { count: 'exact', head: true }),
           supabase.from('properties').select('id, status, property_type', { count: 'exact' }),
-          supabase.from('blogs').select('id', { count: 'exact', head: true }),
+          supabase.from('blogs').select('id, title, slug, views', { count: 'exact' }),
           supabase.from('buyer_requirements').select('id, created_at, status', { count: 'exact' }),
         ]);
 
@@ -93,6 +105,18 @@ export function AdminAnalytics() {
           value,
         }));
 
+        // Calculate blog views data
+        const blogViewsData: BlogViewData[] = (blogsRes.data || [])
+          .map(b => ({
+            title: b.title.length > 20 ? b.title.substring(0, 20) + '...' : b.title,
+            views: b.views || 0,
+            slug: b.slug,
+          }))
+          .sort((a, b) => b.views - a.views)
+          .slice(0, 10);
+
+        const totalBlogViews = (blogsRes.data || []).reduce((sum, b) => sum + (b.views || 0), 0);
+
         setAnalytics({
           totalUsers: usersRes.count || 0,
           totalListings: listingsRes.count || 0,
@@ -100,8 +124,10 @@ export function AdminAnalytics() {
           totalLeads: leadsRes.count || 0,
           activeListings,
           newLeadsThisWeek,
+          totalBlogViews,
           listingsByType,
           leadsByStatus,
+          blogViewsData,
         });
       } catch (error) {
         console.error('Error fetching analytics:', error);
@@ -168,13 +194,22 @@ export function AdminAnalytics() {
       trend: analytics.newLeadsThisWeek > 0 ? '+' + analytics.newLeadsThisWeek : '0',
       trendUp: analytics.newLeadsThisWeek > 0
     },
+    { 
+      title: 'Total Blog Views', 
+      value: analytics.totalBlogViews, 
+      icon: Eye, 
+      color: 'from-cyan-500 to-cyan-600',
+      bgColor: 'bg-cyan-500/10',
+      trend: '+' + analytics.totalBlogViews,
+      trendUp: analytics.totalBlogViews > 0
+    },
   ];
 
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(7)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="pb-2">
                 <div className="h-4 bg-muted rounded w-24" />
@@ -192,7 +227,7 @@ export function AdminAnalytics() {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -223,6 +258,61 @@ export function AdminAnalytics() {
           </motion.div>
         ))}
       </div>
+
+      {/* Blog Views Chart - Full Width */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Card className="shadow-md border-0">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Eye className="h-5 w-5 text-cyan-500" />
+              Blog Traffic - Top Performing Articles
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analytics.blogViewsData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={analytics.blogViewsData} layout="vertical" margin={{ left: 20, right: 30 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={true} vertical={false} />
+                  <XAxis type="number" className="text-xs" />
+                  <YAxis 
+                    type="category" 
+                    dataKey="title" 
+                    className="text-xs" 
+                    width={150}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                    formatter={(value: number) => [value.toLocaleString() + ' views', 'Views']}
+                  />
+                  <Bar 
+                    dataKey="views" 
+                    fill="hsl(187, 85%, 43%)" 
+                    radius={[0, 4, 4, 0]}
+                    background={{ fill: 'hsl(var(--muted))' }}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Eye className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <p>No blog view data available yet</p>
+                  <p className="text-sm mt-1">Views will appear as users visit your blog posts</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
