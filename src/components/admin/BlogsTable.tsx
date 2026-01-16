@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -26,6 +26,7 @@ interface Blog {
   content: string;
   cover_image: string | null;
   status: string;
+  views: number;
   published_at: string | null;
   created_at: string;
 }
@@ -390,6 +391,7 @@ export function BlogsTable() {
               
               <SortableTableHead label="Title" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Views" sortKey="views" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Published" sortKey="published_at" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Created" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead className="text-right">Actions</TableHead>
@@ -397,7 +399,7 @@ export function BlogsTable() {
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? <TableRow>
-                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                   No blogs found
                 </TableCell>
               </TableRow> : paginatedData.map(blog => <TableRow key={blog.id} className="hover:bg-muted/30">
@@ -412,6 +414,12 @@ export function BlogsTable() {
                     <Badge className={`border ${getStatusColor(blog.status)}`}>
                       {blog.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>{blog.views.toLocaleString()}</span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
