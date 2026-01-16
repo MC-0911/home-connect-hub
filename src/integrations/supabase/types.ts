@@ -60,6 +60,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          views: number
         }
         Insert: {
           author_id?: string | null
@@ -73,6 +74,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          views?: number
         }
         Update: {
           author_id?: string | null
@@ -86,6 +88,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          views?: number
         }
         Relationships: []
       }
