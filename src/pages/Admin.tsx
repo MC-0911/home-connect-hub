@@ -118,13 +118,13 @@ export default function Admin() {
                   <Home className="h-4 w-4" />
                   <span className="hidden sm:inline">Listings</span>
                 </TabsTrigger>
-                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Blogs</span>
-                </TabsTrigger>
                 <TabsTrigger value="leads" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">Leads</span>
+                </TabsTrigger>
+                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Blogs</span>
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Settings className="h-4 w-4" />
