@@ -47,6 +47,32 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_views: {
+        Row: {
+          blog_id: string
+          id: string
+          viewed_at: string
+        }
+        Insert: {
+          blog_id: string
+          id?: string
+          viewed_at?: string
+        }
+        Update: {
+          blog_id?: string
+          id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_views_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blogs: {
         Row: {
           author_id: string | null
