@@ -1,1 +1,4 @@
 project_id = "sgrjjnjfllcbmchaxyyu"
+
+[functions.increment-blog-views]
+verify_jwt = false
