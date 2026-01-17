@@ -26,6 +26,8 @@ interface Property {
   status: string;
   featured: boolean;
   created_at: string;
+  user_id: string;
+  owner_name?: string;
 }
 export function ListingsTable() {
   const [listings, setListings] = useState<Property[]>([]);
@@ -38,15 +40,42 @@ export function ListingsTable() {
   const [bulkStatus, setBulkStatus] = useState<string>('');
   const fetchListings = async () => {
     try {
-      let query = supabase.from('properties').select('*').order('created_at', {
-        ascending: false
-      });
-      const {
-        data,
-        error
-      } = await query;
-      if (error) throw error;
-      setListings(data || []);
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*, profiles!properties_user_id_fkey(full_name)')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        // Fallback: fetch properties and profiles separately if join fails
+        const { data: propertiesData, error: propError } = await supabase
+          .from('properties')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (propError) throw propError;
+        
+        // Fetch profiles for all user_ids
+        const userIds = [...new Set(propertiesData?.map(p => p.user_id) || [])];
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', userIds);
+        
+        const profilesMap = new Map(profilesData?.map(p => [p.user_id, p.full_name]) || []);
+        
+        const listingsWithOwners = propertiesData?.map(property => ({
+          ...property,
+          owner_name: profilesMap.get(property.user_id) || 'Unknown'
+        })) || [];
+        
+        setListings(listingsWithOwners);
+      } else {
+        const listingsWithOwners = data?.map(property => ({
+          ...property,
+          owner_name: (property.profiles as any)?.full_name || 'Unknown'
+        })) || [];
+        setListings(listingsWithOwners);
+      }
     } catch (error) {
       console.error('Error fetching listings:', error);
     } finally {
@@ -295,6 +324,7 @@ export function ListingsTable() {
             <TableRow className="bg-muted/50">
               
               <SortableTableHead label="Property" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
+              <TableHead>Owner</TableHead>
               <SortableTableHead label="Price" sortKey="price" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Type</TableHead>
               <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
@@ -305,16 +335,18 @@ export function ListingsTable() {
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                   No listings found
                 </TableCell>
               </TableRow> : paginatedData.map(listing => <TableRow key={listing.id} className="hover:bg-muted/30">
                   
                   <TableCell>
                     <div>
-                      
                       <p className="text-sm text-secondary">{listing.city}, {listing.state}</p>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{listing.owner_name || 'Unknown'}</span>
                   </TableCell>
                   <TableCell className="font-medium">${listing.price.toLocaleString()}</TableCell>
                   <TableCell>
