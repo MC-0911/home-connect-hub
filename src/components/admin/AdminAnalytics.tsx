@@ -38,10 +38,19 @@ interface BlogViewData {
 
 interface AnalyticsData {
   totalUsers: number;
+  activeUsers: number;
+  suspendedUsers: number;
   totalListings: number;
-  totalBlogs: number;
-  totalLeads: number;
   activeListings: number;
+  pendingListings: number;
+  soldListings: number;
+  totalBlogs: number;
+  publishedBlogs: number;
+  draftBlogs: number;
+  totalLeads: number;
+  newLeads: number;
+  contactedLeads: number;
+  qualifiedLeads: number;
   newLeadsThisWeek: number;
   totalBlogViews: number;
   listingsByType: { name: string; value: number }[];
@@ -54,10 +63,19 @@ const COLORS = ['hsl(215, 50%, 23%)', 'hsl(38, 75%, 55%)', 'hsl(215, 40%, 35%)',
 export function AdminAnalytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     totalUsers: 0,
+    activeUsers: 0,
+    suspendedUsers: 0,
     totalListings: 0,
-    totalBlogs: 0,
-    totalLeads: 0,
     activeListings: 0,
+    pendingListings: 0,
+    soldListings: 0,
+    totalBlogs: 0,
+    publishedBlogs: 0,
+    draftBlogs: 0,
+    totalLeads: 0,
+    newLeads: 0,
+    contactedLeads: 0,
+    qualifiedLeads: 0,
     newLeadsThisWeek: 0,
     totalBlogViews: 0,
     listingsByType: [],
@@ -70,13 +88,29 @@ export function AdminAnalytics() {
     const fetchAnalytics = async () => {
       try {
         const [usersRes, listingsRes, blogsRes, leadsRes] = await Promise.all([
-          supabase.from('profiles').select('id', { count: 'exact', head: true }),
+          supabase.from('profiles').select('id, is_suspended', { count: 'exact' }),
           supabase.from('properties').select('id, status, property_type', { count: 'exact' }),
-          supabase.from('blogs').select('id, title, slug, views', { count: 'exact' }),
+          supabase.from('blogs').select('id, title, slug, views, status', { count: 'exact' }),
           supabase.from('buyer_requirements').select('id, created_at, status', { count: 'exact' }),
         ]);
 
+        // User breakdown
+        const suspendedUsers = usersRes.data?.filter(u => u.is_suspended === true).length || 0;
+        const activeUsers = (usersRes.count || 0) - suspendedUsers;
+
+        // Listings breakdown
         const activeListings = listingsRes.data?.filter(p => p.status === 'active').length || 0;
+        const pendingListings = listingsRes.data?.filter(p => p.status === 'under_review').length || 0;
+        const soldListings = listingsRes.data?.filter(p => p.status === 'sold').length || 0;
+
+        // Blogs breakdown
+        const publishedBlogs = blogsRes.data?.filter(b => b.status === 'published').length || 0;
+        const draftBlogs = blogsRes.data?.filter(b => b.status === 'draft').length || 0;
+
+        // Leads breakdown
+        const newLeads = leadsRes.data?.filter(l => l.status === 'new').length || 0;
+        const contactedLeads = leadsRes.data?.filter(l => l.status === 'contacted').length || 0;
+        const qualifiedLeads = leadsRes.data?.filter(l => l.status === 'qualified').length || 0;
         
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -119,10 +153,19 @@ export function AdminAnalytics() {
 
         setAnalytics({
           totalUsers: usersRes.count || 0,
+          activeUsers,
+          suspendedUsers,
           totalListings: listingsRes.count || 0,
-          totalBlogs: blogsRes.count || 0,
-          totalLeads: leadsRes.count || 0,
           activeListings,
+          pendingListings,
+          soldListings,
+          totalBlogs: blogsRes.count || 0,
+          publishedBlogs,
+          draftBlogs,
+          totalLeads: leadsRes.count || 0,
+          newLeads,
+          contactedLeads,
+          qualifiedLeads,
           newLeadsThisWeek,
           totalBlogViews,
           listingsByType,
@@ -146,8 +189,10 @@ export function AdminAnalytics() {
       icon: Users, 
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-500/10',
-      trend: '+12%',
-      trendUp: true
+      breakdown: [
+        { label: 'Active', value: analytics.activeUsers, color: 'text-green-600' },
+        { label: 'Suspended', value: analytics.suspendedUsers, color: 'text-red-600' },
+      ]
     },
     { 
       title: 'Total Listings', 
@@ -155,17 +200,11 @@ export function AdminAnalytics() {
       icon: Home, 
       color: 'from-emerald-500 to-emerald-600',
       bgColor: 'bg-emerald-500/10',
-      trend: '+8%',
-      trendUp: true
-    },
-    { 
-      title: 'Active Listings', 
-      value: analytics.activeListings, 
-      icon: TrendingUp, 
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-500/10',
-      trend: '+5%',
-      trendUp: true
+      breakdown: [
+        { label: 'Active', value: analytics.activeListings, color: 'text-green-600' },
+        { label: 'Pending', value: analytics.pendingListings, color: 'text-amber-600' },
+        { label: 'Sold', value: analytics.soldListings, color: 'text-blue-600' },
+      ]
     },
     { 
       title: 'Total Blogs', 
@@ -173,8 +212,10 @@ export function AdminAnalytics() {
       icon: FileText, 
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-500/10',
-      trend: '+3%',
-      trendUp: true
+      breakdown: [
+        { label: 'Published', value: analytics.publishedBlogs, color: 'text-green-600' },
+        { label: 'Draft', value: analytics.draftBlogs, color: 'text-muted-foreground' },
+      ]
     },
     { 
       title: 'Total Leads', 
@@ -182,17 +223,11 @@ export function AdminAnalytics() {
       icon: MessageSquare, 
       color: 'from-orange-500 to-orange-600',
       bgColor: 'bg-orange-500/10',
-      trend: '+15%',
-      trendUp: true
-    },
-    { 
-      title: 'New Leads (7 days)', 
-      value: analytics.newLeadsThisWeek, 
-      icon: Activity, 
-      color: 'from-accent to-accent',
-      bgColor: 'bg-accent/10',
-      trend: analytics.newLeadsThisWeek > 0 ? '+' + analytics.newLeadsThisWeek : '0',
-      trendUp: analytics.newLeadsThisWeek > 0
+      breakdown: [
+        { label: 'New', value: analytics.newLeads, color: 'text-blue-600' },
+        { label: 'Contacted', value: analytics.contactedLeads, color: 'text-amber-600' },
+        { label: 'Qualified', value: analytics.qualifiedLeads, color: 'text-green-600' },
+      ]
     },
     { 
       title: 'Total Blog Views', 
@@ -200,8 +235,7 @@ export function AdminAnalytics() {
       icon: Eye, 
       color: 'from-cyan-500 to-cyan-600',
       bgColor: 'bg-cyan-500/10',
-      trend: '+' + analytics.totalBlogViews,
-      trendUp: analytics.totalBlogViews > 0
+      breakdown: []
     },
   ];
 
@@ -227,7 +261,7 @@ export function AdminAnalytics() {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -246,13 +280,16 @@ export function AdminAnalytics() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold">{stat.value.toLocaleString()}</div>
-                  <div className={`flex items-center gap-1 text-sm ${stat.trendUp ? 'text-green-600' : 'text-red-600'}`}>
-                    {stat.trendUp ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                    {stat.trend}
+                <div className="text-3xl font-bold mb-2">{stat.value.toLocaleString()}</div>
+                {stat.breakdown && stat.breakdown.length > 0 && (
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                    {stat.breakdown.map((item) => (
+                      <span key={item.label} className={item.color}>
+                        {item.value} {item.label.toLowerCase()}
+                      </span>
+                    ))}
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
