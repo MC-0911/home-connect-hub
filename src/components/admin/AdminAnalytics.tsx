@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, 
   Home, 
   FileText, 
   MessageSquare, 
-  TrendingUp, 
   Eye,
-  Activity,
-  ArrowUpRight,
-  ArrowDownRight
+  CalendarIcon,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { cn } from '@/lib/utils';
 import {
   LineChart,
   Line,
@@ -60,6 +63,13 @@ interface AnalyticsData {
 
 const COLORS = ['hsl(215, 50%, 23%)', 'hsl(38, 75%, 55%)', 'hsl(215, 40%, 35%)', 'hsl(38, 80%, 65%)', 'hsl(215, 55%, 15%)'];
 
+type DateRange = {
+  from: Date | undefined;
+  to: Date | undefined;
+};
+
+type PresetRange = 'all' | '7days' | '30days' | '90days' | 'custom';
+
 export function AdminAnalytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     totalUsers: 0,
@@ -83,20 +93,82 @@ export function AdminAnalytics() {
     blogViewsData: [],
   });
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
+  const [presetRange, setPresetRange] = useState<PresetRange>('all');
+
+  const handlePresetChange = (preset: PresetRange) => {
+    setPresetRange(preset);
+    const today = new Date();
+    
+    switch (preset) {
+      case '7days':
+        setDateRange({ from: subDays(today, 7), to: today });
+        break;
+      case '30days':
+        setDateRange({ from: subDays(today, 30), to: today });
+        break;
+      case '90days':
+        setDateRange({ from: subDays(today, 90), to: today });
+        break;
+      case 'all':
+        setDateRange({ from: undefined, to: undefined });
+        break;
+      case 'custom':
+        // Keep current range for custom
+        break;
+    }
+  };
+
+  const handleDateSelect = (range: DateRange | undefined) => {
+    if (range) {
+      setDateRange(range);
+      setPresetRange('custom');
+    }
+  };
+
+  const clearDateFilter = () => {
+    setDateRange({ from: undefined, to: undefined });
+    setPresetRange('all');
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
+      setLoading(true);
       try {
+        // Build date filter
+        const fromDate = dateRange.from ? startOfDay(dateRange.from).toISOString() : null;
+        const toDate = dateRange.to ? endOfDay(dateRange.to).toISOString() : null;
+
+        // Fetch users (profiles don't have created_at for filtering, so we filter where applicable)
+        let usersQuery = supabase.from('profiles').select('id, is_suspended, created_at', { count: 'exact' });
+        if (fromDate) usersQuery = usersQuery.gte('created_at', fromDate);
+        if (toDate) usersQuery = usersQuery.lte('created_at', toDate);
+
+        // Fetch listings
+        let listingsQuery = supabase.from('properties').select('id, status, property_type, created_at', { count: 'exact' });
+        if (fromDate) listingsQuery = listingsQuery.gte('created_at', fromDate);
+        if (toDate) listingsQuery = listingsQuery.lte('created_at', toDate);
+
+        // Fetch blogs
+        let blogsQuery = supabase.from('blogs').select('id, title, slug, views, status, created_at', { count: 'exact' });
+        if (fromDate) blogsQuery = blogsQuery.gte('created_at', fromDate);
+        if (toDate) blogsQuery = blogsQuery.lte('created_at', toDate);
+
+        // Fetch leads
+        let leadsQuery = supabase.from('buyer_requirements').select('id, created_at, status', { count: 'exact' });
+        if (fromDate) leadsQuery = leadsQuery.gte('created_at', fromDate);
+        if (toDate) leadsQuery = leadsQuery.lte('created_at', toDate);
+
         const [usersRes, listingsRes, blogsRes, leadsRes] = await Promise.all([
-          supabase.from('profiles').select('id, is_suspended', { count: 'exact' }),
-          supabase.from('properties').select('id, status, property_type', { count: 'exact' }),
-          supabase.from('blogs').select('id, title, slug, views, status', { count: 'exact' }),
-          supabase.from('buyer_requirements').select('id, created_at, status', { count: 'exact' }),
+          usersQuery,
+          listingsQuery,
+          blogsQuery,
+          leadsQuery,
         ]);
 
         // User breakdown
         const suspendedUsers = usersRes.data?.filter(u => u.is_suspended === true).length || 0;
-        const activeUsers = (usersRes.count || 0) - suspendedUsers;
+        const activeUsers = (usersRes.data?.length || 0) - suspendedUsers;
 
         // Listings breakdown
         const activeListings = listingsRes.data?.filter(p => p.status === 'active').length || 0;
@@ -152,17 +224,17 @@ export function AdminAnalytics() {
         const totalBlogViews = (blogsRes.data || []).reduce((sum, b) => sum + (b.views || 0), 0);
 
         setAnalytics({
-          totalUsers: usersRes.count || 0,
+          totalUsers: usersRes.data?.length || 0,
           activeUsers,
           suspendedUsers,
-          totalListings: listingsRes.count || 0,
+          totalListings: listingsRes.data?.length || 0,
           activeListings,
           pendingListings,
           soldListings,
-          totalBlogs: blogsRes.count || 0,
+          totalBlogs: blogsRes.data?.length || 0,
           publishedBlogs,
           draftBlogs,
-          totalLeads: leadsRes.count || 0,
+          totalLeads: leadsRes.data?.length || 0,
           newLeads,
           contactedLeads,
           qualifiedLeads,
@@ -180,7 +252,7 @@ export function AdminAnalytics() {
     };
 
     fetchAnalytics();
-  }, []);
+  }, [dateRange]);
 
   const stats = [
     { 
@@ -260,6 +332,76 @@ export function AdminAnalytics() {
 
   return (
     <div className="space-y-6">
+      {/* Date Range Filter */}
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm font-medium text-muted-foreground">Filter by:</span>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { key: 'all', label: 'All Time' },
+            { key: '7days', label: 'Last 7 Days' },
+            { key: '30days', label: 'Last 30 Days' },
+            { key: '90days', label: 'Last 90 Days' },
+          ].map((preset) => (
+            <Button
+              key={preset.key}
+              variant={presetRange === preset.key ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handlePresetChange(preset.key as PresetRange)}
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </div>
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={presetRange === 'custom' ? 'default' : 'outline'}
+              size="sm"
+              className={cn(
+                "justify-start text-left font-normal",
+                !dateRange.from && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateRange.from ? (
+                dateRange.to ? (
+                  <>
+                    {format(dateRange.from, "MMM d, yyyy")} - {format(dateRange.to, "MMM d, yyyy")}
+                  </>
+                ) : (
+                  format(dateRange.from, "MMM d, yyyy")
+                )
+              ) : (
+                "Custom Range"
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={dateRange.from}
+              selected={dateRange}
+              onSelect={handleDateSelect}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {(dateRange.from || dateRange.to) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearDateFilter}
+            className="h-8 px-2"
+          >
+            <X className="h-4 w-4" />
+            <span className="ml-1">Clear</span>
+          </Button>
+        )}
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {stats.map((stat, index) => (
