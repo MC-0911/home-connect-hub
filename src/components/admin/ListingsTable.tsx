@@ -324,7 +324,7 @@ export function ListingsTable() {
             <TableRow className="bg-muted/50">
               
               <SortableTableHead label="Property" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
-              <TableHead>Owner</TableHead>
+              <SortableTableHead label="Owner" sortKey="owner_name" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Price" sortKey="price" sortConfig={sortConfig} onSort={handleSort} />
               <TableHead>Type</TableHead>
               <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
