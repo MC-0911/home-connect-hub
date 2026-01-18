@@ -63,7 +63,7 @@ export function FeaturedProperties({ className }: { className?: string }) {
           .select('*')
           .eq('status', 'active')
           .eq('featured', true)
-          .limit(8);
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setFeaturedProperties(data || []);
