@@ -46,7 +46,7 @@ export function ServiceCard({
       />
 
       {/* Gradient Overlay for Text Readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20 group-hover:from-black/95 group-hover:via-black/70 group-hover:to-black/30 transition-all duration-500" />
 
       {/* Content Container */}
       <div className="relative z-10 flex h-full flex-col justify-between p-5">
