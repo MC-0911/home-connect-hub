@@ -2,6 +2,11 @@ import { Search, ClipboardCheck, FileText, Truck } from "lucide-react";
 import { ServiceCard } from "@/components/ui/service-card";
 import { motion } from "framer-motion";
 
+import servicePropertyMatching from "@/assets/service-property-matching.jpg";
+import serviceHomeInspection from "@/assets/service-home-inspection.jpg";
+import serviceTitleVerification from "@/assets/service-title-verification.jpg";
+import serviceMoving from "@/assets/service-moving.jpg";
+
 const services = [
   {
     icon: Search,
@@ -14,7 +19,7 @@ const services = [
     ],
     cta: "Find My Match",
     link: "/property-requirements",
-    backgroundImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    backgroundImage: servicePropertyMatching,
   },
   {
     icon: ClipboardCheck,
@@ -27,7 +32,7 @@ const services = [
     ],
     cta: "Schedule Inspection",
     link: "/properties",
-    backgroundImage: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    backgroundImage: serviceHomeInspection,
   },
   {
     icon: FileText,
@@ -40,7 +45,7 @@ const services = [
     ],
     cta: "Verify Title",
     link: "/properties",
-    backgroundImage: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    backgroundImage: serviceTitleVerification,
   },
   {
     icon: Truck,
@@ -53,7 +58,7 @@ const services = [
     ],
     cta: "Plan My Move",
     link: "/properties",
-    backgroundImage: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    backgroundImage: serviceMoving,
   },
 ];
 
