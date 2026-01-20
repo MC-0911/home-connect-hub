@@ -11,6 +11,11 @@ import bannerHomeInspection from "@/assets/banner-home-inspection.jpg";
 import bannerTitleVerification from "@/assets/banner-title-verification.jpg";
 import bannerMovingRelocation from "@/assets/banner-moving-relocation.jpg";
 
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 export interface ServiceData {
   slug: string;
   icon: LucideIcon;
@@ -24,6 +29,7 @@ export interface ServiceData {
   cta: string;
   cardImage: string;
   bannerImage: string;
+  faqs: FAQItem[];
 }
 
 export const servicesData: ServiceData[] = [
@@ -58,6 +64,12 @@ export const servicesData: ServiceData[] = [
     cta: "Get Matched",
     cardImage: servicePropertyMatching,
     bannerImage: bannerPropertyMatching,
+    faqs: [
+      { question: "How does AI property matching work?", answer: "Our AI analyzes your preferences, budget, location requirements, and lifestyle needs to identify properties that best match your criteria. It learns from your feedback to continuously improve recommendations." },
+      { question: "How long does it take to receive property matches?", answer: "You'll receive your first batch of curated property recommendations within 24-48 hours after completing your preference profile. New matches are sent in real-time as they become available." },
+      { question: "Is the consultation really free?", answer: "Yes! Your initial consultation with our property specialist is completely free. We'll discuss your needs and explain how our matching service works with no obligation." },
+      { question: "Can I modify my preferences after signing up?", answer: "Absolutely. You can update your preferences anytime through your dashboard, and our AI will immediately adjust recommendations based on your new criteria." },
+    ],
   },
   {
     slug: "home-inspection",
@@ -92,6 +104,12 @@ export const servicesData: ServiceData[] = [
     cta: "Schedule Inspection",
     cardImage: serviceHomeInspection,
     bannerImage: bannerHomeInspection,
+    faqs: [
+      { question: "How long does a home inspection take?", answer: "A typical home inspection takes 2-4 hours depending on the size and condition of the property. Larger homes or properties with multiple issues may take longer." },
+      { question: "Should I attend the inspection?", answer: "We highly encourage buyers to attend the inspection. This gives you the opportunity to ask questions, see issues firsthand, and learn about the home's systems and maintenance needs." },
+      { question: "What's included in the inspection report?", answer: "Our comprehensive report includes detailed findings on all major systems (structural, electrical, plumbing, HVAC, roof), photos of any issues, severity ratings, and recommendations for repairs or further evaluation." },
+      { question: "Can the inspection results be used for negotiation?", answer: "Yes! Many buyers use inspection findings to negotiate repairs or price reductions with sellers. Our detailed reports provide the documentation needed for these discussions." },
+    ],
   },
   {
     slug: "title-verification",
@@ -126,6 +144,12 @@ export const servicesData: ServiceData[] = [
     cta: "Verify Title",
     cardImage: serviceTitleVerification,
     bannerImage: bannerTitleVerification,
+    faqs: [
+      { question: "Why do I need a title search?", answer: "A title search protects you from inheriting legal problems like unpaid taxes, liens, boundary disputes, or ownership claims. It ensures you're getting a clean, marketable title to the property." },
+      { question: "How long does the title search process take?", answer: "A standard title search typically takes 3-5 business days. Complex properties with multiple previous owners or legal issues may require additional time for thorough research." },
+      { question: "What happens if issues are found?", answer: "If we discover title defects, we'll explain the issues and provide guidance on resolution options. Many issues can be resolved before closing, and title insurance can protect against others." },
+      { question: "Do you provide title insurance?", answer: "We facilitate title insurance through our partner providers. Title insurance protects you against future claims or defects that weren't discovered during the search." },
+    ],
   },
   {
     slug: "moving-relocation",
@@ -160,6 +184,12 @@ export const servicesData: ServiceData[] = [
     cta: "Plan My Move",
     cardImage: serviceMoving,
     bannerImage: bannerMovingRelocation,
+    faqs: [
+      { question: "How far in advance should I book my move?", answer: "We recommend booking at least 2-4 weeks in advance for local moves and 4-6 weeks for long-distance moves. Peak season (summer months) may require even earlier booking." },
+      { question: "Is my belongings insured during the move?", answer: "Yes, all our moving partners provide basic liability coverage. We also offer additional full-value protection options for complete peace of mind during your move." },
+      { question: "Do you offer storage solutions?", answer: "Yes! We provide short-term and long-term storage options in climate-controlled facilities. This is perfect if there's a gap between your move-out and move-in dates." },
+      { question: "What items can't be moved?", answer: "Movers cannot transport hazardous materials, perishable foods, plants, pets, or personal documents/valuables. We'll provide a complete list of prohibited items when you book." },
+    ],
   },
 ];
 
