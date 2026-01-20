@@ -1,12 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, HelpCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { ServiceBookingForm } from "@/components/services/ServiceBookingForm";
 import { getServiceBySlug, servicesData } from "@/lib/servicesData";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import NotFound from "./NotFound";
 
 const ServiceDetail = () => {
@@ -167,6 +168,37 @@ const ServiceDetail = () => {
                     >
                       <h2 className="text-xl font-semibold text-foreground mb-2">Pricing</h2>
                       <p className="text-lg text-primary font-medium">{service.pricing}</p>
+                    </motion.div>
+                  )}
+
+                  {/* FAQ Section */}
+                  {service.faqs && service.faqs.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.6 }}
+                      className="bg-card rounded-xl border border-border p-6"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <HelpCircle className="h-5 w-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-foreground">
+                          Frequently Asked Questions
+                        </h2>
+                      </div>
+                      <Accordion type="single" collapsible className="w-full">
+                        {service.faqs.map((faq, idx) => (
+                          <AccordionItem key={idx} value={`faq-${idx}`} className="border-border">
+                            <AccordionTrigger className="text-left text-foreground hover:text-primary hover:no-underline py-4">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-muted-foreground leading-relaxed">
+                              {faq.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
                     </motion.div>
                   )}
                 </div>
