@@ -588,6 +588,57 @@ export type Database = {
           },
         ]
       }
+      service_bookings: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string
+          preferred_date: string
+          preferred_time: string
+          service_name: string
+          service_slug: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone: string
+          preferred_date: string
+          preferred_time: string
+          service_name: string
+          service_slug: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string
+          preferred_date?: string
+          preferred_time?: string
+          service_name?: string
+          service_slug?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_presence: {
         Row: {
           is_online: boolean | null
