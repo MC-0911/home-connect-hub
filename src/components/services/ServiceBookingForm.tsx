@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const bookingSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -77,18 +78,37 @@ export function ServiceBookingForm({ serviceName, serviceSlug }: ServiceBookingF
   const onSubmit = async (data: BookingFormValues) => {
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    console.log("Booking submitted:", { ...data, service: serviceSlug });
-    
-    toast({
-      title: "Booking Request Submitted!",
-      description: `We've received your ${serviceName} booking request. Our team will contact you within 24 hours to confirm your appointment.`,
-    });
-    
-    form.reset();
-    setIsSubmitting(false);
+    try {
+      const { error } = await supabase.from("service_bookings").insert({
+        user_id: user?.id || null,
+        service_slug: serviceSlug,
+        service_name: serviceName,
+        full_name: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        preferred_date: format(data.preferredDate, "yyyy-MM-dd"),
+        preferred_time: data.preferredTime,
+        message: data.message || null,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Booking Request Submitted!",
+        description: `We've received your ${serviceName} booking request. Our team will contact you within 24 hours to confirm your appointment.`,
+      });
+      
+      form.reset();
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your booking. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
