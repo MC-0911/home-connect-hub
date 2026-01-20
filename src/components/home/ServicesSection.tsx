@@ -37,7 +37,7 @@ export function ServicesSection({ className }: { className?: string }) {
               benefits={service.benefits.slice(0, 3)}
               cta={service.cta}
               link={`/services/${service.slug}`}
-              backgroundImage={service.backgroundImage}
+              backgroundImage={service.cardImage}
             />
           ))}
         </div>

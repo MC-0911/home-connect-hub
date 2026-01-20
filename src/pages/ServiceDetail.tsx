@@ -38,7 +38,7 @@ const ServiceDetail = () => {
           <section className="relative h-[400px] sm:h-[450px] overflow-hidden">
             <div
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${service.backgroundImage})` }}
+              style={{ backgroundImage: `url(${service.bannerImage})` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
 

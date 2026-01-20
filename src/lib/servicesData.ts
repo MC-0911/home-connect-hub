@@ -5,6 +5,12 @@ import serviceHomeInspection from "@/assets/service-home-inspection.jpg";
 import serviceTitleVerification from "@/assets/service-title-verification.jpg";
 import serviceMoving from "@/assets/service-moving.jpg";
 
+// Banner images for service detail pages
+import bannerPropertyMatching from "@/assets/banner-property-matching.jpg";
+import bannerHomeInspection from "@/assets/banner-home-inspection.jpg";
+import bannerTitleVerification from "@/assets/banner-title-verification.jpg";
+import bannerMovingRelocation from "@/assets/banner-moving-relocation.jpg";
+
 export interface ServiceData {
   slug: string;
   icon: LucideIcon;
@@ -16,7 +22,8 @@ export interface ServiceData {
   process: { step: number; title: string; description: string }[];
   pricing?: string;
   cta: string;
-  backgroundImage: string;
+  cardImage: string;
+  bannerImage: string;
 }
 
 export const servicesData: ServiceData[] = [
@@ -49,7 +56,8 @@ export const servicesData: ServiceData[] = [
     ],
     pricing: "Free consultation • Premium matching from $99",
     cta: "Get Matched",
-    backgroundImage: servicePropertyMatching,
+    cardImage: servicePropertyMatching,
+    bannerImage: bannerPropertyMatching,
   },
   {
     slug: "home-inspection",
@@ -82,7 +90,8 @@ export const servicesData: ServiceData[] = [
     ],
     pricing: "Starting from $299 • Premium inspection from $499",
     cta: "Schedule Inspection",
-    backgroundImage: serviceHomeInspection,
+    cardImage: serviceHomeInspection,
+    bannerImage: bannerHomeInspection,
   },
   {
     slug: "title-verification",
@@ -115,7 +124,8 @@ export const servicesData: ServiceData[] = [
     ],
     pricing: "Standard search from $199 • Full verification from $399",
     cta: "Verify Title",
-    backgroundImage: serviceTitleVerification,
+    cardImage: serviceTitleVerification,
+    bannerImage: bannerTitleVerification,
   },
   {
     slug: "moving-relocation",
@@ -148,7 +158,8 @@ export const servicesData: ServiceData[] = [
     ],
     pricing: "Local moves from $299 • Long-distance from $999",
     cta: "Plan My Move",
-    backgroundImage: serviceMoving,
+    cardImage: serviceMoving,
+    bannerImage: bannerMovingRelocation,
   },
 ];
 
