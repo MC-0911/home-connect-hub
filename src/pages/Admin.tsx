@@ -9,10 +9,11 @@ import { UsersTable } from '@/components/admin/UsersTable';
 import { ListingsTable } from '@/components/admin/ListingsTable';
 import { BlogsTable } from '@/components/admin/BlogsTable';
 import { LeadsTable } from '@/components/admin/LeadsTable';
+import { ServiceBookingsTable } from '@/components/admin/ServiceBookingsTable';
 import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
-import { LayoutDashboard, Users, Home, FileText, MessageSquare, Shield, Settings, Crown } from 'lucide-react';
+import { LayoutDashboard, Users, Home, FileText, MessageSquare, Shield, Settings, Crown, CalendarCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 export default function Admin() {
   const navigate = useNavigate();
@@ -126,6 +127,10 @@ export default function Admin() {
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Blogs</span>
                 </TabsTrigger>
+                <TabsTrigger value="bookings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <CalendarCheck className="h-4 w-4" />
+                  <span className="hidden sm:inline">Bookings</span>
+                </TabsTrigger>
                 <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Settings className="h-4 w-4" />
                   <span className="hidden sm:inline">Settings</span>
@@ -224,6 +229,29 @@ export default function Admin() {
                   </div>
                   <div className="p-6">
                     <LeadsTable />
+                  </div>
+                </motion.div>
+              </TabsContent>
+
+              <TabsContent value="bookings">
+                <motion.div initial={{
+                opacity: 0
+              }} animate={{
+                opacity: 1
+              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
+                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <CalendarCheck className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold">Service Bookings</h2>
+                        <p className="text-sm text-muted-foreground">Manage service booking requests</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <ServiceBookingsTable />
                   </div>
                 </motion.div>
               </TabsContent>
