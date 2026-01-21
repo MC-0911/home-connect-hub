@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck, Clipboard } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
 import { AlertsTab } from "@/components/dashboard/AlertsTab";
+import { MyBookingsTab } from "@/components/dashboard/MyBookingsTab";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -460,6 +461,10 @@ export default function Dashboard() {
                       {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
                     </Badge>}
                 </TabsTrigger>
+                <TabsTrigger value="bookings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Clipboard className="w-4 h-4 mr-1" />
+                  My Bookings
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="listings" className="mt-6">
@@ -701,6 +706,10 @@ export default function Dashboard() {
 
               <TabsContent value="alerts" className="mt-6">
                 <AlertsTab />
+              </TabsContent>
+
+              <TabsContent value="bookings" className="mt-6">
+                <MyBookingsTab />
               </TabsContent>
             </Tabs>
           </motion.div>
