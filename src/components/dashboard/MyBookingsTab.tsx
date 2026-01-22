@@ -3,8 +3,10 @@ import { format } from "date-fns";
 import { CalendarIcon, Clock, Phone, Mail, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { BookingsCalendarView } from "@/components/dashboard/BookingsCalendarView";
 
 interface Booking {
   id: string;
@@ -91,6 +93,7 @@ export function MyBookingsTab() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   useEffect(() => {
     if (user) {
@@ -164,9 +167,38 @@ export function MyBookingsTab() {
 
   return (
     <div className="space-y-4">
-      {bookings.map((booking) => (
-        <BookingCard key={booking.id} booking={booking} />
-      ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-base font-medium text-foreground">My Bookings</h3>
+          <p className="text-sm text-muted-foreground">Track your service requests and appointment status.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant={view === "list" ? "default" : "outline"}
+            onClick={() => setView("list")}
+          >
+            List
+          </Button>
+          <Button
+            type="button"
+            variant={view === "calendar" ? "default" : "outline"}
+            onClick={() => setView("calendar")}
+          >
+            Calendar
+          </Button>
+        </div>
+      </div>
+
+      {view === "calendar" ? (
+        <BookingsCalendarView bookings={bookings} />
+      ) : (
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <BookingCard key={booking.id} booking={booking} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
