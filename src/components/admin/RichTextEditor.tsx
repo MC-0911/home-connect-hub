@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RichTextEditorProps {
   value: string;
@@ -98,7 +99,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
   }, [onChange]);
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -114,21 +115,45 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
+    try {
+      // Upload to Supabase Storage (avoid storing base64 in the database)
+      const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+      const safeExt = ext.replace(/[^a-z0-9]/g, '') || 'png';
+      const objectPath = `inline/${crypto.randomUUID()}.${safeExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('blog-images')
+        .upload(objectPath, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error('Blog image upload failed:', uploadError);
+        toast.error('Failed to upload image');
+        return;
+      }
+
+      const { data } = supabase.storage.from('blog-images').getPublicUrl(objectPath);
+      const publicUrl = data.publicUrl;
+
       editorRef.current?.focus();
-      document.execCommand('insertHTML', false, `<img src="${dataUrl}" alt="Uploaded image" style="max-width: 100%; height: auto; margin: 8px 0;" />`);
+      document.execCommand(
+        'insertHTML',
+        false,
+        `<img src="${publicUrl}" alt="${file.name || 'Blog image'}" style="max-width: 100%; height: auto; margin: 8px 0;" loading="lazy" />`
+      );
+
       if (editorRef.current) {
         isInternalChange.current = true;
         onChange(editorRef.current.innerHTML);
       }
+
       toast.success('Image inserted successfully');
-    };
-    reader.onerror = () => {
-      toast.error('Failed to load image');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Blog image upload unexpected error:', err);
+      toast.error('Failed to upload image');
+    }
 
     // Reset input
     if (fileInputRef.current) {
@@ -159,6 +184,10 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       size="sm"
       className="h-8 w-8 p-0 hover:bg-muted"
       title={title}
+      onMouseDown={(e) => {
+        // Prevent losing selection in the contentEditable when clicking toolbar buttons
+        e.preventDefault();
+      }}
       onClick={() => onClick ? onClick() : command && execCommand(command, value)}
     >
       <Icon className="h-4 w-4" />
