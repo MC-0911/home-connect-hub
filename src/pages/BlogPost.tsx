@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import DOMPurify from "dompurify";
 
 interface BlogPost {
   id: string;
@@ -185,11 +186,16 @@ export default function BlogPost() {
               )}
 
               {/* Content */}
-              <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary">
-                {post.content.split("\n").map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
-                ))}
-              </div>
+              <div
+                className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-img:rounded-xl prose-img:my-6"
+                // Content comes from the admin editor as HTML. Sanitize before rendering.
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(post.content || "", {
+                    USE_PROFILES: { html: true },
+                    ADD_ATTR: ["target", "rel"],
+                  }),
+                }}
+              />
 
               {/* Footer */}
               <div className="mt-12 pt-8 border-t border-border">
