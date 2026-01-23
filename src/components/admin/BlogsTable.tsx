@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
+import { BlogCoverImagePicker } from './BlogCoverImagePicker';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -349,10 +350,15 @@ export function BlogsTable() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cover_image">Cover Image URL</Label>
-                  <Input id="cover_image" value={formData.cover_image} onChange={e => setFormData({
-                  ...formData,
-                  cover_image: e.target.value
-                })} />
+                  <BlogCoverImagePicker
+                    value={formData.cover_image}
+                    onChange={(url) =>
+                      setFormData({
+                        ...formData,
+                        cover_image: url,
+                      })
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
