@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
 import { BlogCoverImagePicker } from './BlogCoverImagePicker';
+import { BlogContentPreview } from './BlogContentPreview';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -19,6 +20,7 @@ import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
 import { TablePagination } from './TablePagination';
 import { SortableTableHead } from './SortableTableHead';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 interface Blog {
   id: string;
   title: string;
@@ -343,10 +345,36 @@ export function BlogsTable() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Content</Label>
-                  <RichTextEditor value={formData.content} onChange={value => setFormData({
-                  ...formData,
-                  content: value
-                })} placeholder="Write your blog content here..." />
+
+                  <Tabs defaultValue="edit" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="edit">Edit</TabsTrigger>
+                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="edit" className="mt-3">
+                      <RichTextEditor
+                        value={formData.content}
+                        onChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            content: value,
+                          })
+                        }
+                        placeholder="Write your blog content here..."
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="preview" className="mt-3">
+                      <div className="rounded-md border bg-background p-4">
+                        {formData.content ? (
+                          <BlogContentPreview html={formData.content} />
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Nothing to preview yet.</p>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cover_image">Cover Image URL</Label>
