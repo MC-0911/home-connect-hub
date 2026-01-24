@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
 import { BlogCoverImagePicker } from './BlogCoverImagePicker';
 import { BlogContentPreview } from './BlogContentPreview';
+import { BlogAuthorSelector } from './BlogAuthorSelector';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -28,6 +29,9 @@ interface Blog {
   excerpt: string | null;
   content: string;
   cover_image: string | null;
+  author_id?: string | null;
+  author_name?: string | null;
+  author_avatar_url?: string | null;
   status: string;
   views: number;
   published_at: string | null;
@@ -50,6 +54,9 @@ export function BlogsTable() {
     excerpt: '',
     content: '',
     cover_image: '',
+    author_id: null as string | null,
+    author_name: '' as string | null,
+    author_avatar_url: '' as string | null,
     status: 'draft'
   });
   const fetchBlogs = async () => {
@@ -76,6 +83,9 @@ export function BlogsTable() {
     try {
       const blogData = {
         ...formData,
+        author_id: formData.author_id || null,
+        author_name: formData.author_name || null,
+        author_avatar_url: formData.author_avatar_url || null,
         published_at: formData.status === 'published' ? new Date().toISOString() : null
       };
       if (editingBlog) {
@@ -99,6 +109,9 @@ export function BlogsTable() {
         excerpt: '',
         content: '',
         cover_image: '',
+        author_id: null,
+        author_name: '',
+        author_avatar_url: '',
         status: 'draft'
       });
       fetchBlogs();
@@ -115,6 +128,9 @@ export function BlogsTable() {
       excerpt: blog.excerpt || '',
       content: blog.content,
       cover_image: blog.cover_image || '',
+      author_id: blog.author_id ?? null,
+      author_name: blog.author_name ?? '',
+      author_avatar_url: blog.author_avatar_url ?? '',
       status: blog.status
     });
     setIsDialogOpen(true);
@@ -304,6 +320,9 @@ export function BlogsTable() {
               excerpt: '',
               content: '',
               cover_image: '',
+              author_id: null,
+              author_name: '',
+              author_avatar_url: '',
               status: 'draft'
             });
           }
@@ -384,6 +403,25 @@ export function BlogsTable() {
                       setFormData({
                         ...formData,
                         cover_image: url,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Author</Label>
+                  <BlogAuthorSelector
+                    value={{
+                      author_id: formData.author_id,
+                      author_name: formData.author_name,
+                      author_avatar_url: formData.author_avatar_url,
+                    }}
+                    onChange={(next) =>
+                      setFormData({
+                        ...formData,
+                        author_id: next.author_id,
+                        author_name: next.author_name,
+                        author_avatar_url: next.author_avatar_url,
                       })
                     }
                   />

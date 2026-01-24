@@ -75,7 +75,9 @@ export type Database = {
       }
       blogs: {
         Row: {
+          author_avatar_url: string | null
           author_id: string | null
+          author_name: string | null
           content: string
           cover_image: string | null
           created_at: string
@@ -89,7 +91,9 @@ export type Database = {
           views: number
         }
         Insert: {
+          author_avatar_url?: string | null
           author_id?: string | null
+          author_name?: string | null
           content: string
           cover_image?: string | null
           created_at?: string
@@ -103,7 +107,9 @@ export type Database = {
           views?: number
         }
         Update: {
+          author_avatar_url?: string | null
           author_id?: string | null
+          author_name?: string | null
           content?: string
           cover_image?: string | null
           created_at?: string
