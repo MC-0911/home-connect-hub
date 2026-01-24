@@ -34,6 +34,7 @@ interface Blog {
   author_avatar_url?: string | null;
   status: string;
   views: number;
+  publish_at?: string | null;
   published_at: string | null;
   created_at: string;
 }
@@ -57,8 +58,24 @@ export function BlogsTable() {
     author_id: null as string | null,
     author_name: '' as string | null,
     author_avatar_url: '' as string | null,
+    publish_at_local: '' as string,
     status: 'draft'
   });
+
+  const localDateTimeToIso = (localValue: string) => {
+    if (!localValue) return null;
+    const d = new Date(localValue);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString();
+  };
+
+  const isoToLocalDateTimeInput = (iso: string | null | undefined) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
   const fetchBlogs = async () => {
     try {
       const {
@@ -81,23 +98,33 @@ export function BlogsTable() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const publishAtIso = localDateTimeToIso(formData.publish_at_local);
+
       const blogData = {
         ...formData,
         author_id: formData.author_id || null,
         author_name: formData.author_name || null,
         author_avatar_url: formData.author_avatar_url || null,
-        published_at: formData.status === 'published' ? new Date().toISOString() : null
+        publish_at: publishAtIso,
+        // If publish_at is set, we force scheduled as requested.
+        status: publishAtIso ? 'scheduled' : formData.status,
+        published_at: (publishAtIso ? null : formData.status === 'published') ? new Date().toISOString() : null
       };
+
+      // Do not send the local-only helper field to DB
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { publish_at_local, ...blogDataForDb } = blogData as any;
+
       if (editingBlog) {
         const {
           error
-        } = await supabase.from('blogs').update(blogData).eq('id', editingBlog.id);
+        } = await supabase.from('blogs').update(blogDataForDb).eq('id', editingBlog.id);
         if (error) throw error;
         toast.success('Blog updated successfully');
       } else {
         const {
           error
-        } = await supabase.from('blogs').insert([blogData]);
+        } = await supabase.from('blogs').insert([blogDataForDb]);
         if (error) throw error;
         toast.success('Blog created successfully');
       }
@@ -112,6 +139,7 @@ export function BlogsTable() {
         author_id: null,
         author_name: '',
         author_avatar_url: '',
+        publish_at_local: '',
         status: 'draft'
       });
       fetchBlogs();
@@ -131,6 +159,7 @@ export function BlogsTable() {
       author_id: blog.author_id ?? null,
       author_name: blog.author_name ?? '',
       author_avatar_url: blog.author_avatar_url ?? '',
+      publish_at_local: isoToLocalDateTimeInput(blog.publish_at ?? null),
       status: blog.status
     });
     setIsDialogOpen(true);
@@ -234,6 +263,8 @@ export function BlogsTable() {
         return 'bg-green-500/10 text-green-600 border-green-500/20';
       case 'draft':
         return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+      case 'scheduled':
+        return 'bg-muted text-muted-foreground border-muted';
       case 'archived':
         return 'bg-muted text-muted-foreground border-muted';
       default:
@@ -259,6 +290,7 @@ export function BlogsTable() {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
@@ -323,6 +355,7 @@ export function BlogsTable() {
               author_id: null,
               author_name: '',
               author_avatar_url: '',
+              publish_at_local: '',
               status: 'draft'
             });
           }
@@ -426,17 +459,42 @@ export function BlogsTable() {
                     }
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="publish_at">Publish date & time</Label>
+                  <Input
+                    id="publish_at"
+                    type="datetime-local"
+                    value={formData.publish_at_local}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        publish_at_local: e.target.value,
+                        status: e.target.value ? 'scheduled' : (formData.status === 'scheduled' ? 'draft' : formData.status),
+                      })
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Times are saved from your local timezone and stored in UTC. If set, status will be Scheduled.
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={value => setFormData({
-                  ...formData,
-                  status: value
-                })}>
+                  <Select
+                    value={formData.publish_at_local ? 'scheduled' : formData.status}
+                    onValueChange={value => setFormData({
+                    ...formData,
+                    status: value
+                  })}
+                    disabled={!!formData.publish_at_local}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="scheduled">Scheduled</SelectItem>
                       <SelectItem value="published">Published</SelectItem>
                       <SelectItem value="archived">Archived</SelectItem>
                     </SelectContent>
