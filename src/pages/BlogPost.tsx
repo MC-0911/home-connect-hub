@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import DOMPurify from "dompurify";
@@ -19,6 +20,8 @@ interface BlogPost {
   content: string;
   excerpt: string | null;
   cover_image: string | null;
+  author_name?: string | null;
+  author_avatar_url?: string | null;
   published_at: string | null;
   created_at: string;
 }
@@ -154,6 +157,26 @@ export default function BlogPost() {
                 <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
                   {post.title}
                 </h1>
+
+                {(post.author_name || post.author_avatar_url) && (
+                  <div className="mb-4 flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={post.author_avatar_url ?? undefined} alt={post.author_name ?? "Author"} />
+                      <AvatarFallback>
+                        {(post.author_name || "Author")
+                          .split(" ")
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .map((p) => p[0]?.toUpperCase())
+                          .join("") || "A"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="leading-tight">
+                      <p className="text-sm font-medium text-foreground">{post.author_name || "Author"}</p>
+                      <p className="text-xs text-muted-foreground">Author</p>
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
