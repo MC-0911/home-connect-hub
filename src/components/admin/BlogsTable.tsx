@@ -15,13 +15,67 @@ import { BlogCoverImagePicker } from './BlogCoverImagePicker';
 import { BlogContentPreview } from './BlogContentPreview';
 import { BlogAuthorSelector } from './BlogAuthorSelector';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock } from 'lucide-react';
-import { format } from 'date-fns';
+import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock, Timer } from 'lucide-react';
+import { format, formatDistanceToNow, differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
 import { TablePagination } from './TablePagination';
 import { SortableTableHead } from './SortableTableHead';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Countdown Badge Component
+const CountdownBadge = ({ publishAt }: { publishAt: string }) => {
+  const [timeLeft, setTimeLeft] = useState('');
+  const [isPast, setIsPast] = useState(false);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const publishDate = new Date(publishAt);
+      const diffSeconds = differenceInSeconds(publishDate, now);
+
+      if (diffSeconds <= 0) {
+        setIsPast(true);
+        setTimeLeft('Publishing...');
+        return;
+      }
+
+      const days = differenceInDays(publishDate, now);
+      const hours = differenceInHours(publishDate, now) % 24;
+      const minutes = differenceInMinutes(publishDate, now) % 60;
+      const seconds = diffSeconds % 60;
+
+      if (days > 0) {
+        setTimeLeft(`${days}d ${hours}h`);
+      } else if (hours > 0) {
+        setTimeLeft(`${hours}h ${minutes}m`);
+      } else if (minutes > 0) {
+        setTimeLeft(`${minutes}m ${seconds}s`);
+      } else {
+        setTimeLeft(`${seconds}s`);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [publishAt]);
+
+  return (
+    <Badge 
+      variant="outline" 
+      className={`text-xs font-normal ${
+        isPast 
+          ? 'bg-success/10 text-success border-success/30' 
+          : 'bg-info/10 text-info border-info/30'
+      }`}
+    >
+      <Timer className="h-3 w-3 mr-1" />
+      {timeLeft}
+    </Badge>
+  );
+};
+
 interface Blog {
   id: string;
   title: string;
@@ -581,9 +635,14 @@ export function BlogsTable() {
                   </TableCell>
                   <TableCell>
                     {blog.publish_at ? (
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{format(new Date(blog.publish_at), 'MMM d, yyyy h:mm a')}</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          <span>{format(new Date(blog.publish_at), 'MMM d, yyyy h:mm a')}</span>
+                        </div>
+                        {blog.status === 'scheduled' && (
+                          <CountdownBadge publishAt={blog.publish_at} />
+                        )}
                       </div>
                     ) : (
                       <span className="text-sm text-muted-foreground">-</span>
