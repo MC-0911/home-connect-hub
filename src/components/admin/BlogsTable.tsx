@@ -15,7 +15,7 @@ import { BlogCoverImagePicker } from './BlogCoverImagePicker';
 import { BlogContentPreview } from './BlogContentPreview';
 import { BlogAuthorSelector } from './BlogAuthorSelector';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -236,7 +236,20 @@ export function BlogsTable() {
   };
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || blog.status === statusFilter;
+    let matchesStatus = false;
+    if (statusFilter === 'all') {
+      matchesStatus = true;
+    } else if (statusFilter === 'upcoming') {
+      // Upcoming = scheduled posts within next 24 hours
+      if (blog.status === 'scheduled' && blog.publish_at) {
+        const publishDate = new Date(blog.publish_at);
+        const now = new Date();
+        const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        matchesStatus = publishDate >= now && publishDate <= in24h;
+      }
+    } else {
+      matchesStatus = blog.status === statusFilter;
+    }
     return matchesSearch && matchesStatus;
   });
   const {
@@ -291,6 +304,7 @@ export function BlogsTable() {
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="upcoming">Upcoming (24h)</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
@@ -540,6 +554,7 @@ export function BlogsTable() {
               
               <SortableTableHead label="Title" sortKey="title" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="status" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Scheduled For" sortKey="publish_at" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Views" sortKey="views" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Published" sortKey="published_at" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Created" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
@@ -548,7 +563,7 @@ export function BlogsTable() {
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                   No blogs found
                 </TableCell>
               </TableRow> : paginatedData.map(blog => <TableRow key={blog.id} className="hover:bg-muted/30">
@@ -563,6 +578,16 @@ export function BlogsTable() {
                     <Badge className={`border ${getStatusColor(blog.status)}`}>
                       {blog.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {blog.publish_at ? (
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{format(new Date(blog.publish_at), 'MMM d, yyyy h:mm a')}</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
