@@ -462,18 +462,37 @@ export function BlogsTable() {
 
                 <div className="space-y-2">
                   <Label htmlFor="publish_at">Publish date & time</Label>
-                  <Input
-                    id="publish_at"
-                    type="datetime-local"
-                    value={formData.publish_at_local}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        publish_at_local: e.target.value,
-                        status: e.target.value ? 'scheduled' : (formData.status === 'scheduled' ? 'draft' : formData.status),
-                      })
-                    }
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="publish_at"
+                      type="datetime-local"
+                      value={formData.publish_at_local}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          publish_at_local: e.target.value,
+                          status: e.target.value ? 'scheduled' : (formData.status === 'scheduled' ? 'draft' : formData.status),
+                        })
+                      }
+                      className="flex-1"
+                    />
+                    {formData.publish_at_local && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            publish_at_local: '',
+                            status: 'draft',
+                          })
+                        }
+                      >
+                        Cancel Schedule
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Times are saved from your local timezone and stored in UTC. If set, status will be Scheduled.
                   </p>
