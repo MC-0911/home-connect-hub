@@ -30,7 +30,8 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const nowIso = new Date().toISOString();
 
-    const { data, error } = await supabase
+    // Publish scheduled blogs
+    const { data: publishedBlogs, error } = await supabase
       .from("blogs")
       .update({
         status: "published",
@@ -39,14 +40,55 @@ Deno.serve(async (req) => {
       })
       .eq("status", "scheduled")
       .lte("publish_at", nowIso)
-      .select("id");
+      .select("id, title, slug");
 
     if (error) {
       console.error("Failed to publish scheduled blogs:", error);
       return jsonResponse({ error: "Failed to publish scheduled blogs" }, 500);
     }
 
-    return jsonResponse({ success: true, published: (data || []).length });
+    const publishedCount = (publishedBlogs || []).length;
+
+    // If blogs were published, notify all admins
+    if (publishedCount > 0) {
+      // Get all admin user IDs
+      const { data: adminRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+
+      if (rolesError) {
+        console.error("Failed to fetch admin roles:", rolesError);
+      } else if (adminRoles && adminRoles.length > 0) {
+        // Create alerts for each admin for each published blog
+        const alerts = [];
+        for (const blog of publishedBlogs || []) {
+          for (const admin of adminRoles) {
+            alerts.push({
+              user_id: admin.user_id,
+              title: "Scheduled Post Published",
+              message: `"${blog.title}" has been automatically published.`,
+              type: "success",
+              link: `/blog/${blog.slug}`,
+            });
+          }
+        }
+
+        if (alerts.length > 0) {
+          const { error: alertError } = await supabase
+            .from("alerts")
+            .insert(alerts);
+
+          if (alertError) {
+            console.error("Failed to create admin alerts:", alertError);
+          } else {
+            console.log(`Created ${alerts.length} admin alerts for ${publishedCount} published blogs`);
+          }
+        }
+      }
+    }
+
+    return jsonResponse({ success: true, published: publishedCount });
   } catch (error) {
     console.error("Error:", error);
     return jsonResponse({ error: "Internal server error" }, 500);
