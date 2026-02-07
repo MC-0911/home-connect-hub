@@ -351,25 +351,141 @@ interface TrafficChartsProps {
 
 export function TrafficCharts({ blogViewsData }: TrafficChartsProps) {
   return (
-    <>
-      <ChartCard title="Blog Traffic - Top Performing Articles" delay={0.9}>
-        {blogViewsData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={blogViewsData} layout="vertical" margin={{ left: 20, right: 30 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal vertical={false} />
-              <XAxis type="number" tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="title" width={160} tick={{ fontSize: 11 }} />
-              <Tooltip
-                contentStyle={tooltipStyle}
-                formatter={(value: number) => [`${value.toLocaleString()} views`, 'Views']}
-              />
-              <Bar dataKey="views" fill={CHART_COLORS.accent} radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <EmptyState message="No blog view data available yet" />
-        )}
-      </ChartCard>
-    </>
+    <ChartCard title="Blog Traffic - Top Performing Articles" delay={0.9}>
+      {blogViewsData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={blogViewsData} layout="vertical" margin={{ left: 20, right: 30 }}>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal vertical={false} />
+            <XAxis type="number" tick={{ fontSize: 11 }} />
+            <YAxis type="category" dataKey="title" width={160} tick={{ fontSize: 11 }} />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              formatter={(value: number) => [`${value.toLocaleString()} views`, 'Views']}
+            />
+            <Bar dataKey="views" fill={CHART_COLORS.accent} radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <EmptyState message="No blog view data available yet" />
+      )}
+    </ChartCard>
+  );
+}
+
+// ─── Traffic Overview (Monthly Visitors & Page Views) ──────────────
+
+interface TrafficOverviewProps {
+  blogViews: { viewed_at: string }[];
+  users: { created_at: string }[];
+  fromDate?: Date;
+  toDate?: Date;
+}
+
+export function TrafficOverviewChart({ blogViews, users, fromDate, toDate }: TrafficOverviewProps) {
+  const now = toDate || new Date();
+  const start = fromDate || subMonths(now, 6);
+  const months = eachMonthOfInterval({ start: startOfMonth(start), end: startOfMonth(now) });
+
+  const data = months.map((m) => {
+    const key = format(m, 'MMM yyyy');
+    const pageViews = blogViews.filter((v) => format(startOfMonth(parseISO(v.viewed_at)), 'MMM yyyy') === key).length;
+    const visitors = users.filter((u) => format(startOfMonth(parseISO(u.created_at)), 'MMM yyyy') === key).length;
+    return { name: key, pageViews, visitors };
+  });
+
+  return (
+    <ChartCard
+      title="Traffic Overview"
+      subtitle="Monthly page views & new visitors"
+      delay={0.35}
+    >
+      {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height={280}>
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="pageViewsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={CHART_COLORS.primary} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={CHART_COLORS.primary} stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="visitorsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={CHART_COLORS.success} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={CHART_COLORS.success} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 11 }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Area type="monotone" dataKey="pageViews" stroke={CHART_COLORS.primary} fill="url(#pageViewsGrad)" strokeWidth={2} name="Page Views" />
+            <Area type="monotone" dataKey="visitors" stroke={CHART_COLORS.success} fill="url(#visitorsGrad)" strokeWidth={2} name="New Visitors" />
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : (
+        <EmptyState message="No traffic data available" />
+      )}
+    </ChartCard>
+  );
+}
+
+// ─── Revenue Trend (Monthly Sold Property Values) ──────────────────
+
+interface RevenueTrendProps {
+  soldListings: { price: number; updated_at: string }[];
+  offers: { status: string; created_at: string; offer_amount: number }[];
+  fromDate?: Date;
+  toDate?: Date;
+}
+
+export function RevenueTrendChart({ soldListings, offers, fromDate, toDate }: RevenueTrendProps) {
+  const now = toDate || new Date();
+  const start = fromDate || subMonths(now, 6);
+  const months = eachMonthOfInterval({ start: startOfMonth(start), end: startOfMonth(now) });
+
+  const data = months.map((m) => {
+    const key = format(m, 'MMM yyyy');
+    // Sum sold listing prices for that month
+    const soldValue = soldListings
+      .filter((l) => format(startOfMonth(parseISO(l.updated_at)), 'MMM yyyy') === key)
+      .reduce((sum, l) => sum + Number(l.price), 0);
+    // Sum accepted offer amounts for that month
+    const offerValue = offers
+      .filter((o) => o.status === 'accepted' && format(startOfMonth(parseISO(o.created_at)), 'MMM yyyy') === key)
+      .reduce((sum, o) => sum + Number(o.offer_amount), 0);
+    return { name: key, soldValue, offerValue };
+  });
+
+  const formatCurrency = (value: number) => {
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
+    return `$${value}`;
+  };
+
+  return (
+    <ChartCard
+      title="Revenue Trend"
+      subtitle="Monthly property sales & accepted offers value"
+      delay={0.4}
+    >
+      {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 11 }} tickFormatter={formatCurrency} />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              formatter={(value: number, name: string) => [
+                `$${value.toLocaleString()}`,
+                name === 'soldValue' ? 'Sold Listings' : 'Accepted Offers',
+              ]}
+            />
+            <Bar dataKey="soldValue" fill={CHART_COLORS.secondary} radius={[4, 4, 0, 0]} name="Sold Listings" />
+            <Bar dataKey="offerValue" fill={CHART_COLORS.warning} radius={[4, 4, 0, 0]} name="Accepted Offers" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <EmptyState message="No revenue data available" />
+      )}
+    </ChartCard>
   );
 }

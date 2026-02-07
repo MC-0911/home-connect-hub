@@ -33,8 +33,11 @@ export interface AnalyticsData {
   // Raw arrays for time-series charts
   rawListings: { created_at: string; property_type: string; status: string }[];
   rawUsers: { created_at: string }[];
-  rawOffers: { status: string; created_at: string }[];
+  rawOffers: { status: string; created_at: string; offer_amount: number }[];
   rawLeads: { created_at: string; requirement_type: string; status: string }[];
+  // Traffic & Revenue
+  rawBlogViews: { viewed_at: string }[];
+  rawSoldListings: { created_at: string; price: number; updated_at: string }[];
 }
 
 const INITIAL: AnalyticsData = {
@@ -46,6 +49,7 @@ const INITIAL: AnalyticsData = {
   listingsByType: [], propertiesByStatus: [], leadsByStatus: [], leadsByType: [],
   blogViewsData: [],
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
+  rawBlogViews: [], rawSoldListings: [],
 };
 
 export function useAnalyticsData(dateRange: DateRange) {
@@ -60,10 +64,11 @@ export function useAnalyticsData(dateRange: DateRange) {
         const toDate = dateRange.to ? endOfDay(dateRange.to).toISOString() : null;
 
         let usersQ = supabase.from('profiles').select('id, is_suspended, created_at');
-        let listingsQ = supabase.from('properties').select('id, status, property_type, created_at');
+        let listingsQ = supabase.from('properties').select('id, status, property_type, created_at, price, updated_at');
         let blogsQ = supabase.from('blogs').select('id, title, slug, views, status, created_at');
         let leadsQ = supabase.from('buyer_requirements').select('id, created_at, status, requirement_type');
-        let offersQ = supabase.from('property_offers').select('id, status, created_at');
+        let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount');
+        let blogViewsQ = supabase.from('blog_views').select('id, viewed_at');
 
         if (fromDate) {
           usersQ = usersQ.gte('created_at', fromDate);
@@ -71,6 +76,7 @@ export function useAnalyticsData(dateRange: DateRange) {
           blogsQ = blogsQ.gte('created_at', fromDate);
           leadsQ = leadsQ.gte('created_at', fromDate);
           offersQ = offersQ.gte('created_at', fromDate);
+          blogViewsQ = blogViewsQ.gte('viewed_at', fromDate);
         }
         if (toDate) {
           usersQ = usersQ.lte('created_at', toDate);
@@ -78,10 +84,11 @@ export function useAnalyticsData(dateRange: DateRange) {
           blogsQ = blogsQ.lte('created_at', toDate);
           leadsQ = leadsQ.lte('created_at', toDate);
           offersQ = offersQ.lte('created_at', toDate);
+          blogViewsQ = blogViewsQ.lte('viewed_at', toDate);
         }
 
-        const [usersRes, listingsRes, blogsRes, leadsRes, offersRes] = await Promise.all([
-          usersQ, listingsQ, blogsQ, leadsQ, offersQ,
+        const [usersRes, listingsRes, blogsRes, leadsRes, offersRes, blogViewsRes] = await Promise.all([
+          usersQ, listingsQ, blogsQ, leadsQ, offersQ, blogViewsQ,
         ]);
 
         const users = usersRes.data || [];
@@ -89,6 +96,7 @@ export function useAnalyticsData(dateRange: DateRange) {
         const blogs = blogsRes.data || [];
         const leads = leadsRes.data || [];
         const offers = offersRes.data || [];
+        const blogViews = blogViewsRes.data || [];
 
         // User breakdown
         const suspendedUsers = users.filter((u) => u.is_suspended === true).length;
@@ -164,8 +172,12 @@ export function useAnalyticsData(dateRange: DateRange) {
           blogViewsData,
           rawListings: listings.map((l) => ({ created_at: l.created_at, property_type: l.property_type, status: l.status || 'active' })),
           rawUsers: users.map((u) => ({ created_at: u.created_at })),
-          rawOffers: offers.map((o) => ({ status: o.status, created_at: o.created_at })),
+          rawOffers: offers.map((o) => ({ status: o.status, created_at: o.created_at, offer_amount: o.offer_amount })),
           rawLeads: leads.map((l) => ({ created_at: l.created_at, requirement_type: l.requirement_type, status: l.status || 'new' })),
+          rawBlogViews: blogViews.map((v) => ({ viewed_at: v.viewed_at })),
+          rawSoldListings: listings
+            .filter((l) => l.status === 'sold')
+            .map((l) => ({ created_at: l.created_at, price: (l as any).price || 0, updated_at: (l as any).updated_at || l.created_at })),
         });
       } catch (error) {
         console.error('Error fetching analytics:', error);
