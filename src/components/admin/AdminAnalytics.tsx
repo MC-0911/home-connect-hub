@@ -104,7 +104,7 @@ export function AdminAnalytics() {
 
       {/* Live Activity Feed + Activity Over Time */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LiveActivityFeed />
+        <LiveActivityFeed fromDate={dateRange.from} toDate={dateRange.to} />
         <ActivityOverTimeChart
           listings={analytics.rawListings}
           users={analytics.rawUsers}

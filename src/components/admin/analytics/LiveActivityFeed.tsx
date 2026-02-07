@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Home, UserPlus, DollarSign, CalendarCheck, FileText, Activity } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, startOfDay, endOfDay } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -15,6 +15,11 @@ interface ActivityItem {
   timestamp: string;
 }
 
+interface LiveActivityFeedProps {
+  fromDate?: Date;
+  toDate?: Date;
+}
+
 const ACTIVITY_CONFIG = {
   listing: { icon: Home, color: 'text-success', bg: 'bg-success/10', label: 'New Listing' },
   signup: { icon: UserPlus, color: 'text-primary', bg: 'bg-primary/10', label: 'New Signup' },
@@ -24,20 +29,43 @@ const ACTIVITY_CONFIG = {
   lead: { icon: Activity, color: 'text-destructive', bg: 'bg-destructive/10', label: 'New Lead' },
 };
 
-export function LiveActivityFeed() {
+export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecentActivity = async () => {
+    const fetchRecentActivity = async (silent = false) => {
+      if (!silent) setLoading(true);
       try {
+        const from = fromDate ? startOfDay(fromDate).toISOString() : null;
+        const to = toDate ? endOfDay(toDate).toISOString() : null;
+
+        let listingsQ = supabase.from('properties').select('id, title, created_at').order('created_at', { ascending: false });
+        let profilesQ = supabase.from('profiles').select('id, full_name, created_at').order('created_at', { ascending: false });
+        let offersQ = supabase.from('property_offers').select('id, offer_amount, created_at').order('created_at', { ascending: false });
+        let visitsQ = supabase.from('property_visits').select('id, preferred_date, created_at').order('created_at', { ascending: false });
+        let blogsQ = supabase.from('blogs').select('id, title, created_at').order('created_at', { ascending: false });
+        let leadsQ = supabase.from('buyer_requirements').select('id, full_name, created_at').order('created_at', { ascending: false });
+
+        if (from) {
+          listingsQ = listingsQ.gte('created_at', from);
+          profilesQ = profilesQ.gte('created_at', from);
+          offersQ = offersQ.gte('created_at', from);
+          visitsQ = visitsQ.gte('created_at', from);
+          blogsQ = blogsQ.gte('created_at', from);
+          leadsQ = leadsQ.gte('created_at', from);
+        }
+        if (to) {
+          listingsQ = listingsQ.lte('created_at', to);
+          profilesQ = profilesQ.lte('created_at', to);
+          offersQ = offersQ.lte('created_at', to);
+          visitsQ = visitsQ.lte('created_at', to);
+          blogsQ = blogsQ.lte('created_at', to);
+          leadsQ = leadsQ.lte('created_at', to);
+        }
+
         const [listingsRes, profilesRes, offersRes, visitsRes, blogsRes, leadsRes] = await Promise.all([
-          supabase.from('properties').select('id, title, created_at').order('created_at', { ascending: false }).limit(5),
-          supabase.from('profiles').select('id, full_name, created_at').order('created_at', { ascending: false }).limit(5),
-          supabase.from('property_offers').select('id, offer_amount, created_at').order('created_at', { ascending: false }).limit(5),
-          supabase.from('property_visits').select('id, preferred_date, created_at').order('created_at', { ascending: false }).limit(5),
-          supabase.from('blogs').select('id, title, created_at').order('created_at', { ascending: false }).limit(3),
-          supabase.from('buyer_requirements').select('id, full_name, created_at').order('created_at', { ascending: false }).limit(3),
+          listingsQ, profilesQ, offersQ, visitsQ, blogsQ, leadsQ,
         ]);
 
         const items: ActivityItem[] = [];
@@ -103,7 +131,7 @@ export function LiveActivityFeed() {
         );
 
         items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        setActivities(items.slice(0, 10));
+        setActivities(items);
       } catch (error) {
         console.error('Error fetching activity feed:', error);
       } finally {
@@ -116,16 +144,16 @@ export function LiveActivityFeed() {
     // Realtime: refresh feed when key tables change
     const channel = supabase
       .channel('activity-feed-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'properties' }, () => fetchRecentActivity())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => fetchRecentActivity())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_offers' }, () => fetchRecentActivity())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_visits' }, () => fetchRecentActivity())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'blogs' }, () => fetchRecentActivity())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'buyer_requirements' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'properties' }, () => fetchRecentActivity(true))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => fetchRecentActivity(true))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_offers' }, () => fetchRecentActivity(true))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_visits' }, () => fetchRecentActivity(true))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'blogs' }, () => fetchRecentActivity(true))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'buyer_requirements' }, () => fetchRecentActivity(true))
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [fromDate, toDate]);
 
   return (
     <Card className="h-full">
@@ -135,10 +163,15 @@ export function LiveActivityFeed() {
             <Activity className="h-4 w-4 text-primary" />
             Live Activity Feed
           </CardTitle>
-          <Badge variant="outline" className="text-[10px] gap-1 animate-pulse">
-            <span className="h-1.5 w-1.5 rounded-full bg-success inline-block" />
-            Live
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-[10px]">
+              {activities.length} activities
+            </Badge>
+            <Badge variant="outline" className="text-[10px] gap-1 animate-pulse">
+              <span className="h-1.5 w-1.5 rounded-full bg-success inline-block" />
+              Live
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-0">
@@ -168,7 +201,7 @@ export function LiveActivityFeed() {
                       key={item.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.5) }}
                       className="flex gap-3 py-2.5 border-b border-border/50 last:border-0"
                     >
                       <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
