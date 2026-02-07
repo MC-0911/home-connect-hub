@@ -13,6 +13,8 @@ import {
   OffersCharts,
   LeadsCharts,
   TrafficCharts,
+  TrafficOverviewChart,
+  RevenueTrendChart,
 } from './analytics/AnalyticsCharts';
 import { useAnalyticsData } from './analytics/useAnalyticsData';
 import type { DateRange, PresetRange } from './analytics/AnalyticsDateFilter';
@@ -106,6 +108,22 @@ export function AdminAnalytics() {
         <ActivityOverTimeChart
           listings={analytics.rawListings}
           users={analytics.rawUsers}
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+        />
+      </div>
+
+      {/* Traffic Overview + Revenue Trend */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TrafficOverviewChart
+          blogViews={analytics.rawBlogViews}
+          users={analytics.rawUsers}
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+        />
+        <RevenueTrendChart
+          soldListings={analytics.rawSoldListings}
+          offers={analytics.rawOffers}
           fromDate={dateRange.from}
           toDate={dateRange.to}
         />
