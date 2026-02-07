@@ -112,6 +112,19 @@ export function LiveActivityFeed() {
     };
 
     fetchRecentActivity();
+
+    // Realtime: refresh feed when key tables change
+    const channel = supabase
+      .channel('activity-feed-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'properties' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_offers' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'property_visits' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'blogs' }, () => fetchRecentActivity())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'buyer_requirements' }, () => fetchRecentActivity())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   return (
