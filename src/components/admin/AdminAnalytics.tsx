@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { AnalyticsDateFilter, getDateRangeForPreset } from './analytics/AnalyticsDateFilter';
 import { AnalyticsStatsCards } from './analytics/AnalyticsStatsCards';
 import { LiveActivityFeed } from './analytics/LiveActivityFeed';
@@ -22,6 +25,7 @@ import type { DateRange, PresetRange } from './analytics/AnalyticsDateFilter';
 export function AdminAnalytics() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [presetRange, setPresetRange] = useState<PresetRange>('6months');
+  const analyticsRef = useRef<HTMLDivElement>(null);
 
   // Initialize with 6 months default
   const [initialized, setInitialized] = useState(false);
@@ -32,6 +36,44 @@ export function AdminAnalytics() {
   }
 
   const { analytics, loading } = useAnalyticsData(dateRange);
+
+  const handleExport = useCallback(async () => {
+    if (!analyticsRef.current) return;
+    const toastId = toast.loading('Generating PDF…');
+    try {
+      const canvas = await html2canvas(analyticsRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: analyticsRef.current.scrollWidth,
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth - 20; // 10mm margin each side
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let yPos = 10;
+      let remainingHeight = imgHeight;
+
+      // Multi-page support
+      while (remainingHeight > 0) {
+        pdf.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
+        remainingHeight -= (pdfHeight - 20);
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          yPos = -(imgHeight - remainingHeight - 10);
+        }
+      }
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      pdf.save(`analytics-report-${dateStr}.pdf`);
+      toast.success('PDF downloaded successfully', { id: toastId });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF', { id: toastId });
+    }
+  }, []);
 
   const handlePresetChange = (preset: PresetRange) => {
     setPresetRange(preset);
@@ -77,13 +119,10 @@ export function AdminAnalytics() {
         onPresetChange={handlePresetChange}
         onDateSelect={handleDateSelect}
         onClear={clearDateFilter}
-        onExport={() => {
-          // Placeholder for CSV export
-          console.log('Export analytics');
-        }}
+        onExport={handleExport}
       />
 
-      {/* Stats Cards */}
+      <div ref={analyticsRef} className="space-y-6">
       <AnalyticsStatsCards
         totalUsers={analytics.totalUsers}
         activeUsers={analytics.activeUsers}
@@ -172,6 +211,7 @@ export function AdminAnalytics() {
 
       {/* Blog Traffic */}
       <TrafficCharts blogViewsData={analytics.blogViewsData} />
+      </div>
     </div>
   );
 }
