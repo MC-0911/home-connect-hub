@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RichTextEditor } from './RichTextEditor';
 import { BlogCoverImagePicker } from './BlogCoverImagePicker';
 import { BlogContentPreview } from './BlogContentPreview';
+import { BlogPostPreview } from './BlogPostPreview';
 import { BlogAuthorSelector } from './BlogAuthorSelector';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock, Timer } from 'lucide-react';
@@ -469,7 +470,10 @@ export function BlogsTable() {
                   <Tabs defaultValue="edit" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="edit">Edit</TabsTrigger>
-                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                      <TabsTrigger value="preview">
+                        <Eye className="h-3.5 w-3.5 mr-1.5" />
+                        Preview
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="edit" className="mt-3">
@@ -486,12 +490,15 @@ export function BlogsTable() {
                     </TabsContent>
 
                     <TabsContent value="preview" className="mt-3">
-                      <div className="rounded-md border bg-background p-4">
-                        {formData.content ? (
-                          <BlogContentPreview html={formData.content} />
-                        ) : (
-                          <p className="text-sm text-muted-foreground">Nothing to preview yet.</p>
-                        )}
+                      <div className="rounded-md border bg-background p-6 max-h-[60vh] overflow-y-auto">
+                        <BlogPostPreview
+                          title={formData.title}
+                          content={formData.content}
+                          coverImage={formData.cover_image}
+                          excerpt={formData.excerpt}
+                          authorName={formData.author_name}
+                          authorAvatarUrl={formData.author_avatar_url}
+                        />
                       </div>
                     </TabsContent>
                   </Tabs>
