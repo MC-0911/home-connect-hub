@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfDay, endOfDay } from 'date-fns';
 import type { DateRange } from './AnalyticsDateFilter';
@@ -55,6 +55,13 @@ const INITIAL: AnalyticsData = {
 export function useAnalyticsData(dateRange: DateRange) {
   const [analytics, setAnalytics] = useState<AnalyticsData>(INITIAL);
   const [loading, setLoading] = useState(true);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetchRef = useRef<(silent?: boolean) => Promise<void>>();
+
+  const debouncedSilentFetch = useCallback(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => fetchRef.current?.(true), 2000);
+  }, []);
 
   const fetchAnalytics = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -164,25 +171,31 @@ export function useAnalyticsData(dateRange: DateRange) {
     }
   };
 
+  // Keep fetchRef in sync so debounced callback uses latest closure
+  fetchRef.current = fetchAnalytics;
+
   // Initial fetch + refetch on dateRange change
   useEffect(() => {
     fetchAnalytics();
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
   }, [dateRange]);
 
-  // Realtime subscriptions — silent refetch on any table change
+  // Realtime subscriptions — debounced silent refetch on any table change
   useEffect(() => {
     const channel = supabase
       .channel('analytics-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchAnalytics(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => fetchAnalytics(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'blogs' }, () => fetchAnalytics(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'buyer_requirements' }, () => fetchAnalytics(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'property_offers' }, () => fetchAnalytics(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'blog_views' }, () => fetchAnalytics(true))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blogs' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'buyer_requirements' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'property_offers' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blog_views' }, debouncedSilentFetch)
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [dateRange]);
+  }, [debouncedSilentFetch]);
 
   return { analytics, loading };
 }
