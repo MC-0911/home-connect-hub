@@ -118,7 +118,29 @@ export function BlogsTable() {
     status: 'draft'
   });
 
-  const { autosaveStatus } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen);
+  const handleDraftCreated = (newId: string) => {
+    // Switch from "create" mode to "edit" mode so subsequent autosaves use UPDATE
+    setEditingBlog((prev) => ({
+      id: newId,
+      title: formData.title,
+      slug: formData.slug,
+      excerpt: formData.excerpt,
+      content: formData.content,
+      cover_image: formData.cover_image,
+      author_id: formData.author_id,
+      author_name: formData.author_name,
+      author_avatar_url: formData.author_avatar_url,
+      status: formData.status,
+      views: 0,
+      publish_at: null,
+      published_at: null,
+      created_at: new Date().toISOString(),
+    }));
+    toast.success('Draft created automatically');
+    fetchBlogs();
+  };
+
+  const { autosaveStatus } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen, handleDraftCreated);
 
   const localDateTimeToIso = (localValue: string) => {
     if (!localValue) return null;
@@ -174,6 +196,7 @@ export function BlogsTable() {
       const { publish_at_local, ...blogDataForDb } = blogData as any;
 
       if (editingBlog) {
+        // Either a manually opened edit OR an auto-created draft – always UPDATE
         const {
           error
         } = await supabase.from('blogs').update(blogDataForDb).eq('id', editingBlog.id);
@@ -441,35 +464,33 @@ export function BlogsTable() {
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <div className="flex items-center justify-between gap-4">
-                  <DialogTitle>{editingBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
-                  {editingBlog && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
-                      {autosaveStatus === 'saving' && (
-                        <>
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          <span>Saving…</span>
-                        </>
-                      )}
-                      {autosaveStatus === 'saved' && (
-                        <>
-                          <Save className="h-3 w-3 text-green-600" />
-                          <span className="text-green-600">Autosaved</span>
-                        </>
-                      )}
-                      {autosaveStatus === 'error' && (
-                        <>
-                          <AlertCircle className="h-3 w-3 text-destructive" />
-                          <span className="text-destructive">Save failed</span>
-                        </>
-                      )}
-                      {autosaveStatus === 'idle' && editingBlog && (
-                        <>
-                          <Save className="h-3 w-3" />
-                          <span>Autosave on</span>
-                        </>
-                      )}
-                    </div>
-                  )}
+                   <DialogTitle>{editingBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
+                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                     {autosaveStatus === 'saving' && (
+                       <>
+                         <Loader2 className="h-3 w-3 animate-spin" />
+                         <span>Saving…</span>
+                       </>
+                     )}
+                     {autosaveStatus === 'saved' && (
+                       <>
+                         <Save className="h-3 w-3 text-green-600" />
+                         <span className="text-green-600">Autosaved</span>
+                       </>
+                     )}
+                     {autosaveStatus === 'error' && (
+                       <>
+                         <AlertCircle className="h-3 w-3 text-destructive" />
+                         <span className="text-destructive">Save failed</span>
+                       </>
+                     )}
+                     {autosaveStatus === 'idle' && (
+                       <>
+                         <Save className="h-3 w-3" />
+                         <span>Autosave on</span>
+                       </>
+                     )}
+                   </div>
                 </div>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
