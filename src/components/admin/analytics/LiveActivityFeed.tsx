@@ -6,14 +6,7 @@ import { Home, UserPlus, DollarSign, CalendarCheck, FileText, Activity } from 'l
 import { formatDistanceToNow, startOfDay, endOfDay } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface ActivityItem {
-  id: string;
-  type: 'listing' | 'signup' | 'offer' | 'visit' | 'blog' | 'lead';
-  title: string;
-  description: string;
-  timestamp: string;
-}
+import { ActivityDetailModal, type ActivityItemFull } from './ActivityDetailModal';
 
 interface LiveActivityFeedProps {
   fromDate?: Date;
@@ -30,8 +23,10 @@ const ACTIVITY_CONFIG = {
 };
 
 export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [activities, setActivities] = useState<ActivityItemFull[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityItemFull | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchRecentActivity = async (silent = false) => {
@@ -40,12 +35,13 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
         const from = fromDate ? startOfDay(fromDate).toISOString() : null;
         const to = toDate ? endOfDay(toDate).toISOString() : null;
 
-        let listingsQ = supabase.from('properties').select('id, title, created_at').order('created_at', { ascending: false });
-        let profilesQ = supabase.from('profiles').select('id, full_name, created_at').order('created_at', { ascending: false });
-        let offersQ = supabase.from('property_offers').select('id, offer_amount, created_at').order('created_at', { ascending: false });
-        let visitsQ = supabase.from('property_visits').select('id, preferred_date, created_at').order('created_at', { ascending: false });
-        let blogsQ = supabase.from('blogs').select('id, title, created_at').order('created_at', { ascending: false });
-        let leadsQ = supabase.from('buyer_requirements').select('id, full_name, created_at').order('created_at', { ascending: false });
+        // Fetch richer data for detail modals
+        let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at').order('created_at', { ascending: false });
+        let profilesQ = supabase.from('profiles').select('id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
+        let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at').order('created_at', { ascending: false });
+        let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at').order('created_at', { ascending: false });
+        let blogsQ = supabase.from('blogs').select('id, title, slug, author_name, status, views, excerpt, created_at').order('created_at', { ascending: false });
+        let leadsQ = supabase.from('buyer_requirements').select('id, full_name, email, phone, property_type, requirement_type, min_budget, max_budget, min_bedrooms, preferred_locations, status, created_at').order('created_at', { ascending: false });
 
         if (from) {
           listingsQ = listingsQ.gte('created_at', from);
@@ -68,7 +64,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
           listingsQ, profilesQ, offersQ, visitsQ, blogsQ, leadsQ,
         ]);
 
-        const items: ActivityItem[] = [];
+        const items: ActivityItemFull[] = [];
 
         listingsRes.data?.forEach((l) =>
           items.push({
@@ -77,6 +73,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'New Listing',
             description: `Property "${l.title}" was listed`,
             timestamp: l.created_at,
+            metadata: { ...l, entity_id: l.id },
           })
         );
 
@@ -87,6 +84,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'New Signup',
             description: `${p.full_name || 'A user'} joined the platform`,
             timestamp: p.created_at,
+            metadata: { ...p },
           })
         );
 
@@ -95,8 +93,9 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             id: `offer-${o.id}`,
             type: 'offer',
             title: 'New Offer',
-            description: `Offer of $${o.offer_amount?.toLocaleString()} submitted`,
+            description: `Offer of ₦${o.offer_amount?.toLocaleString()} submitted`,
             timestamp: o.created_at,
+            metadata: { ...o },
           })
         );
 
@@ -107,6 +106,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'Visit Request',
             description: `Visit scheduled for ${v.preferred_date}`,
             timestamp: v.created_at,
+            metadata: { ...v },
           })
         );
 
@@ -117,6 +117,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'New Blog',
             description: `"${b.title}" was created`,
             timestamp: b.created_at,
+            metadata: { ...b },
           })
         );
 
@@ -127,6 +128,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'New Lead',
             description: `${l.full_name} submitted requirements`,
             timestamp: l.created_at,
+            metadata: { ...l },
           })
         );
 
@@ -141,7 +143,6 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
 
     fetchRecentActivity();
 
-    // Realtime: refresh feed when key tables change
     const channel = supabase
       .channel('activity-feed-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'properties' }, () => fetchRecentActivity(true))
@@ -155,75 +156,89 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
     return () => { supabase.removeChannel(channel); };
   }, [fromDate, toDate]);
 
+  const handleActivityClick = (item: ActivityItemFull) => {
+    setSelectedActivity(item);
+    setModalOpen(true);
+  };
+
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
-            Live Activity Feed
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-[10px]">
-              {activities.length} activities
-            </Badge>
-            <Badge variant="outline" className="text-[10px] gap-1 animate-pulse">
-              <span className="h-1.5 w-1.5 rounded-full bg-success inline-block" />
-              Live
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[340px] px-4 pb-4">
-          {loading ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex gap-3 animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-muted shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 bg-muted rounded w-24" />
-                    <div className="h-3 bg-muted rounded w-40" />
-                  </div>
-                </div>
-              ))}
+    <>
+      <Card className="h-full">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <Activity className="h-4 w-4 text-primary" />
+              Live Activity Feed
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-[10px]">
+                {activities.length} activities
+              </Badge>
+              <Badge variant="outline" className="text-[10px] gap-1 animate-pulse">
+                <span className="h-1.5 w-1.5 rounded-full bg-success inline-block" />
+                Live
+              </Badge>
             </div>
-          ) : activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No recent activity</p>
-          ) : (
-            <AnimatePresence>
-              <div className="space-y-1">
-                {activities.map((item, index) => {
-                  const config = ACTIVITY_CONFIG[item.type];
-                  const Icon = config.icon;
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: Math.min(index * 0.02, 0.5) }}
-                      className="flex gap-3 py-2.5 border-b border-border/50 last:border-0"
-                    >
-                      <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
-                        <Icon className={`h-3.5 w-3.5 ${config.color}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-foreground">{config.label}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ScrollArea className="h-[340px] px-4 pb-4">
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex gap-3 animate-pulse">
+                    <div className="w-8 h-8 rounded-full bg-muted shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 bg-muted rounded w-24" />
+                      <div className="h-3 bg-muted rounded w-40" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </AnimatePresence>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
+            ) : activities.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">No recent activity</p>
+            ) : (
+              <AnimatePresence>
+                <div className="space-y-1">
+                  {activities.map((item, index) => {
+                    const config = ACTIVITY_CONFIG[item.type];
+                    const Icon = config.icon;
+                    return (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: Math.min(index * 0.02, 0.5) }}
+                        onClick={() => handleActivityClick(item)}
+                        className="flex gap-3 py-2.5 border-b border-border/50 last:border-0 cursor-pointer rounded-md px-1 -mx-1 transition-colors hover:bg-muted/50"
+                      >
+                        <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
+                          <Icon className={`h-3.5 w-3.5 ${config.color}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-foreground">{config.label}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{item.description}</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </AnimatePresence>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <ActivityDetailModal
+        activity={selectedActivity}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
+    </>
   );
 }
