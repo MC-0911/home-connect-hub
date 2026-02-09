@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useBlogAutosave } from '@/hooks/useBlogAutosave';
 import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ import { BlogContentPreview } from './BlogContentPreview';
 import { BlogPostPreview } from './BlogPostPreview';
 import { BlogAuthorSelector } from './BlogAuthorSelector';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock, Timer } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, MoreVertical, MoreHorizontal, CheckCircle, Eye, Clock, Timer, Save, Loader2, AlertCircle } from 'lucide-react';
 import { format, formatDistanceToNow, differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -116,6 +117,8 @@ export function BlogsTable() {
     publish_at_local: '' as string,
     status: 'draft'
   });
+
+  const { autosaveStatus } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen);
 
   const localDateTimeToIso = (localValue: string) => {
     if (!localValue) return null;
@@ -437,7 +440,37 @@ export function BlogsTable() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editingBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
+                <div className="flex items-center justify-between gap-4">
+                  <DialogTitle>{editingBlog ? 'Edit Blog' : 'Create New Blog'}</DialogTitle>
+                  {editingBlog && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
+                      {autosaveStatus === 'saving' && (
+                        <>
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Saving…</span>
+                        </>
+                      )}
+                      {autosaveStatus === 'saved' && (
+                        <>
+                          <Save className="h-3 w-3 text-green-600" />
+                          <span className="text-green-600">Autosaved</span>
+                        </>
+                      )}
+                      {autosaveStatus === 'error' && (
+                        <>
+                          <AlertCircle className="h-3 w-3 text-destructive" />
+                          <span className="text-destructive">Save failed</span>
+                        </>
+                      )}
+                      {autosaveStatus === 'idle' && editingBlog && (
+                        <>
+                          <Save className="h-3 w-3" />
+                          <span>Autosave on</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
