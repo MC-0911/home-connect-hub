@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 interface BlogFormData {
   title: string;
@@ -21,17 +20,22 @@ const AUTOSAVE_INTERVAL_MS = 30_000;
 
 /**
  * Autosaves blog draft content every 30 seconds when the editor dialog is open.
- * Only autosaves for existing blogs (editingBlogId must be set).
- * Compares a snapshot to detect real changes and avoid unnecessary writes.
+ *
+ * For **existing** blogs (editingBlogId is set) it updates the row.
+ * For **new** blogs (editingBlogId is null) it auto-creates a draft row on the
+ * first autosave cycle when the title & slug are filled, then switches to
+ * update mode via the `onDraftCreated` callback.
  */
 export function useBlogAutosave(
   formData: BlogFormData,
   editingBlogId: string | null,
-  isDialogOpen: boolean
+  isDialogOpen: boolean,
+  onDraftCreated?: (id: string) => void
 ) {
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>('idle');
   const lastSavedSnapshot = useRef<string>('');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const creatingRef = useRef(false); // guards against double-insert
 
   const getSnapshot = useCallback((data: BlogFormData) => {
     return JSON.stringify({
@@ -48,66 +52,98 @@ export function useBlogAutosave(
     });
   }, []);
 
-  // Keep a mutable ref to formData so the interval always reads the latest
+  // Mutable refs so the interval always reads the latest values
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
 
-  const save = useCallback(async () => {
-    if (!editingBlogId) return;
+  const editingIdRef = useRef(editingBlogId);
+  editingIdRef.current = editingBlogId;
 
+  const onDraftCreatedRef = useRef(onDraftCreated);
+  onDraftCreatedRef.current = onDraftCreated;
+
+  const parsePublishAt = (local: string) => {
+    if (!local) return null;
+    const d = new Date(local);
+    return Number.isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
+  const buildPayload = (current: BlogFormData) => {
+    const publishAtIso = parsePublishAt(current.publish_at_local);
+    return {
+      title: current.title,
+      slug: current.slug,
+      excerpt: current.excerpt || null,
+      content: current.content,
+      cover_image: current.cover_image || null,
+      author_id: current.author_id || null,
+      author_name: current.author_name || null,
+      author_avatar_url: current.author_avatar_url || null,
+      publish_at: publishAtIso,
+      status: publishAtIso ? 'scheduled' : current.status,
+    };
+  };
+
+  const save = useCallback(async () => {
+    const currentId = editingIdRef.current;
     const current = formDataRef.current;
     const snapshot = getSnapshot(current);
-
-    // Skip if nothing changed since last save
-    if (snapshot === lastSavedSnapshot.current) return;
 
     // Don't autosave if title or slug is empty (required fields)
     if (!current.title.trim() || !current.slug.trim()) return;
 
+    // Skip if nothing changed since last save
+    if (snapshot === lastSavedSnapshot.current) return;
+
     setAutosaveStatus('saving');
 
     try {
-      const publishAtIso = current.publish_at_local
-        ? (() => {
-            const d = new Date(current.publish_at_local);
-            return Number.isNaN(d.getTime()) ? null : d.toISOString();
-          })()
-        : null;
+      if (currentId) {
+        // --- UPDATE existing blog ---
+        const { error } = await supabase
+          .from('blogs')
+          .update(buildPayload(current))
+          .eq('id', currentId);
 
-      const { error } = await supabase
-        .from('blogs')
-        .update({
-          title: current.title,
-          slug: current.slug,
-          excerpt: current.excerpt || null,
-          content: current.content,
-          cover_image: current.cover_image || null,
-          author_id: current.author_id || null,
-          author_name: current.author_name || null,
-          author_avatar_url: current.author_avatar_url || null,
-          publish_at: publishAtIso,
-          status: publishAtIso ? 'scheduled' : current.status,
-        })
-        .eq('id', editingBlogId);
+        if (error) throw error;
+      } else {
+        // --- CREATE a new draft ---
+        if (creatingRef.current) return; // prevent double insert
+        creatingRef.current = true;
 
-      if (error) throw error;
+        const { data, error } = await supabase
+          .from('blogs')
+          .insert([buildPayload(current)])
+          .select('id')
+          .single();
+
+        creatingRef.current = false;
+
+        if (error) throw error;
+
+        // Notify the parent so it can switch to "edit" mode
+        if (data?.id) {
+          onDraftCreatedRef.current?.(data.id);
+        }
+      }
 
       lastSavedSnapshot.current = snapshot;
       setAutosaveStatus('saved');
     } catch (err) {
+      creatingRef.current = false;
       console.error('Autosave failed:', err);
       setAutosaveStatus('error');
     }
-  }, [editingBlogId, getSnapshot]);
+  }, [getSnapshot]);
 
   // Start / stop the interval when the dialog opens / closes
   useEffect(() => {
-    if (!isDialogOpen || !editingBlogId) {
-      // Reset on close
+    if (!isDialogOpen) {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
       setAutosaveStatus('idle');
       lastSavedSnapshot.current = '';
+      creatingRef.current = false;
       return;
     }
 
@@ -120,7 +156,7 @@ export function useBlogAutosave(
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = null;
     };
-  }, [isDialogOpen, editingBlogId, save, getSnapshot]);
+  }, [isDialogOpen, save, getSnapshot]);
 
   return { autosaveStatus };
 }
