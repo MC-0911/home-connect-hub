@@ -29,6 +29,7 @@ export interface AnalyticsData {
   propertiesByStatus: { name: string; value: number }[];
   leadsByStatus: { name: string; value: number }[];
   leadsByType: { name: string; value: number }[];
+  blogsByStatus: { name: string; value: number }[];
   blogViewsData: BlogViewData[];
   // Raw arrays for time-series charts
   rawListings: { created_at: string; property_type: string; status: string }[];
@@ -47,7 +48,7 @@ const INITIAL: AnalyticsData = {
   totalBlogs: 0, publishedBlogs: 0, draftBlogs: 0,
   totalLeads: 0, newLeads: 0, contactedLeads: 0, qualifiedLeads: 0,
   totalBlogViews: 0,
-  listingsByType: [], propertiesByStatus: [], leadsByStatus: [], leadsByType: [],
+  listingsByType: [], propertiesByStatus: [], leadsByStatus: [], leadsByType: [], blogsByStatus: [],
   blogViewsData: [],
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
   rawBlogViews: [], rawSoldListings: [], rawBlogs: [],
@@ -150,12 +151,18 @@ export function useAnalyticsData(dateRange: DateRange) {
 
       const totalBlogViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
 
+      const bsc: Record<string, number> = {};
+      blogs.forEach((b) => { const s = b.status || 'draft'; bsc[s] = (bsc[s] || 0) + 1; });
+      const blogsByStatus = Object.entries(bsc).map(([name, value]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1), value,
+      }));
+
       setAnalytics({
         totalUsers: users.length, activeUsers, suspendedUsers,
         totalListings: listings.length, activeListings, pendingListings, soldListings,
         totalBlogs: blogs.length, publishedBlogs, draftBlogs,
         totalLeads: leads.length, newLeads, contactedLeads, qualifiedLeads,
-        totalBlogViews, listingsByType, propertiesByStatus, leadsByStatus, leadsByType, blogViewsData,
+        totalBlogViews, listingsByType, propertiesByStatus, leadsByStatus, leadsByType, blogsByStatus, blogViewsData,
         rawListings: listings.map((l) => ({ created_at: l.created_at, property_type: l.property_type, status: l.status || 'active' })),
         rawUsers: users.map((u) => ({ created_at: u.created_at })),
         rawOffers: offers.map((o) => ({ status: o.status, created_at: o.created_at, offer_amount: o.offer_amount })),
