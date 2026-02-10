@@ -52,6 +52,14 @@ function ListingDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Bathrooms" value={meta.bathrooms} />
       <DetailRow label="Square Feet" value={meta.square_feet ? `${Number(meta.square_feet).toLocaleString()} sqft` : undefined} />
       <DetailRow label="Status" value={<Badge variant="outline" className="text-xs">{meta.status}</Badge>} />
+      <DetailRow label="User" value={
+        (meta.owner_name || meta.owner_email) ? (
+          <div>
+            <div>{meta.owner_name || 'Not provided'}</div>
+            {meta.owner_email && <div className="text-xs text-muted-foreground">{meta.owner_email}</div>}
+          </div>
+        ) : undefined
+      } />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
         const to = toDate ? endOfDay(toDate).toISOString() : null;
 
         // Fetch richer data for detail modals
-        let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at').order('created_at', { ascending: false });
+        let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at, user_id').order('created_at', { ascending: false });
         let profilesQ = supabase.from('profiles').select('id, user_id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
         let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at').order('created_at', { ascending: false });
         let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at').order('created_at', { ascending: false });
@@ -70,16 +70,17 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
 
         const items: ActivityItemFull[] = [];
 
-        listingsRes.data?.forEach((l) =>
+        listingsRes.data?.forEach((l) => {
+          const ownerProfile = profilesRes.data?.find((p) => p.user_id === l.user_id);
           items.push({
             id: `listing-${l.id}`,
             type: 'listing',
             title: 'New Listing',
             description: `Property "${l.title}" was listed`,
             timestamp: l.created_at,
-            metadata: { ...l, entity_id: l.id },
-          })
-        );
+            metadata: { ...l, entity_id: l.id, owner_name: ownerProfile?.full_name, owner_email: emailMap.get(l.user_id) },
+          });
+        });
 
         profilesRes.data?.forEach((p) =>
           items.push({
