@@ -354,7 +354,7 @@ interface BlogActivityOverTimeProps {
   toDate?: Date;
 }
 
-export function BlogActivityOverTimeChart({ blogs, blogViews, fromDate, toDate }: BlogActivityOverTimeProps) {
+export function BlogActivityOverTimeChart({ blogs = [], blogViews = [], fromDate, toDate }: BlogActivityOverTimeProps) {
   const now = toDate || new Date();
   const start = fromDate || subMonths(now, 6);
   const months = eachMonthOfInterval({ start: startOfMonth(start), end: startOfMonth(now) });
