@@ -37,7 +37,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
 
         // Fetch richer data for detail modals
         let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at').order('created_at', { ascending: false });
-        let profilesQ = supabase.from('profiles').select('id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
+        let profilesQ = supabase.from('profiles').select('id, user_id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
         let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at').order('created_at', { ascending: false });
         let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at').order('created_at', { ascending: false });
         let blogsQ = supabase.from('blogs').select('id, title, slug, author_name, status, views, excerpt, created_at').order('created_at', { ascending: false });
@@ -60,9 +60,13 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
           leadsQ = leadsQ.lte('created_at', to);
         }
 
-        const [listingsRes, profilesRes, offersRes, visitsRes, blogsRes, leadsRes] = await Promise.all([
+        const [listingsRes, profilesRes, offersRes, visitsRes, blogsRes, leadsRes, emailsRes] = await Promise.all([
           listingsQ, profilesQ, offersQ, visitsQ, blogsQ, leadsQ,
+          supabase.rpc('get_user_emails'),
         ]);
+
+        const emailMap = new Map<string, string>();
+        emailsRes.data?.forEach((e: { user_id: string; email: string }) => emailMap.set(e.user_id, e.email));
 
         const items: ActivityItemFull[] = [];
 
@@ -84,7 +88,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             title: 'New Signup',
             description: `${p.full_name || 'A user'} joined the platform`,
             timestamp: p.created_at,
-            metadata: { ...p },
+            metadata: { ...p, email: emailMap.get(p.user_id) },
           })
         );
 
