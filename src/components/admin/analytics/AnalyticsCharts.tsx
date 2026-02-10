@@ -345,6 +345,51 @@ export function LeadsCharts({ leadsByStatus, leadsByType, leadsRaw, fromDate, to
   );
 }
 
+// ─── Blog Activity Over Time ───────────────────────────────────────
+
+interface BlogActivityOverTimeProps {
+  blogs: { created_at: string }[];
+  blogViews: { viewed_at: string }[];
+  fromDate?: Date;
+  toDate?: Date;
+}
+
+export function BlogActivityOverTimeChart({ blogs, blogViews, fromDate, toDate }: BlogActivityOverTimeProps) {
+  const now = toDate || new Date();
+  const start = fromDate || subMonths(now, 6);
+  const months = eachMonthOfInterval({ start: startOfMonth(start), end: startOfMonth(now) });
+
+  const data = months.map((m) => {
+    const key = format(m, 'MMM yyyy');
+    const newPosts = blogs.filter((b) => format(startOfMonth(parseISO(b.created_at)), 'MMM yyyy') === key).length;
+    const views = blogViews.filter((v) => format(startOfMonth(parseISO(v.viewed_at)), 'MMM yyyy') === key).length;
+    return { name: key, newPosts, views };
+  });
+
+  return (
+    <ChartCard
+      title="Blog Activity Over Time"
+      subtitle={fromDate && toDate ? `${format(fromDate, 'MMM d, yyyy')} - ${format(toDate, 'MMM d, yyyy')}` : undefined}
+      delay={0.85}
+    >
+      {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 11 }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Line type="monotone" dataKey="newPosts" stroke={CHART_COLORS.secondary} strokeWidth={2} dot={{ r: 4 }} name="New Posts" />
+            <Line type="monotone" dataKey="views" stroke={CHART_COLORS.accent} strokeWidth={2} dot={{ r: 4 }} name="Views" />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <EmptyState message="No blog activity data available" />
+      )}
+    </ChartCard>
+  );
+}
+
 interface TrafficChartsProps {
   blogViewsData: { title: string; views: number }[];
 }

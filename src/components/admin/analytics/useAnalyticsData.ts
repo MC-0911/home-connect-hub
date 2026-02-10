@@ -38,6 +38,7 @@ export interface AnalyticsData {
   // Traffic & Revenue
   rawBlogViews: { viewed_at: string }[];
   rawSoldListings: { created_at: string; price: number; updated_at: string }[];
+  rawBlogs: { created_at: string }[];
 }
 
 const INITIAL: AnalyticsData = {
@@ -49,7 +50,7 @@ const INITIAL: AnalyticsData = {
   listingsByType: [], propertiesByStatus: [], leadsByStatus: [], leadsByType: [],
   blogViewsData: [],
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
-  rawBlogViews: [], rawSoldListings: [],
+  rawBlogViews: [], rawSoldListings: [], rawBlogs: [],
 };
 
 export function useAnalyticsData(dateRange: DateRange) {
@@ -163,6 +164,7 @@ export function useAnalyticsData(dateRange: DateRange) {
         rawSoldListings: listings
           .filter((l) => l.status === 'sold')
           .map((l) => ({ created_at: l.created_at, price: (l as any).price || 0, updated_at: (l as any).updated_at || l.created_at })),
+        rawBlogs: blogs.map((b) => ({ created_at: b.created_at })),
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);

@@ -16,6 +16,7 @@ import {
   OffersCharts,
   LeadsCharts,
   TrafficCharts,
+  BlogActivityOverTimeChart,
   TrafficOverviewChart,
   RevenueTrendChart,
 } from './analytics/AnalyticsCharts';
@@ -205,6 +206,14 @@ export function AdminAnalytics() {
         leadsByStatus={analytics.leadsByStatus}
         leadsByType={analytics.leadsByType}
         leadsRaw={analytics.rawLeads}
+        fromDate={dateRange.from}
+        toDate={dateRange.to}
+      />
+
+      {/* Blog Activity Over Time */}
+      <BlogActivityOverTimeChart
+        blogs={analytics.rawBlogs}
+        blogViews={analytics.rawBlogViews}
         fromDate={dateRange.from}
         toDate={dateRange.to}
       />
