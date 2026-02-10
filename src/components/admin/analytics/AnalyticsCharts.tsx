@@ -184,7 +184,7 @@ interface DonutChartProps {
   showLegend?: boolean;
 }
 
-export function DonutChart({ data, title, delay = 0.5, showLegend = true }: DonutChartProps) {
+export function DonutChart({ data = [], title, delay = 0.5, showLegend = true }: DonutChartProps) {
   const total = data.reduce((s, d) => s + d.value, 0);
   return (
     <ChartCard title={title} delay={delay}>
