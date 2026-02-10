@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { Home, UserPlus, DollarSign, CalendarCheck, FileText, Activity, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -59,7 +59,20 @@ function ListingDetails({ meta }: { meta: Record<string, any> }) {
 function SignupDetails({ meta }: { meta: Record<string, any> }) {
   return (
     <div className="divide-y divide-border">
-      <DetailRow label="Full Name" value={meta.full_name || 'Not provided'} />
+      <DetailRow label="Date & Time" value={
+        meta.created_at ? (
+          <div>
+            <div>{format(new Date(meta.created_at), 'MMMM d, yyyy \'at\' h:mm a')}</div>
+            <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(meta.created_at), { addSuffix: true })}</div>
+          </div>
+        ) : undefined
+      } />
+      <DetailRow label="User" value={
+        <div>
+          <div>{meta.full_name || 'Not provided'}</div>
+          {meta.email && <div className="text-xs text-muted-foreground">{meta.email}</div>}
+        </div>
+      } />
       <DetailRow label="Phone" value={meta.phone} />
       <DetailRow label="Location" value={meta.location} />
       <DetailRow label="Bio" value={meta.bio} />
