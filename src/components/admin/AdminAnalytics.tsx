@@ -210,13 +210,16 @@ export function AdminAnalytics() {
         toDate={dateRange.to}
       />
 
-      {/* Blog Activity Over Time */}
-      <BlogActivityOverTimeChart
-        blogs={analytics.rawBlogs}
-        blogViews={analytics.rawBlogViews}
-        fromDate={dateRange.from}
-        toDate={dateRange.to}
-      />
+      {/* Blog Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BlogActivityOverTimeChart
+          blogs={analytics.rawBlogs}
+          blogViews={analytics.rawBlogViews}
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+        />
+        <DonutChart data={analytics.blogsByStatus} title="Blogs by Status" delay={0.9} />
+      </div>
 
       {/* Blog Traffic */}
       <TrafficCharts blogViewsData={analytics.blogViewsData} />
