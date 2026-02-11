@@ -96,6 +96,16 @@ function OfferDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Message" value={meta.message} />
       <DetailRow label="Counter Amount" value={meta.counter_amount ? `₦${Number(meta.counter_amount).toLocaleString()}` : undefined} />
       <DetailRow label="Expires" value={meta.expires_at ? format(new Date(meta.expires_at), 'MMM d, yyyy h:mm a') : undefined} />
+      <DetailRow label="User" value={
+        (meta.buyer_name || meta.buyer_email) ? (
+          <div>
+            <div>{meta.buyer_name || 'Not provided'}</div>
+            {meta.buyer_email && <div className="text-xs text-muted-foreground">{meta.buyer_email}</div>}
+          </div>
+        ) : undefined
+      } />
+      <DetailRow label="Property" value={meta.property_title} />
+      {meta.property_location && <DetailRow label="Location" value={meta.property_location} />}
     </div>
   );
 }
