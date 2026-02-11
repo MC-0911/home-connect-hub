@@ -38,8 +38,8 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
         // Fetch richer data for detail modals
         let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at, user_id').order('created_at', { ascending: false });
         let profilesQ = supabase.from('profiles').select('id, user_id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
-        let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at, user_id, property_id').order('created_at', { ascending: false });
-        let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at').order('created_at', { ascending: false });
+        let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at, user_id, property_id, seller_id').order('created_at', { ascending: false });
+        let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at, user_id, property_id, seller_id').order('created_at', { ascending: false });
         let blogsQ = supabase.from('blogs').select('id, title, slug, author_name, status, views, excerpt, created_at').order('created_at', { ascending: false });
         let leadsQ = supabase.from('buyer_requirements').select('id, full_name, email, phone, property_type, requirement_type, min_budget, max_budget, min_bedrooms, preferred_locations, status, created_at').order('created_at', { ascending: false });
 
@@ -96,26 +96,38 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
         offersRes.data?.forEach((o) => {
           const offerProfile = profilesRes.data?.find((p) => p.user_id === o.user_id);
           const offerProperty = listingsRes.data?.find((l) => l.id === o.property_id);
+          const ownerProfile = profilesRes.data?.find((p) => p.user_id === o.seller_id);
           items.push({
             id: `offer-${o.id}`,
             type: 'offer',
             title: 'New Offer',
             description: `Offer of ₦${o.offer_amount?.toLocaleString()} submitted`,
             timestamp: o.created_at,
-            metadata: { ...o, buyer_name: offerProfile?.full_name, buyer_email: emailMap.get(o.user_id), property_title: offerProperty?.title, property_location: [offerProperty?.city, offerProperty?.state].filter(Boolean).join(', ') },
+            metadata: { ...o, buyer_name: offerProfile?.full_name, buyer_email: emailMap.get(o.user_id), property_title: offerProperty?.title, property_location: [offerProperty?.city, offerProperty?.state].filter(Boolean).join(', '), owner_name: ownerProfile?.full_name, owner_email: emailMap.get(o.seller_id) },
           });
         });
 
-        visitsRes.data?.forEach((v) =>
+        visitsRes.data?.forEach((v) => {
+          const visitorProfile = profilesRes.data?.find((p) => p.user_id === v.user_id);
+          const visitProperty = listingsRes.data?.find((l) => l.id === v.property_id);
+          const ownerProfile = profilesRes.data?.find((p) => p.user_id === v.seller_id);
           items.push({
             id: `visit-${v.id}`,
             type: 'visit',
             title: 'Visit Request',
             description: `Visit scheduled for ${v.preferred_date}`,
             timestamp: v.created_at,
-            metadata: { ...v },
-          })
-        );
+            metadata: {
+              ...v,
+              visitor_name: visitorProfile?.full_name,
+              visitor_email: emailMap.get(v.user_id),
+              property_title: visitProperty?.title,
+              property_location: [visitProperty?.city, visitProperty?.state].filter(Boolean).join(', '),
+              owner_name: ownerProfile?.full_name,
+              owner_email: emailMap.get(v.seller_id),
+            },
+          });
+        });
 
         blogsRes.data?.forEach((b) =>
           items.push({
