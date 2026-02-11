@@ -96,11 +96,19 @@ function OfferDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Message" value={meta.message} />
       <DetailRow label="Counter Amount" value={meta.counter_amount ? `₦${Number(meta.counter_amount).toLocaleString()}` : undefined} />
       <DetailRow label="Expires" value={meta.expires_at ? format(new Date(meta.expires_at), 'MMM d, yyyy h:mm a') : undefined} />
-      <DetailRow label="User" value={
+      <DetailRow label="Buyer" value={
         (meta.buyer_name || meta.buyer_email) ? (
           <div>
             <div>{meta.buyer_name || 'Not provided'}</div>
             {meta.buyer_email && <div className="text-xs text-muted-foreground">{meta.buyer_email}</div>}
+          </div>
+        ) : undefined
+      } />
+      <DetailRow label="Property Owner" value={
+        (meta.owner_name || meta.owner_email) ? (
+          <div>
+            <div>{meta.owner_name || 'Not provided'}</div>
+            {meta.owner_email && <div className="text-xs text-muted-foreground">{meta.owner_email}</div>}
           </div>
         ) : undefined
       } />
@@ -118,6 +126,24 @@ function VisitDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Status" value={<Badge variant="outline" className="text-xs">{meta.status}</Badge>} />
       <DetailRow label="Message" value={meta.message} />
       <DetailRow label="Seller Notes" value={meta.seller_notes} />
+      <DetailRow label="Visitor" value={
+        (meta.visitor_name || meta.visitor_email) ? (
+          <div>
+            <div>{meta.visitor_name || 'Not provided'}</div>
+            {meta.visitor_email && <div className="text-xs text-muted-foreground">{meta.visitor_email}</div>}
+          </div>
+        ) : undefined
+      } />
+      <DetailRow label="Property Owner" value={
+        (meta.owner_name || meta.owner_email) ? (
+          <div>
+            <div>{meta.owner_name || 'Not provided'}</div>
+            {meta.owner_email && <div className="text-xs text-muted-foreground">{meta.owner_email}</div>}
+          </div>
+        ) : undefined
+      } />
+      <DetailRow label="Property" value={meta.property_title} />
+      {meta.property_location && <DetailRow label="Location" value={meta.property_location} />}
     </div>
   );
 }
