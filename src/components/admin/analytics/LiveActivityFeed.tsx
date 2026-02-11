@@ -38,7 +38,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
         // Fetch richer data for detail modals
         let listingsQ = supabase.from('properties').select('id, title, property_type, listing_type, price, city, state, bedrooms, bathrooms, square_feet, status, created_at, user_id').order('created_at', { ascending: false });
         let profilesQ = supabase.from('profiles').select('id, user_id, full_name, phone, location, bio, created_at').order('created_at', { ascending: false });
-        let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at').order('created_at', { ascending: false });
+        let offersQ = supabase.from('property_offers').select('id, offer_amount, status, message, counter_amount, expires_at, created_at, user_id, property_id').order('created_at', { ascending: false });
         let visitsQ = supabase.from('property_visits').select('id, preferred_date, preferred_time, status, message, seller_notes, created_at').order('created_at', { ascending: false });
         let blogsQ = supabase.from('blogs').select('id, title, slug, author_name, status, views, excerpt, created_at').order('created_at', { ascending: false });
         let leadsQ = supabase.from('buyer_requirements').select('id, full_name, email, phone, property_type, requirement_type, min_budget, max_budget, min_bedrooms, preferred_locations, status, created_at').order('created_at', { ascending: false });
@@ -93,16 +93,18 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
           })
         );
 
-        offersRes.data?.forEach((o) =>
+        offersRes.data?.forEach((o) => {
+          const offerProfile = profilesRes.data?.find((p) => p.user_id === o.user_id);
+          const offerProperty = listingsRes.data?.find((l) => l.id === o.property_id);
           items.push({
             id: `offer-${o.id}`,
             type: 'offer',
             title: 'New Offer',
             description: `Offer of ₦${o.offer_amount?.toLocaleString()} submitted`,
             timestamp: o.created_at,
-            metadata: { ...o },
-          })
-        );
+            metadata: { ...o, buyer_name: offerProfile?.full_name, buyer_email: emailMap.get(o.user_id), property_title: offerProperty?.title, property_location: [offerProperty?.city, offerProperty?.state].filter(Boolean).join(', ') },
+          });
+        });
 
         visitsRes.data?.forEach((v) =>
           items.push({
