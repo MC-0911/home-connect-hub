@@ -475,10 +475,11 @@ export function TrafficOverviewChart({ blogViews, users, fromDate, toDate }: Tra
 // ─── Traffic Sources (Device Breakdown) ────────────────────────────
 
 interface TrafficSourcesProps {
+  deviceTraffic: { name: string; value: number }[];
   totalSessions: number;
 }
 
-const DEVICE_COLORS = {
+const DEVICE_COLORS: Record<string, string> = {
   Desktop: CHART_COLORS.accent,
   Mobile: CHART_COLORS.secondary,
   Tablet: CHART_COLORS.muted,
@@ -496,17 +497,17 @@ const DEVICE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-export function TrafficSourcesChart({ totalSessions }: TrafficSourcesProps) {
-  // Simulated device breakdown based on total sessions
-  const desktopPct = 60;
-  const mobilePct = 31;
-  const tabletPct = 9;
-
-  const data = [
-    { name: 'Desktop', value: Math.round(totalSessions * desktopPct / 100), pct: desktopPct },
-    { name: 'Mobile', value: Math.round(totalSessions * mobilePct / 100), pct: mobilePct },
-    { name: 'Tablet', value: Math.round(totalSessions * tabletPct / 100), pct: tabletPct },
-  ];
+export function TrafficSourcesChart({ deviceTraffic, totalSessions }: TrafficSourcesProps) {
+  const data = deviceTraffic.length > 0
+    ? deviceTraffic.map((d) => ({
+        ...d,
+        pct: totalSessions > 0 ? Math.round((d.value / totalSessions) * 100) : 0,
+      }))
+    : [
+        { name: 'Desktop', value: 0, pct: 0 },
+        { name: 'Mobile', value: 0, pct: 0 },
+        { name: 'Tablet', value: 0, pct: 0 },
+      ];
 
   return (
     <ChartCard title="Traffic Sources" subtitle={`Real-time · ${totalSessions.toLocaleString()} active sessions`} delay={0.42}>

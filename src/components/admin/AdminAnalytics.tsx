@@ -173,7 +173,8 @@ export function AdminAnalytics() {
       {/* Traffic Sources */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TrafficSourcesChart
-          totalSessions={analytics.totalBlogViews + analytics.totalUsers}
+          deviceTraffic={analytics.deviceTraffic}
+          totalSessions={analytics.totalSessions}
         />
         <UserGrowthChart
         items={analytics.rawUsers}

@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { usePageViewTracker } from "@/hooks/usePageViewTracker";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -29,6 +30,7 @@ const App = () => <HelmetProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <PageViewTracker />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/properties" element={<Properties />} />
@@ -52,4 +54,9 @@ const App = () => <HelmetProvider>
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>;
+function PageViewTracker() {
+  usePageViewTracker();
+  return null;
+}
+
 export default App;
