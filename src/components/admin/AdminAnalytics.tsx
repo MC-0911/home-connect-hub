@@ -19,6 +19,7 @@ import {
   BlogActivityOverTimeChart,
   TrafficOverviewChart,
   RevenueTrendChart,
+  TrafficSourcesChart,
 } from './analytics/AnalyticsCharts';
 import { useAnalyticsData } from './analytics/useAnalyticsData';
 import type { DateRange, PresetRange } from './analytics/AnalyticsDateFilter';
@@ -169,12 +170,17 @@ export function AdminAnalytics() {
         />
       </div>
 
-      {/* User Growth */}
-      <UserGrowthChart
+      {/* Traffic Sources */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TrafficSourcesChart
+          totalSessions={analytics.totalBlogViews + analytics.totalUsers}
+        />
+        <UserGrowthChart
         items={analytics.rawUsers}
-        fromDate={dateRange.from}
-        toDate={dateRange.to}
-      />
+          fromDate={dateRange.from}
+          toDate={dateRange.to}
+        />
+      </div>
 
       {/* Listings by Type + Properties by Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
