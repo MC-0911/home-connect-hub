@@ -40,6 +40,9 @@ export interface AnalyticsData {
   rawBlogViews: { viewed_at: string }[];
   rawSoldListings: { created_at: string; price: number; updated_at: string }[];
   rawBlogs: { created_at: string }[];
+  // Device traffic
+  deviceTraffic: { name: string; value: number }[];
+  totalSessions: number;
 }
 
 const INITIAL: AnalyticsData = {
@@ -52,6 +55,7 @@ const INITIAL: AnalyticsData = {
   blogViewsData: [],
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
   rawBlogViews: [], rawSoldListings: [], rawBlogs: [],
+  deviceTraffic: [], totalSessions: 0,
 };
 
 export function useAnalyticsData(dateRange: DateRange) {
@@ -77,6 +81,7 @@ export function useAnalyticsData(dateRange: DateRange) {
       let leadsQ = supabase.from('buyer_requirements').select('id, created_at, status, requirement_type');
       let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount');
       let blogViewsQ = supabase.from('blog_views').select('id, viewed_at');
+      let pageViewsQ = supabase.from('page_views').select('id, device_type, created_at');
 
       if (fromDate) {
         usersQ = usersQ.gte('created_at', fromDate);
@@ -85,6 +90,7 @@ export function useAnalyticsData(dateRange: DateRange) {
         leadsQ = leadsQ.gte('created_at', fromDate);
         offersQ = offersQ.gte('created_at', fromDate);
         blogViewsQ = blogViewsQ.gte('viewed_at', fromDate);
+        pageViewsQ = pageViewsQ.gte('created_at', fromDate);
       }
       if (toDate) {
         usersQ = usersQ.lte('created_at', toDate);
@@ -93,10 +99,11 @@ export function useAnalyticsData(dateRange: DateRange) {
         leadsQ = leadsQ.lte('created_at', toDate);
         offersQ = offersQ.lte('created_at', toDate);
         blogViewsQ = blogViewsQ.lte('viewed_at', toDate);
+        pageViewsQ = pageViewsQ.lte('created_at', toDate);
       }
 
-      const [usersRes, listingsRes, blogsRes, leadsRes, offersRes, blogViewsRes] = await Promise.all([
-        usersQ, listingsQ, blogsQ, leadsQ, offersQ, blogViewsQ,
+      const [usersRes, listingsRes, blogsRes, leadsRes, offersRes, blogViewsRes, pageViewsRes] = await Promise.all([
+        usersQ, listingsQ, blogsQ, leadsQ, offersQ, blogViewsQ, pageViewsQ,
       ]);
 
       const users = usersRes.data || [];
@@ -105,6 +112,34 @@ export function useAnalyticsData(dateRange: DateRange) {
       const leads = leadsRes.data || [];
       const offers = offersRes.data || [];
       const blogViews = blogViewsRes.data || [];
+      const pageViews = pageViewsRes.data || [];
+
+      // Device traffic from page_views
+      const deviceCounts: Record<string, number> = { Desktop: 0, Mobile: 0, Tablet: 0 };
+      const sessionDevices = new Map<string, string>();
+      pageViews.forEach((pv: any) => {
+        // Count unique sessions per device
+        if (!sessionDevices.has(pv.session_id)) {
+          // session_id not in select, count by device_type directly
+          const dt = (pv.device_type || 'desktop').toLowerCase();
+          const key = dt === 'mobile' ? 'Mobile' : dt === 'tablet' ? 'Tablet' : 'Desktop';
+          deviceCounts[key]++;
+        }
+      });
+      // If no session_id, just count rows by device_type
+      if (pageViews.length > 0) {
+        // Reset and count properly
+        deviceCounts.Desktop = 0; deviceCounts.Mobile = 0; deviceCounts.Tablet = 0;
+        pageViews.forEach((pv: any) => {
+          const dt = (pv.device_type || 'desktop').toLowerCase();
+          const key = dt === 'mobile' ? 'Mobile' : dt === 'tablet' ? 'Tablet' : 'Desktop';
+          deviceCounts[key]++;
+        });
+      }
+      const totalPageSessions = pageViews.length;
+      const deviceTraffic = Object.entries(deviceCounts)
+        .filter(([, v]) => v > 0)
+        .map(([name, value]) => ({ name, value }));
 
       const suspendedUsers = users.filter((u) => u.is_suspended === true).length;
       const activeUsers = users.length - suspendedUsers;
@@ -172,6 +207,8 @@ export function useAnalyticsData(dateRange: DateRange) {
           .filter((l) => l.status === 'sold')
           .map((l) => ({ created_at: l.created_at, price: (l as any).price || 0, updated_at: (l as any).updated_at || l.created_at })),
         rawBlogs: blogs.map((b) => ({ created_at: b.created_at })),
+        deviceTraffic,
+        totalSessions: totalPageSessions,
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -201,6 +238,7 @@ export function useAnalyticsData(dateRange: DateRange) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'buyer_requirements' }, debouncedSilentFetch)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'property_offers' }, debouncedSilentFetch)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'blog_views' }, debouncedSilentFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'page_views' }, debouncedSilentFetch)
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };

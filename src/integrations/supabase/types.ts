@@ -287,6 +287,30 @@ export type Database = {
           },
         ]
       }
+      page_views: {
+        Row: {
+          created_at: string
+          device_type: string
+          id: string
+          page_path: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string
+          id?: string
+          page_path?: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          device_type?: string
+          id?: string
+          page_path?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
