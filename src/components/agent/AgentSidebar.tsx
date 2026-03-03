@@ -3,14 +3,17 @@ import {
   FileText, BarChart3, Settings, LogOut, Home
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarHeader, SidebarFooter, SidebarSeparator, useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -34,6 +37,51 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [pendingVisits, setPendingVisits] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchCounts = async () => {
+      const { count: msgCount } = await supabase
+        .from("messages")
+        .select("*", { count: "exact", head: true })
+        .eq("is_read", false)
+        .neq("sender_id", user.id);
+      setUnreadMessages(msgCount || 0);
+
+      const { count: visitCount } = await supabase
+        .from("property_visits")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("status", "pending");
+      setPendingVisits(visitCount || 0);
+    };
+
+    fetchCounts();
+
+    const msgChannel = supabase
+      .channel("sidebar-messages")
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, fetchCounts)
+      .subscribe();
+
+    const visitChannel = supabase
+      .channel("sidebar-visits")
+      .on("postgres_changes", { event: "*", schema: "public", table: "property_visits" }, fetchCounts)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(msgChannel);
+      supabase.removeChannel(visitChannel);
+    };
+  }, [user]);
+
+  const getBadgeCount = (id: string) => {
+    if (id === "messages") return unreadMessages;
+    if (id === "calendar") return pendingVisits;
+    return 0;
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -63,18 +111,37 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    isActive={activeSection === item.id}
-                    onClick={() => onSectionChange(item.id)}
-                    tooltip={item.label}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {!collapsed && <span>{item.label}</span>}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const count = getBadgeCount(item.id);
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      isActive={activeSection === item.id}
+                      onClick={() => onSectionChange(item.id)}
+                      tooltip={item.label}
+                    >
+                      <div className="relative">
+                        <item.icon className="h-4 w-4" />
+                        {count > 0 && collapsed && (
+                          <span className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center">
+                            {count > 9 ? "9+" : count}
+                          </span>
+                        )}
+                      </div>
+                      {!collapsed && (
+                        <span className="flex-1 flex items-center justify-between">
+                          {item.label}
+                          {count > 0 && (
+                            <Badge variant="destructive" className="ml-auto h-5 min-w-[20px] px-1.5 text-[10px]">
+                              {count}
+                            </Badge>
+                          )}
+                        </span>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
