@@ -21,6 +21,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Messages from "./pages/Messages";
 import ServiceDetail from "./pages/ServiceDetail";
+import AgentDashboard from "./pages/AgentDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => <HelmetProvider>
@@ -47,6 +48,7 @@ const App = () => <HelmetProvider>
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/services/:slug" element={<ServiceDetail />} />
+              <Route path="/agent-dashboard" element={<AgentDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
