@@ -22,6 +22,7 @@ const Index = () => {
         <HowItWorks className="bg-secondary-foreground" />
         <PropertyTypes />
         <MapExplore className="bg-secondary-foreground" />
+        <UserTypeCards className="bg-background" />
         <ServicesSection className="bg-background" />
         <WhyChooseUs />
         <CTASection />
