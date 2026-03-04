@@ -2,6 +2,9 @@ import { motion } from "framer-motion";
 import { Search, Home, Briefcase, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import cardBuyers from "@/assets/card-buyers.jpg";
+import cardSellers from "@/assets/card-sellers.jpg";
+import cardAgents from "@/assets/card-agents.jpg";
 
 const userTypes = [
   {
@@ -16,6 +19,7 @@ const userTypes = [
     cta: "Start Searching",
     link: "/properties",
     accent: "accent",
+    image: cardBuyers,
   },
   {
     icon: Home,
@@ -29,6 +33,7 @@ const userTypes = [
     cta: "List Your Property",
     link: "/add-property",
     accent: "primary",
+    image: cardSellers,
   },
   {
     icon: Briefcase,
@@ -42,6 +47,7 @@ const userTypes = [
     cta: "Join as Agent",
     link: "/agent-dashboard",
     accent: "accent",
+    image: cardAgents,
   },
 ];
 
@@ -75,52 +81,63 @@ export function UserTypeCards({ className }: { className?: string }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="group relative bg-card border border-border rounded-2xl p-7 flex flex-col hover:shadow-elegant transition-all duration-300 hover:-translate-y-1"
+              className="group relative bg-card border border-border rounded-2xl overflow-hidden flex flex-col hover:shadow-elegant transition-all duration-300 hover:-translate-y-1"
             >
-              {/* Icon */}
-              <div
-                className={`w-14 h-14 rounded-xl flex items-center justify-center mb-5 ${
-                  type.accent === "accent"
-                    ? "bg-accent/10 text-accent"
-                    : "bg-primary/10 text-primary"
-                }`}
-              >
-                <type.icon className="w-7 h-7" />
+              {/* Background Image */}
+              <div className="relative h-44 overflow-hidden">
+                <img
+                  src={type.image}
+                  alt={type.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+                {/* Icon overlaid on image */}
+                <div
+                  className={`absolute bottom-4 left-7 w-14 h-14 rounded-xl flex items-center justify-center backdrop-blur-sm ${
+                    type.accent === "accent"
+                      ? "bg-accent/20 text-accent"
+                      : "bg-primary/20 text-primary"
+                  }`}
+                >
+                  <type.icon className="w-7 h-7" />
+                </div>
               </div>
 
-              {/* Title */}
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                {type.title}
-              </h3>
-              <p className="text-muted-foreground text-sm mb-5 leading-relaxed">
-                {type.description}
-              </p>
+              {/* Content */}
+              <div className="p-7 pt-4 flex flex-col flex-1">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  {type.title}
+                </h3>
+                <p className="text-muted-foreground text-sm mb-5 leading-relaxed">
+                  {type.description}
+                </p>
 
-              {/* Benefits */}
-              <ul className="space-y-3 mb-7 flex-1">
-                {type.benefits.map((benefit, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-foreground">
-                    <span
-                      className={`mt-1.5 h-2 w-2 rounded-full shrink-0 ${
-                        type.accent === "accent" ? "bg-accent" : "bg-primary"
-                      }`}
-                    />
-                    {benefit}
-                  </li>
-                ))}
-              </ul>
+                {/* Benefits */}
+                <ul className="space-y-3 mb-7 flex-1">
+                  {type.benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm text-foreground">
+                      <span
+                        className={`mt-1.5 h-2 w-2 rounded-full shrink-0 ${
+                          type.accent === "accent" ? "bg-accent" : "bg-primary"
+                        }`}
+                      />
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
 
-              {/* CTA */}
-              <Button
-                variant={type.accent === "accent" ? "gold" : "default"}
-                className="w-full"
-                asChild
-              >
-                <Link to={type.link}>
-                  {type.cta}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
+                {/* CTA */}
+                <Button
+                  variant={type.accent === "accent" ? "gold" : "default"}
+                  className="w-full"
+                  asChild
+                >
+                  <Link to={type.link}>
+                    {type.cta}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
             </motion.div>
           ))}
         </div>
