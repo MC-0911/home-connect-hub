@@ -432,30 +432,36 @@ export default function Dashboard() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
                 <TabsTrigger value="listings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Building2 className="w-4 h-4 mr-1" />
                   My Listings 
                 </TabsTrigger>
                 <TabsTrigger value="saved" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Heart className="w-4 h-4 mr-1" />
                   Saved 
                 </TabsTrigger>
                 <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
+                  <CalendarCheck className="w-4 h-4 mr-1" />
                   Visits
                   {pendingVisitsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
                       {pendingVisitsCount > 9 ? '9+' : pendingVisitsCount}
                     </Badge>}
                 </TabsTrigger>
                 <TabsTrigger value="offers" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
+                  <DollarSign className="w-4 h-4 mr-1" />
                   Offers
                   {pendingOffersCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
                       {pendingOffersCount > 9 ? '9+' : pendingOffersCount}
                     </Badge>}
                 </TabsTrigger>
                 <TabsTrigger value="messages" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
+                  <MessageSquare className="w-4 h-4 mr-1" />
                   Messages
                   {unreadCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </Badge>}
                 </TabsTrigger>
                 <TabsTrigger value="alerts" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
+                  <Bell className="w-4 h-4 mr-1" />
                   Alerts
                   {unreadAlertsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
                       {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
