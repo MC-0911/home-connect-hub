@@ -6,7 +6,6 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { PropertyTypes } from "@/components/home/PropertyTypes";
 import { MapExplore } from "@/components/home/MapExplore";
 import { UserTypeCards } from "@/components/home/UserTypeCards";
-import { Testimonials } from "@/components/home/Testimonials";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { CTASection } from "@/components/home/CTASection";
@@ -24,7 +23,6 @@ const Index = () => {
         <PropertyTypes />
         <MapExplore className="bg-secondary-foreground" />
         <UserTypeCards className="bg-background" />
-        <Testimonials className="bg-primary-foreground" />
         <ServicesSection className="bg-background" />
         <WhyChooseUs />
         <CTASection />
