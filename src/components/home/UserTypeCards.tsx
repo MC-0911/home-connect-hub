@@ -127,14 +127,17 @@ export function UserTypeCards({ className }: { className?: string }) {
 
               {/* Benefits */}
               <ul className="space-y-4 mb-6 flex-1 relative z-10">
-                {type.benefits.map((benefit, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
-                    <span className={`w-9 h-9 rounded-2xl flex items-center justify-center border border-white/25 shrink-0 bg-[rgba(110,180,255,0.15)] transition-all duration-200 ${markerColors[type.accentClass as keyof typeof markerColors]}`} style={{ boxShadow: "0 6px 14px rgba(0,30,60,0.7)" }}>
-                      <Zap className="w-4 h-4" />
-                    </span>
-                    {benefit}
-                  </li>
-                ))}
+              {type.benefits.map((benefit, idx) => {
+                  const BenefitIcon = benefit.icon;
+                  return (
+                    <li key={idx} className="flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
+                      <span className={`w-9 h-9 rounded-2xl flex items-center justify-center border border-white/25 shrink-0 bg-[rgba(110,180,255,0.15)] transition-all duration-200 ${markerColors[type.accentClass as keyof typeof markerColors]}`} style={{ boxShadow: "0 6px 14px rgba(0,30,60,0.7)" }}>
+                        <BenefitIcon className="w-4 h-4" />
+                      </span>
+                      {benefit.text}
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* Spec tag */}
