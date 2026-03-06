@@ -57,9 +57,9 @@ const iconColors = {
 };
 
 const markerColors = {
-  buyer: "text-[#b1dbff]",
-  seller: "text-[#b0f0c0]",
-  agent: "text-[#e2c5ff]",
+  buyer: "text-[#b1dbff] group-hover/benefit:text-[#60b0ff] group-hover/benefit:bg-[rgba(100,180,255,0.3)] group-hover/benefit:border-[rgba(100,180,255,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(100,180,255,0.4)]",
+  seller: "text-[#b0f0c0] group-hover/benefit:text-[#60e080] group-hover/benefit:bg-[rgba(80,220,130,0.3)] group-hover/benefit:border-[rgba(80,220,130,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(80,220,130,0.4)]",
+  agent: "text-[#e2c5ff] group-hover/benefit:text-[#c090ff] group-hover/benefit:bg-[rgba(180,130,255,0.3)] group-hover/benefit:border-[rgba(180,130,255,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(180,130,255,0.4)]",
 };
 
 export function UserTypeCards({ className }: { className?: string }) {
