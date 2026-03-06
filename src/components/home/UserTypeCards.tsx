@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Search, Home, Briefcase, ArrowRight, Star, Zap, Sparkles } from "lucide-react";
+import { Search, Home, Briefcase, ArrowRight, Star, ShieldCheck, CalendarCheck, Sparkles, Camera, Users, BarChart3, ClipboardList, FileText, TrendingUp, LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const userTypes = [
@@ -8,9 +8,9 @@ const userTypes = [
     title: "Buyers & Tenants",
     microStat: "2,400+ premium listings • verified daily",
     benefits: [
-      "Browse thousands of verified listings",
-      "Schedule visits & make offers online",
-      "Personalized property recommendations",
+      { text: "Browse thousands of verified listings", icon: ShieldCheck },
+      { text: "Schedule visits & make offers online", icon: CalendarCheck },
+      { text: "Personalized property recommendations", icon: Sparkles },
     ],
     specTag: "Expert Guidance 24/7",
     cta: "Start Searching",
@@ -23,9 +23,9 @@ const userTypes = [
     title: "Sellers & Landlords",
     microStat: "avg 23% faster sale • qualified pool",
     benefits: [
-      "Free property listing with photos & details",
-      "Wide pool of verified buyers & tenants",
-      "Track offers, visits & inquiries in one place",
+      { text: "Free property listing with photos & details", icon: Camera },
+      { text: "Wide pool of verified buyers & tenants", icon: Users },
+      { text: "Track offers, visits & inquiries in one place", icon: ClipboardList },
     ],
     specTag: "Max ROI · Dedicated Advisor",
     cta: "List Your Property",
@@ -38,9 +38,9 @@ const userTypes = [
     title: "Real Estate Agents",
     microStat: "join 6,200+ agents • elite tools",
     benefits: [
-      "Dedicated dashboard & CRM tools",
-      "Manage leads, appointments & documents",
-      "Performance analytics & commission tracking",
+      { text: "Dedicated dashboard & CRM tools", icon: BarChart3 },
+      { text: "Manage leads, appointments & documents", icon: FileText },
+      { text: "Performance analytics & commission tracking", icon: TrendingUp },
     ],
     specTag: "14‑Day Trial · No Card",
     cta: "Join as Agent",
@@ -127,14 +127,17 @@ export function UserTypeCards({ className }: { className?: string }) {
 
               {/* Benefits */}
               <ul className="space-y-4 mb-6 flex-1 relative z-10">
-                {type.benefits.map((benefit, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
-                    <span className={`w-9 h-9 rounded-2xl flex items-center justify-center border border-white/25 shrink-0 bg-[rgba(110,180,255,0.15)] transition-all duration-200 ${markerColors[type.accentClass as keyof typeof markerColors]}`} style={{ boxShadow: "0 6px 14px rgba(0,30,60,0.7)" }}>
-                      <Zap className="w-4 h-4" />
-                    </span>
-                    {benefit}
-                  </li>
-                ))}
+              {type.benefits.map((benefit, idx) => {
+                  const BenefitIcon = benefit.icon;
+                  return (
+                    <li key={idx} className="flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
+                      <span className={`w-9 h-9 rounded-2xl flex items-center justify-center border border-white/25 shrink-0 bg-[rgba(110,180,255,0.15)] transition-all duration-200 ${markerColors[type.accentClass as keyof typeof markerColors]}`} style={{ boxShadow: "0 6px 14px rgba(0,30,60,0.7)" }}>
+                        <BenefitIcon className="w-4 h-4" />
+                      </span>
+                      {benefit.text}
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* Spec tag */}
