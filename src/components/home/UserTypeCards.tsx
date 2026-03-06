@@ -23,9 +23,9 @@ const userTypes = [
     title: "Sellers & Landlords",
     microStat: "avg 23% faster sale • qualified pool",
     benefits: [
-      "Free property listing with photos & details",
-      "Wide pool of verified buyers & tenants",
-      "Track offers, visits & inquiries in one place",
+      { text: "Free property listing with photos & details", icon: Camera },
+      { text: "Wide pool of verified buyers & tenants", icon: Users },
+      { text: "Track offers, visits & inquiries in one place", icon: ClipboardList },
     ],
     specTag: "Max ROI · Dedicated Advisor",
     cta: "List Your Property",
