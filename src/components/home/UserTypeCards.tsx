@@ -95,7 +95,8 @@ export function UserTypeCards({ className }: { className?: string }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="group relative flex-1 min-w-[290px] max-w-[380px] rounded-[3.5rem_3.5rem_3rem_3rem] p-7 sm:p-8 flex flex-col overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:-translate-y-3.5 hover:scale-[1.02]"
+              whileHover={{ y: -14, scale: 1.025, transition: { type: "spring", stiffness: 260, damping: 20 } }}
+              className="group relative flex-1 min-w-[290px] max-w-[380px] rounded-[3.5rem_3.5rem_3rem_3rem] p-7 sm:p-8 flex flex-col overflow-hidden border border-white/10 hover:border-white/30 transition-[border-color,box-shadow] duration-500"
               style={{
                 background: "rgba(12, 22, 34, 0.65)",
                 backdropFilter: "blur(18px) saturate(200%)",
