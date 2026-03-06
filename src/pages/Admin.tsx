@@ -123,13 +123,13 @@ export default function Admin() {
                   <MessageSquare className="h-4 w-4" />
                   <span className="hidden sm:inline">Leads</span>
                 </TabsTrigger>
-                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Blogs</span>
-                </TabsTrigger>
                 <TabsTrigger value="bookings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <CalendarCheck className="h-4 w-4" />
                   <span className="hidden sm:inline">Bookings</span>
+                </TabsTrigger>
+                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Blogs</span>
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Settings className="h-4 w-4" />
