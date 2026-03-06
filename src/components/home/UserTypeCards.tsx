@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Search, Home, Briefcase, ArrowRight, Star, Zap, Sparkles } from "lucide-react";
+import { Search, Home, Briefcase, ArrowRight, Star, ShieldCheck, CalendarCheck, Sparkles, Camera, Users, BarChart3, ClipboardList, FileText, TrendingUp, LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const userTypes = [
@@ -8,9 +8,9 @@ const userTypes = [
     title: "Buyers & Tenants",
     microStat: "2,400+ premium listings • verified daily",
     benefits: [
-      "Browse thousands of verified listings",
-      "Schedule visits & make offers online",
-      "Personalized property recommendations",
+      { text: "Browse thousands of verified listings", icon: ShieldCheck },
+      { text: "Schedule visits & make offers online", icon: CalendarCheck },
+      { text: "Personalized property recommendations", icon: Sparkles },
     ],
     specTag: "Expert Guidance 24/7",
     cta: "Start Searching",
