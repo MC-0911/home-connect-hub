@@ -38,9 +38,9 @@ const userTypes = [
     title: "Real Estate Agents",
     microStat: "join 6,200+ agents • elite tools",
     benefits: [
-      "Dedicated dashboard & CRM tools",
-      "Manage leads, appointments & documents",
-      "Performance analytics & commission tracking",
+      { text: "Dedicated dashboard & CRM tools", icon: BarChart3 },
+      { text: "Manage leads, appointments & documents", icon: FileText },
+      { text: "Performance analytics & commission tracking", icon: TrendingUp },
     ],
     specTag: "14‑Day Trial · No Card",
     cta: "Join as Agent",
