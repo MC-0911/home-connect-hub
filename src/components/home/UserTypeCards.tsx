@@ -57,9 +57,9 @@ const iconColors = {
 };
 
 const markerColors = {
-  buyer: "text-[#b1dbff]",
-  seller: "text-[#b0f0c0]",
-  agent: "text-[#e2c5ff]",
+  buyer: "text-[#b1dbff] group-hover/benefit:text-[#60b0ff] group-hover/benefit:bg-[rgba(100,180,255,0.3)] group-hover/benefit:border-[rgba(100,180,255,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(100,180,255,0.4)]",
+  seller: "text-[#b0f0c0] group-hover/benefit:text-[#60e080] group-hover/benefit:bg-[rgba(80,220,130,0.3)] group-hover/benefit:border-[rgba(80,220,130,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(80,220,130,0.4)]",
+  agent: "text-[#e2c5ff] group-hover/benefit:text-[#c090ff] group-hover/benefit:bg-[rgba(180,130,255,0.3)] group-hover/benefit:border-[rgba(180,130,255,0.5)] group-hover/benefit:shadow-[0_0_14px_rgba(180,130,255,0.4)]",
 };
 
 export function UserTypeCards({ className }: { className?: string }) {
@@ -95,7 +95,8 @@ export function UserTypeCards({ className }: { className?: string }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="group relative flex-1 min-w-[290px] max-w-[380px] rounded-[3.5rem_3.5rem_3rem_3rem] p-7 sm:p-8 flex flex-col overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:-translate-y-3.5 hover:scale-[1.02]"
+              whileHover={{ y: -14, scale: 1.025, transition: { type: "spring", stiffness: 260, damping: 20 } }}
+              className="group relative flex-1 min-w-[290px] max-w-[380px] rounded-[3.5rem_3.5rem_3rem_3rem] p-7 sm:p-8 flex flex-col overflow-hidden border border-white/10 hover:border-white/30 transition-[border-color,box-shadow] duration-500"
               style={{
                 background: "rgba(12, 22, 34, 0.65)",
                 backdropFilter: "blur(18px) saturate(200%)",
@@ -130,7 +131,7 @@ export function UserTypeCards({ className }: { className?: string }) {
               {type.benefits.map((benefit, idx) => {
                   const BenefitIcon = benefit.icon;
                   return (
-                    <li key={idx} className="flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
+                    <li key={idx} className="group/benefit flex items-center gap-3 text-[1.05rem] text-white/95 leading-relaxed transition-transform duration-200 hover:translate-x-1.5">
                       <span className={`w-9 h-9 rounded-2xl flex items-center justify-center border border-white/25 shrink-0 bg-[rgba(110,180,255,0.15)] transition-all duration-200 ${markerColors[type.accentClass as keyof typeof markerColors]}`} style={{ boxShadow: "0 6px 14px rgba(0,30,60,0.7)" }}>
                         <BenefitIcon className="w-4 h-4" />
                       </span>
