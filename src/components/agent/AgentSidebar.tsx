@@ -1,28 +1,24 @@
 import {
   LayoutDashboard, Building2, Users, CalendarDays, MessageSquare,
-  FileText, BarChart3, Settings, LogOut, Home
+  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
-  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-  SidebarHeader, SidebarFooter, SidebarSeparator, useSidebar,
-} from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const menuItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "listings", label: "My Listings", icon: Building2 },
-  { id: "leads", label: "Leads & Clients", icon: Users },
-  { id: "calendar", label: "Calendar", icon: CalendarDays },
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "listings", label: "My Properties", icon: Building2 },
+  { id: "leads", label: "Clients", icon: Users },
+  { id: "calendar", label: "Appointments", icon: CalendarDays },
   { id: "messages", label: "Messages", icon: MessageSquare },
-  { id: "documents", label: "Documents", icon: FileText },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "documents", label: "Documents", icon: FileText },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -32,13 +28,13 @@ interface AgentSidebarProps {
 }
 
 export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarProps) {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingVisits, setPendingVisits] = useState(0);
+  const [listingsCount, setListingsCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -57,6 +53,12 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
         .eq("seller_id", user.id)
         .eq("status", "pending");
       setPendingVisits(visitCount || 0);
+
+      const { count: propCount } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      setListingsCount(propCount || 0);
     };
 
     fetchCounts();
@@ -80,92 +82,153 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
   const getBadgeCount = (id: string) => {
     if (id === "messages") return unreadMessages;
     if (id === "calendar") return pendingVisits;
+    if (id === "listings") return listingsCount;
     return 0;
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarHeader className="p-4">
-        {!collapsed && (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border-2 border-primary/20">
-              <AvatarImage src={profile?.avatar_url || ""} />
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "A"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {profile?.full_name || "Agent"}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-            </div>
+    <motion.aside
+      animate={{ width: collapsed ? 80 : 280 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed left-0 top-0 h-screen z-50 flex flex-col overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #1e3c72 0%, #2a5298 100%)",
+      }}
+    >
+      {/* Logo */}
+      <div className="p-5 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-white/10 shrink-0">
+            <Crown className="h-6 w-6 text-white" />
           </div>
-        )}
-      </SidebarHeader>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="text-xl font-display font-bold text-white whitespace-nowrap"
+              >
+                Royal Landmark
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
-      <SidebarSeparator />
+      {/* Agent Profile */}
+      <div className={cn("px-5 py-6 border-b border-white/10", collapsed && "px-3 py-4")}>
+        <div className="flex flex-col items-center gap-2">
+          <Avatar className={cn("border-3 border-white/40 transition-all", collapsed ? "h-10 w-10" : "h-[100px] w-[100px]")}>
+            <AvatarImage src={profile?.avatar_url || ""} />
+            <AvatarFallback className="bg-white/20 text-white text-2xl font-semibold">
+              {profile?.full_name?.charAt(0) || "A"}
+            </AvatarFallback>
+          </Avatar>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center mt-1"
+              >
+                <p className="text-white font-semibold text-lg">
+                  {profile?.full_name || "Agent"}
+                </p>
+                <p className="text-white/60 text-sm">Senior Real Estate Agent</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => {
-                const count = getBadgeCount(item.id);
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      isActive={activeSection === item.id}
-                      onClick={() => onSectionChange(item.id)}
-                      tooltip={item.label}
-                    >
-                      <div className="relative">
-                        <item.icon className="h-4 w-4" />
-                        {count > 0 && collapsed && (
-                          <span className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center">
-                            {count > 9 ? "9+" : count}
-                          </span>
-                        )}
-                      </div>
-                      {!collapsed && (
-                        <span className="flex-1 flex items-center justify-between">
-                          {item.label}
-                          {count > 0 && (
-                            <Badge variant="destructive" className="ml-auto h-5 min-w-[20px] px-1.5 text-[10px]">
-                              {count}
-                            </Badge>
-                          )}
-                        </span>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => navigate("/")} tooltip="Back to Home">
-              <Home className="h-4 w-4" />
-              {!collapsed && <span>Back to Home</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={async () => { await signOut(); navigate("/auth"); }}
-              tooltip="Sign Out"
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {menuItems.map((item) => {
+          const isActive = activeSection === item.id;
+          const count = getBadgeCount(item.id);
+          return (
+            <button
+              key={item.id}
+              onClick={() => onSectionChange(item.id)}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group relative",
+                isActive
+                  ? "bg-white/20 text-white shadow-lg shadow-black/10"
+                  : "text-white/70 hover:bg-white/10 hover:text-white hover:translate-x-1"
+              )}
             >
-              <LogOut className="h-4 w-4" />
-              {!collapsed && <span>Sign Out</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+              {isActive && (
+                <motion.div
+                  layoutId="agent-nav-active"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <item.icon className={cn("h-5 w-5 shrink-0", isActive && "drop-shadow-lg")} />
+              <AnimatePresence>
+                {!collapsed && (
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="text-sm font-medium whitespace-nowrap flex-1 text-left"
+                  >
+                    {item.label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              {count > 0 && !collapsed && (
+                <span className="bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center">
+                  {count}
+                </span>
+              )}
+              {count > 0 && collapsed && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer */}
+      <div className="px-3 py-4 border-t border-white/10 space-y-1">
+        <button
+          onClick={() => navigate("/")}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <Home className="h-5 w-5 shrink-0" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm font-medium whitespace-nowrap">
+                Back to Site
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+        <button
+          onClick={async () => { await signOut(); navigate("/auth"); }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm font-medium whitespace-nowrap">
+                Sign Out
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="w-full flex items-center justify-center p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all"
+        >
+          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        </button>
+      </div>
+    </motion.aside>
   );
 }
