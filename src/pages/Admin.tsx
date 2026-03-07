@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { UsersTable } from '@/components/admin/UsersTable';
 import { ListingsTable } from '@/components/admin/ListingsTable';
@@ -11,33 +8,41 @@ import { BlogsTable } from '@/components/admin/BlogsTable';
 import { LeadsTable } from '@/components/admin/LeadsTable';
 import { ServiceBookingsTable } from '@/components/admin/ServiceBookingsTable';
 import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
+import { AdminSidebar, type AdminSection } from '@/components/admin/AdminSidebar';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
-import { LayoutDashboard, Users, Home, FileText, MessageSquare, Shield, Settings, Crown, CalendarCheck } from 'lucide-react';
+import { Shield, Crown, Search, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+
+const sectionMeta: Record<AdminSection, { title: string; description: string; icon: typeof Shield }> = {
+  analytics: { title: 'Dashboard Overview', description: 'Platform analytics and performance metrics', icon: Crown },
+  users: { title: 'User Management', description: 'View and manage all registered users', icon: Shield },
+  listings: { title: 'Listing Management', description: 'Manage all property listings', icon: Shield },
+  leads: { title: 'Lead Management', description: 'Track and export buyer leads', icon: Shield },
+  bookings: { title: 'Service Bookings', description: 'Manage service booking requests', icon: Shield },
+  blogs: { title: 'Blog Management', description: 'Create and manage blog posts', icon: Shield },
+  settings: { title: 'Platform Settings', description: 'Manage property types and amenities', icon: Shield },
+};
+
 export default function Admin() {
   const navigate = useNavigate();
-  const {
-    isAdmin,
-    loading
-  } = useAdmin();
-  const [user, setUser] = useState<any>(null);
+  const { isAdmin, loading } = useAdmin();
+  const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
+
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) {
-        navigate('/auth');
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) navigate('/auth');
     };
     checkAuth();
   }, [navigate]);
+
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="relative">
             <Shield className="w-16 h-16 text-primary" />
@@ -45,19 +50,20 @@ export default function Admin() {
           </div>
           <p className="text-muted-foreground font-medium">Verifying admin access...</p>
         </div>
-      </div>;
+      </div>
+    );
   }
+
   if (!isAdmin) {
-    return <div className="min-h-screen flex flex-col">
+    return (
+      <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center pt-20">
-          <motion.div initial={{
-          opacity: 0,
-          scale: 0.9
-        }} animate={{
-          opacity: 1,
-          scale: 1
-        }} className="text-center space-y-4 p-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-4 p-8"
+          >
             <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
               <Shield className="w-10 h-10 text-destructive" />
             </div>
@@ -69,220 +75,114 @@ export default function Admin() {
           </motion.div>
         </main>
         <Footer />
-      </div>;
+      </div>
+    );
   }
-  return <>
+
+  const meta = sectionMeta[activeSection];
+
+  return (
+    <>
       <Helmet>
         <title>Admin Dashboard - Royal Landmark</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        
-        <main className="flex-1 pt-24 pb-12 bg-primary-foreground">
-          <div className="container mx-auto px-4">
-            {/* Admin Header */}
-            <motion.div initial={{
-            opacity: 0,
-            y: -20
-          }} animate={{
-            opacity: 1,
-            y: 0
-          }} className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-                  <Crown className="h-6 w-6" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-display font-bold text-foreground">
-                    Admin Dashboard
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Complete control over your platform
-                  </p>
-                </div>
+      <div className="min-h-screen flex bg-muted/30">
+        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+
+        {/* Main content area — shifts based on sidebar */}
+        <main className="flex-1 ml-[280px] transition-all duration-300">
+          {/* Top Header Bar */}
+          <motion.header
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border/50"
+          >
+            <div className="flex items-center justify-between px-8 py-4">
+              <div>
+                <h1 className="text-2xl font-display font-bold text-foreground">{meta.title}</h1>
+                <p className="text-sm text-muted-foreground">{meta.description}</p>
               </div>
-            </motion.div>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search..."
+                    className="pl-9 w-64 bg-muted/50 border-border/50 rounded-xl h-10"
+                  />
+                </div>
+                <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                  <Bell className="h-5 w-5 text-muted-foreground" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
+                    3
+                  </span>
+                </button>
+              </div>
+            </div>
+          </motion.header>
 
-            <Tabs defaultValue="analytics" className="space-y-6">
-              <TabsList className="bg-card border p-1 h-auto flex-wrap">
-                <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <LayoutDashboard className="h-4 w-4" />
-                  <span className="hidden sm:inline">Analytics</span>
-                </TabsTrigger>
-                <TabsTrigger value="users" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Users</span>
-                </TabsTrigger>
-                <TabsTrigger value="listings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <Home className="h-4 w-4" />
-                  <span className="hidden sm:inline">Listings</span>
-                </TabsTrigger>
-                <TabsTrigger value="leads" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <MessageSquare className="h-4 w-4" />
-                  <span className="hidden sm:inline">Leads</span>
-                </TabsTrigger>
-                <TabsTrigger value="bookings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <CalendarCheck className="h-4 w-4" />
-                  <span className="hidden sm:inline">Bookings</span>
-                </TabsTrigger>
-                <TabsTrigger value="blogs" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Blogs</span>
-                </TabsTrigger>
-                <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">Settings</span>
-                </TabsTrigger>
-              </TabsList>
+          {/* Content */}
+          <div className="p-8">
+            <motion.div
+              key={activeSection}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeSection === 'analytics' && <AdminAnalytics />}
 
-              <TabsContent value="analytics">
-                <AdminAnalytics />
-              </TabsContent>
-
-              <TabsContent value="users">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Users className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">User Management</h2>
-                        <p className="text-sm text-muted-foreground">View and manage all registered users</p>
-                      </div>
-                    </div>
-                  </div>
+              {activeSection === 'users' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
                     <UsersTable />
                   </div>
-                </motion.div>
-              </TabsContent>
+                </div>
+              )}
 
-              <TabsContent value="listings">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Home className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">Listing Management</h2>
-                        <p className="text-sm text-muted-foreground">Manage all property listings</p>
-                      </div>
-                    </div>
-                  </div>
+              {activeSection === 'listings' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
                     <ListingsTable />
                   </div>
-                </motion.div>
-              </TabsContent>
+                </div>
+              )}
 
-              <TabsContent value="blogs">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <FileText className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">Blog Management</h2>
-                        <p className="text-sm text-muted-foreground">Create and manage blog posts</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <BlogsTable />
-                  </div>
-                </motion.div>
-              </TabsContent>
-
-              <TabsContent value="leads">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">Lead Management</h2>
-                        <p className="text-sm text-muted-foreground">Track and export buyer leads</p>
-                      </div>
-                    </div>
-                  </div>
+              {activeSection === 'leads' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
                     <LeadsTable />
                   </div>
-                </motion.div>
-              </TabsContent>
+                </div>
+              )}
 
-              <TabsContent value="bookings">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <CalendarCheck className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">Service Bookings</h2>
-                        <p className="text-sm text-muted-foreground">Manage service booking requests</p>
-                      </div>
-                    </div>
-                  </div>
+              {activeSection === 'bookings' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
                     <ServiceBookingsTable />
                   </div>
-                </motion.div>
-              </TabsContent>
+                </div>
+              )}
 
-              <TabsContent value="settings">
-                <motion.div initial={{
-                opacity: 0
-              }} animate={{
-                opacity: 1
-              }} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                  <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-transparent">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Settings className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-semibold">Platform Settings</h2>
-                        <p className="text-sm text-muted-foreground">Manage property types and amenities</p>
-                      </div>
-                    </div>
+              {activeSection === 'blogs' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+                  <div className="p-6">
+                    <BlogsTable />
                   </div>
-                  <div className="p-6 border-0 rounded-none shadow-none">
+                </div>
+              )}
+
+              {activeSection === 'settings' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+                  <div className="p-6">
                     <PropertyTypesManager />
                   </div>
-                </motion.div>
-              </TabsContent>
-            </Tabs>
+                </div>
+              )}
+            </motion.div>
           </div>
         </main>
-
-        <Footer />
       </div>
-    </>;
+    </>
+  );
 }
