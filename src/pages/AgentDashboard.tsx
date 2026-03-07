@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AgentSidebar } from "@/components/agent/AgentSidebar";
 import { OverviewSection } from "@/components/agent/OverviewSection";
 import { ListingsSection } from "@/components/agent/ListingsSection";
@@ -12,6 +11,9 @@ import { AnalyticsSection } from "@/components/agent/AnalyticsSection";
 import { SettingsSection } from "@/components/agent/SettingsSection";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Input } from "@/components/ui/input";
+import { Search, Bell, MessageSquare, Settings } from "lucide-react";
+import { motion } from "framer-motion";
 import type { Tables } from "@/integrations/supabase/types";
 
 export default function AgentDashboard() {
@@ -52,7 +54,6 @@ export default function AgentDashboard() {
   };
 
   const fetchLeads = async () => {
-    // Use buyer_requirements as leads proxy
     const { data } = await supabase.from("buyer_requirements").select("*")
       .order("created_at", { ascending: false }).limit(50);
     if (data) setLeads(data);
@@ -98,7 +99,6 @@ export default function AgentDashboard() {
       totalViews: 0, monthlyCommission: commission,
     });
 
-    // Recent activity
     const activities: any[] = [];
     offersData?.slice(0, 3).forEach((o) => activities.push({
       id: o.id, type: "offer", title: "New offer received", time: "Recently",
@@ -112,6 +112,17 @@ export default function AgentDashboard() {
 
   if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return null;
+
+  const sectionTitle: Record<string, string> = {
+    overview: "Dashboard",
+    listings: "My Properties",
+    leads: "Clients",
+    calendar: "Appointments",
+    messages: "Messages",
+    documents: "Documents",
+    analytics: "Analytics",
+    settings: "Settings",
+  };
 
   const renderSection = () => {
     switch (activeSection) {
@@ -127,19 +138,56 @@ export default function AgentDashboard() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AgentSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b border-border bg-background px-6">
-            <SidebarTrigger />
-            <h1 className="text-lg font-semibold capitalize text-foreground">
-              {activeSection === "overview" ? "Dashboard" : activeSection.replace("_", " ")}
-            </h1>
-          </header>
-          <main className="flex-1 p-6 bg-muted/30">{renderSection()}</main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen flex bg-muted/30">
+      <AgentSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+
+      <main className="flex-1 ml-[280px] transition-all duration-300">
+        {/* Top Header */}
+        <motion.header
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border/50"
+        >
+          <div className="flex items-center justify-between px-8 py-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search properties, clients..."
+                className="pl-9 w-72 bg-muted/50 border-border/50 rounded-xl h-10"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                <Bell className="h-5 w-5 text-muted-foreground" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+              </button>
+              <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
+                  </span>
+                )}
+              </button>
+              <button className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                <Settings className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </div>
+          </div>
+        </motion.header>
+
+        {/* Content */}
+        <div className="p-8">
+          <motion.div
+            key={activeSection}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderSection()}
+          </motion.div>
+        </div>
+      </main>
+    </div>
   );
 }
