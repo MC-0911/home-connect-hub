@@ -16,6 +16,7 @@ const menuItems = [
   { id: "favorites", label: "Favorites", icon: Heart },
   { id: "saved-searches", label: "Saved Searches", icon: Bookmark },
   { id: "viewings", label: "Viewings", icon: CalendarDays },
+  { id: "offers", label: "My Offers", icon: FileText },
   { id: "compare", label: "Compare", icon: Scale },
   { id: "calculator", label: "Mortgage Calc", icon: Calculator },
   { id: "messages", label: "Messages", icon: MessageSquare },

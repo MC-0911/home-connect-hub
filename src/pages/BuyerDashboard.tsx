@@ -62,6 +62,7 @@ export default function BuyerDashboard() {
       case "favorites": return <FavoritesSection />;
       case "saved-searches": return <SavedSearchesSection onRunSearch={handleRunSearch} />;
       case "viewings": return <ViewingsSection />;
+      case "offers": return <BuyerOffersSection />;
       case "compare": return <CompareSection />;
       case "calculator": return <MortgageCalculatorSection />;
       case "messages": return <BuyerMessagesSection />;
