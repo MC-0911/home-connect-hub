@@ -16,7 +16,7 @@ const menuItems = [
   { id: "listings", label: "My Properties", icon: Building2 },
   { id: "offers", label: "Offers", icon: DollarSign },
   { id: "leads", label: "Clients", icon: Users },
-  { id: "tenants", label: "Tenants", icon: Users },
+  { id: "tenants", label: "Tenants", icon: UsersRound },
   { id: "calendar", label: "Appointments", icon: CalendarDays },
   { id: "messages", label: "Messages", icon: MessageSquare },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
