@@ -87,6 +87,43 @@ export default function AgentDashboard() {
             </div>
             <TooltipProvider delayDuration={200}>
               <div className="flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="gold" size="sm" className="rounded-lg shadow-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Quick Add
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
+                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
+                      <Link to="/add-property" className="flex items-center gap-3">
+                        <Plus className="w-4 h-4 text-accent" />
+                        <span className="font-medium">Add Property</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("tenants")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Users className="w-4 h-4 text-primary" />
+                      <span className="font-medium">Add Tenant</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("calendar")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Wrench className="w-4 h-4 text-amber-600" />
+                      <span className="font-medium">Maintenance Request</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("documents")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <FileUp className="w-4 h-4 text-indigo-600" />
+                      <span className="font-medium">Upload Document</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <div className="relative hidden sm:block">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
