@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield, MessageSquare } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useMessages } from "@/hooks/useMessages";
 import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
@@ -29,9 +30,8 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const {
-    isAdmin
-  } = useAdmin();
+  const { isAdmin } = useAdmin();
+  const { getDashboardPath, loading: roleLoading } = useUserRole();
   const {
     profile
   } = useProfile();
@@ -41,6 +41,7 @@ export function Header() {
   const unreadCount = getUnreadCount();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const dashboardPath = getDashboardPath();
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -92,10 +93,10 @@ export function Header() {
                 {link.label}
                 {location.pathname === link.href && <motion.div layoutId="activeNav" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
               </Link>)}
-            {user && <Link to="/dashboard" className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === "/dashboard" && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
+            {user && <Link to={dashboardPath} className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === dashboardPath && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
                 <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-                {location.pathname === "/dashboard" && <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
+                My Dashboard
+                {location.pathname === dashboardPath && <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
               </Link>}
             {user && <Link to="/messages" className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === "/messages" && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
                 <div className="relative">
@@ -177,9 +178,9 @@ export function Header() {
                   <link.icon className="w-5 h-5" />
                   {link.label}
                 </Link>)}
-              {user && <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/dashboard" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
+              {user && <Link to={dashboardPath} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === dashboardPath ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <LayoutDashboard className="w-5 h-5" />
-                  Dashboard
+                  My Dashboard
                 </Link>}
               {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <div className="relative">
