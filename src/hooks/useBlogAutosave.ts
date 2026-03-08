@@ -129,6 +129,7 @@ export function useBlogAutosave(
       }
 
       lastSavedSnapshot.current = snapshot;
+      setLastSavedAt(new Date());
       setAutosaveStatus('saved');
     } catch (err) {
       creatingRef.current = false;
