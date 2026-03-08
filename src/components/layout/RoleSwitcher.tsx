@@ -32,10 +32,13 @@ interface RoleSwitcherProps {
 }
 
 export function RoleSwitcher({ variant, isHomePage, isScrolled, onMobileClose }: RoleSwitcherProps) {
-  const { roles, getDashboardPath } = useUserRole();
+  const { roles, getDashboardPath, isAdmin } = useUserRole();
   const location = useLocation();
 
-  const availableRoles = ROLE_OPTIONS.filter((opt) => roles.includes(opt.role));
+  // Admins get access to ALL dashboards
+  const availableRoles = isAdmin
+    ? ROLE_OPTIONS
+    : ROLE_OPTIONS.filter((opt) => roles.includes(opt.role));
   const dashboardPath = getDashboardPath();
   const currentRole = availableRoles.find((r) => r.path === dashboardPath);
   const isDashboardActive = availableRoles.some((r) => location.pathname === r.path);
