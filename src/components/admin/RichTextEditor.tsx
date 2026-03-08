@@ -254,10 +254,14 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         contentEditable
         className={cn(
           "min-h-[200px] p-3 outline-none",
-          "prose prose-sm max-w-none",
-          "prose-headings:mt-2 prose-headings:mb-1",
-          "prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg",
-          "prose-p:my-1",
+          "prose prose-base max-w-none dark:prose-invert",
+          "prose-headings:mt-3 prose-headings:mb-1 prose-headings:font-bold prose-headings:text-foreground",
+          "prose-h1:text-3xl prose-h1:leading-tight prose-h1:border-b prose-h1:border-border/40 prose-h1:pb-2",
+          "prose-h2:text-2xl prose-h2:leading-snug",
+          "prose-h3:text-xl prose-h3:leading-snug",
+          "prose-p:my-1 prose-p:text-foreground",
+          "prose-strong:font-bold prose-strong:text-foreground",
+          "[&_b]:font-bold [&_b]:text-foreground",
           "prose-ul:my-1 prose-ol:my-1",
           "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:my-2",
           "prose-a:text-primary prose-a:underline",
