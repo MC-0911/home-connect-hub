@@ -178,7 +178,18 @@ export function useAgentRealtime() {
       supabase
         .channel("rt-agent-offers")
         .on("postgres_changes", {
-          event: "*", schema: "public", table: "property_offers",
+          event: "INSERT", schema: "public", table: "property_offers",
+          filter: `seller_id=eq.${user.id}`,
+        }, (payload) => {
+          const offer = payload.new as any;
+          const formatted = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(offer.offer_amount);
+          toast.success("New Offer Received!", {
+            description: `You received an offer of ${formatted} on your property`,
+          });
+          fetchStats();
+        })
+        .on("postgres_changes", {
+          event: "UPDATE", schema: "public", table: "property_offers",
           filter: `seller_id=eq.${user.id}`,
         }, () => {
           fetchStats();
