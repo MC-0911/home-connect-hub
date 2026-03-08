@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { Users, Home, Trophy, UserCheck } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { QuickOverviewData } from './useAnalyticsData';
 
 interface QuickOverviewPanelProps {
