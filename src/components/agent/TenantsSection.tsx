@@ -141,6 +141,42 @@ export function TenantsSection() {
     if (error) toast.error("Failed to update status");
   };
 
+  // Lease renewal
+  const [renewDialogOpen, setRenewDialogOpen] = useState(false);
+  const [renewingTenant, setRenewingTenant] = useState<Tenant | null>(null);
+  const [newLeaseEnd, setNewLeaseEnd] = useState<Date | undefined>();
+  const [newRent, setNewRent] = useState("");
+
+  const openRenew = (t: Tenant) => {
+    setRenewingTenant(t);
+    setNewLeaseEnd(t.lease_end ? addYears(new Date(t.lease_end), 1) : addYears(new Date(), 1));
+    setNewRent(String(t.monthly_rent || ""));
+    setRenewDialogOpen(true);
+  };
+
+  const handleRenew = async () => {
+    if (!renewingTenant || !newLeaseEnd) {
+      toast.error("Please select a new lease end date");
+      return;
+    }
+    const newStart = renewingTenant.lease_end || format(new Date(), "yyyy-MM-dd");
+    const { error } = await supabase
+      .from("tenants")
+      .update({
+        lease_start: newStart,
+        lease_end: format(newLeaseEnd, "yyyy-MM-dd"),
+        monthly_rent: Number(newRent) || renewingTenant.monthly_rent,
+      })
+      .eq("id", renewingTenant.id);
+    if (error) {
+      toast.error("Failed to renew lease");
+      return;
+    }
+    toast.success(`Lease renewed for ${renewingTenant.tenant_name}`);
+    setRenewDialogOpen(false);
+    setRenewingTenant(null);
+  };
+
   const stats = {
     total: tenants.length,
     paid: tenants.filter((t) => t.payment_status === "paid").length,
