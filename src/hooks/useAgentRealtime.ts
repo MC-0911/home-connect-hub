@@ -148,7 +148,25 @@ export function useAgentRealtime() {
       supabase
         .channel("rt-agent-visits")
         .on("postgres_changes", {
-          event: "*", schema: "public", table: "property_visits",
+          event: "INSERT", schema: "public", table: "property_visits",
+          filter: `seller_id=eq.${user.id}`,
+        }, (payload) => {
+          const visit = payload.new as any;
+          toast.info("New Visit Request", {
+            description: `A visit has been scheduled for ${visit.preferred_date} at ${visit.preferred_time}`,
+          });
+          fetchAppointments();
+          fetchStats();
+        })
+        .on("postgres_changes", {
+          event: "UPDATE", schema: "public", table: "property_visits",
+          filter: `seller_id=eq.${user.id}`,
+        }, () => {
+          fetchAppointments();
+          fetchStats();
+        })
+        .on("postgres_changes", {
+          event: "DELETE", schema: "public", table: "property_visits",
           filter: `seller_id=eq.${user.id}`,
         }, () => {
           fetchAppointments();
