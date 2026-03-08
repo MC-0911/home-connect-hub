@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield, MessageSquare } from "lucide-react";
+import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useMessages } from "@/hooks/useMessages";
@@ -31,7 +32,7 @@ export function Header() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin } = useAdmin();
-  const { getDashboardPath, loading: roleLoading } = useUserRole();
+  const { loading: roleLoading } = useUserRole();
   const {
     profile
   } = useProfile();
@@ -41,7 +42,7 @@ export function Header() {
   const unreadCount = getUnreadCount();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
-  const dashboardPath = getDashboardPath();
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -93,11 +94,7 @@ export function Header() {
                 {link.label}
                 {location.pathname === link.href && <motion.div layoutId="activeNav" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
               </Link>)}
-            {user && <Link to={dashboardPath} className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === dashboardPath && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
-                <LayoutDashboard className="w-4 h-4" />
-                My Dashboard
-                {location.pathname === dashboardPath && <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
-              </Link>}
+            {user && <RoleSwitcher variant="desktop" isHomePage={isHomePage} isScrolled={isScrolled} />}
             {user && <Link to="/messages" className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === "/messages" && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
                 <div className="relative">
                   <MessageSquare className="w-4 h-4" />
@@ -178,10 +175,7 @@ export function Header() {
                   <link.icon className="w-5 h-5" />
                   {link.label}
                 </Link>)}
-              {user && <Link to={dashboardPath} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === dashboardPath ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
-                  <LayoutDashboard className="w-5 h-5" />
-                  My Dashboard
-                </Link>}
+              {user && <RoleSwitcher variant="mobile" isHomePage={isHomePage} isScrolled={isScrolled} onMobileClose={() => setMobileMenuOpen(false)} />}
               {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <div className="relative">
                     <MessageSquare className="w-5 h-5" />
