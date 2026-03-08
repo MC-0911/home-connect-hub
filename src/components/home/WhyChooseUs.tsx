@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, DollarSign, Home, Star, Shield, CheckCircle, Clock, Quote, Headphones, Rocket, Award, Lock } from "lucide-react";
+import { Users, DollarSign, Home, Star, Shield, CheckCircle, Clock, Quote, Headphones, Rocket, Award } from "lucide-react";
 
 const stats = [
   { icon: Users, value: "50,000+", label: "Happy Users" },
@@ -29,11 +29,6 @@ const features = [
   { icon: Rocket, title: "Fast & Efficient", desc: "Average closing time just 21 days" },
 ];
 
-const bottomStats = [
-  { value: "98%", label: "Satisfaction Rate", icon: CheckCircle },
-  { value: "24/7", label: "Customer Support", icon: Clock },
-  { value: "100%", label: "Secure Platform", icon: Lock },
-];
 
 export function WhyChooseUs() {
   return (
@@ -172,25 +167,6 @@ export function WhyChooseUs() {
               </motion.div>
             </div>
 
-            {/* Bottom Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-border">
-              {bottomStats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="text-center"
-                >
-                  <p className="text-3xl font-bold text-accent mb-1">{stat.value}</p>
-                  <p className="text-muted-foreground text-sm font-medium flex items-center justify-center gap-1.5">
-                    <stat.icon className="w-4 h-4 text-success" />
-                    {stat.label}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
