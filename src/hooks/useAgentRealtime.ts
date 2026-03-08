@@ -28,6 +28,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
   const [stats, setStats] = useState<AgentStats>({
     totalListings: 0, activeListings: 0, soldListings: 0,
     totalLeads: 0, newLeads: 0, totalViews: 0, monthlyCommission: 0,
