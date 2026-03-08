@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { DashboardFooter } from "@/components/layout/DashboardFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { BuyerSidebar } from "@/components/buyer/BuyerSidebar";
 import { DiscoverSection } from "@/components/buyer/DiscoverSection";
