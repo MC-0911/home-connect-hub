@@ -21,7 +21,7 @@ import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
 import { Footer } from "@/components/layout/Footer";
 
 export default function AgentDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -32,11 +32,7 @@ export default function AgentDashboard() {
     refreshListings, refreshLeads, refreshAppointments, refreshDocuments,
   } = useAgentRealtime(setActiveSection);
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [user, authLoading, navigate]);
-
-  if (authLoading || dataLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
+  if (dataLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return null;
 
   const renderSection = () => {
