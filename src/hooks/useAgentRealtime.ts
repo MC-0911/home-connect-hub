@@ -21,7 +21,7 @@ interface RecentActivity {
   time: string;
 }
 
-export function useAgentRealtime() {
+export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const { user } = useAuth();
   const [listings, setListings] = useState<Tables<"properties">[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
@@ -206,6 +206,10 @@ export function useAgentRealtime() {
           if (msg.sender_id !== userRef.current?.id) {
             toast.info("New Message", {
               description: msg.content?.slice(0, 80) || "You have a new message",
+              action: onNavigate ? {
+                label: "View",
+                onClick: () => onNavigate("messages"),
+              } : undefined,
             });
           }
           fetchUnreadMessages();
