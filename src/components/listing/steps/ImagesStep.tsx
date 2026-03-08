@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { useListingForm } from '../ListingFormContext';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, GripVertical } from 'lucide-react';
+import { ImagePlus, X, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type UnifiedImage = 
   | { type: 'existing'; url: string; originalIndex: number }
