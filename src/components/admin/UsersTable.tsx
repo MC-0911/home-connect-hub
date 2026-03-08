@@ -60,11 +60,11 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
         error: emailsError
       } = await supabase.rpc('get_user_emails');
 
-      // Fetch admin roles
+      // Fetch all user roles
       const {
         data: rolesData,
         error: rolesError
-      } = await supabase.from('user_roles').select('user_id, role').eq('role', 'admin');
+      } = await supabase.from('user_roles').select('user_id, role');
 
       // Fetch listings count per user
       const {
@@ -84,21 +84,21 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
       // Create a map of user_id to email
       const emailMap = new Map<string, string>();
       if (!emailsError && emailsData) {
-        emailsData.forEach((item: {
-          user_id: string;
-          email: string;
-        }) => {
+        emailsData.forEach((item: { user_id: string; email: string }) => {
           emailMap.set(item.user_id, item.email);
         });
       }
 
-      // Create a set of admin user_ids
+      // Create maps for roles
       const adminSet = new Set<string>();
+      const roleMap = new Map<string, string>();
       if (!rolesError && rolesData) {
-        rolesData.forEach((item: {
-          user_id: string;
-        }) => {
-          adminSet.add(item.user_id);
+        rolesData.forEach((item: { user_id: string; role: string }) => {
+          if (item.role === 'admin') adminSet.add(item.user_id);
+          // Store primary non-admin role (buyer/seller/agent)
+          if (['buyer', 'seller', 'agent'].includes(item.role)) {
+            roleMap.set(item.user_id, item.role);
+          }
         });
       }
 
