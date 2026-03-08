@@ -30,7 +30,7 @@ export function MortgageCalculatorSection() {
     setResult({ monthly, totalInterest, totalPayment });
   };
 
-  const formatCurrency = (n: number) => new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(n);
+  const formatCurrency = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
   return (
     <div className="space-y-6">
