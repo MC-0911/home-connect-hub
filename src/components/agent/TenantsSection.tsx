@@ -437,6 +437,17 @@ export function TenantsSection() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Payment History Dialog */}
+      {paymentTenant && (
+        <PaymentHistoryDialog
+          open={paymentDialogOpen}
+          onOpenChange={(o) => { setPaymentDialogOpen(o); if (!o) setPaymentTenant(null); }}
+          tenantId={paymentTenant.id}
+          tenantName={paymentTenant.tenant_name}
+          monthlyRent={paymentTenant.monthly_rent}
+        />
+      )}
     </div>
   );
 }
