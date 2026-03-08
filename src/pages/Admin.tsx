@@ -129,6 +129,8 @@ export default function Admin() {
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search properties, clients..."
+                    value={globalSearch}
+                    onChange={(e) => setGlobalSearch(e.target.value)}
                     className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
                   />
                 </div>
