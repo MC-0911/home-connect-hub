@@ -1,4 +1,4 @@
-import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X, CalendarIcon } from "lucide-react";
+import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X, CalendarIcon, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -396,10 +396,14 @@ interface TaskItem {
   priority: "high" | "medium" | "low";
   isAppointment?: boolean;
   isCompleted?: boolean;
+  rawDate?: string | null;
+  rawTime?: string;
 }
 
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDate, setNewDate] = useState<Date>();
   const [newTimeSlot, setNewTimeSlot] = useState("9:00 AM");
@@ -423,6 +427,8 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
         time: t.task_date ? `${format(new Date(t.task_date + "T00:00:00"), "MMM d, yyyy")}, ${t.task_time}` : t.task_time,
         priority: t.priority as "high" | "medium" | "low",
         isCompleted: t.is_completed,
+        rawDate: t.task_date,
+        rawTime: t.task_time,
       })));
     }
     setLoading(false);
@@ -480,6 +486,30 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     toast.success("Task removed");
   };
 
+  const openEditDialog = (task: TaskItem) => {
+    setEditingTask(task);
+    setNewTitle(task.title);
+    setNewDate(task.rawDate ? new Date(task.rawDate + "T00:00:00") : undefined);
+    setNewTimeSlot(task.rawTime || "9:00 AM");
+    setNewPriority(task.priority);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditTask = async () => {
+    if (!editingTask || !newTitle.trim()) return;
+    const { error } = await supabase.from("agent_tasks").update({
+      title: newTitle.trim(),
+      task_date: newDate ? format(newDate, "yyyy-MM-dd") : null,
+      task_time: newTimeSlot,
+      priority: newPriority,
+    }).eq("id", editingTask.id);
+    if (error) { toast.error("Failed to update task"); return; }
+    setEditDialogOpen(false);
+    setEditingTask(null);
+    toast.success("Task updated");
+    fetchTasks();
+  };
+
   return (
     <Card className="lg:col-span-3 border border-border/50 shadow-sm">
       <CardHeader className="pb-3">
@@ -525,12 +555,22 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
               </span>
               {!task.isAppointment && (
-                <button
-                  onClick={() => handleDeleteTask(task.id)}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => openEditDialog(task)}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    title="Edit task"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    title="Delete task"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               )}
             </div>
           ))
@@ -604,6 +644,77 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleAddTask} disabled={!newTitle.trim()}>Add Task</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={(open) => { setEditDialogOpen(open); if (!open) setEditingTask(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Task Title</label>
+              <Input
+                placeholder="e.g. Client Meeting - Johnson Family"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn("w-full justify-start text-left font-normal", !newDate && "text-muted-foreground")}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newDate ? format(newDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newDate}
+                    onSelect={setNewDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Time</label>
+              <Select value={newTimeSlot} onValueChange={setNewTimeSlot}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["8:00 AM","8:30 AM","9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM","6:00 PM"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Priority</label>
+              <Select value={newPriority} onValueChange={(v) => setNewPriority(v as "high" | "medium" | "low")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEditDialogOpen(false); setEditingTask(null); }}>Cancel</Button>
+            <Button onClick={handleEditTask} disabled={!newTitle.trim()}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
