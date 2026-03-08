@@ -122,8 +122,16 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
   const kpis = [
     { label: "Total Properties", value: stats.totalListings, sub: `${stats.activeListings} active, ${stats.soldListings} sold/rented`, icon: Home, gradient: "from-blue-500 to-indigo-600" },
     { label: "Active Listings", value: stats.activeListings, sub: `${listings.filter(l => l.listing_type === 'sale').length} for sale, ${listings.filter(l => l.listing_type === 'rent').length} for rent`, icon: Tag, gradient: "from-emerald-500 to-teal-600" },
-    { label: "Pending Deals", value: stats.totalLeads, sub: `${appointments.length} visits scheduled`, icon: Clock, gradient: "from-amber-500 to-orange-600" },
-    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: DollarSign, gradient: "from-violet-500 to-purple-600" },
+    { label: "Total Offers", value: stats.totalOffers, sub: `${stats.pendingOffers} pending, ${stats.acceptedOffers} accepted`, icon: DollarSign, gradient: "from-amber-500 to-orange-600" },
+    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: TrendingUp, gradient: "from-violet-500 to-purple-600" },
+  ];
+
+  // Second row of KPIs for offer breakdown
+  const offerKpis = [
+    { label: "Pending Offers", value: stats.pendingOffers, icon: Clock, gradient: "from-amber-400 to-yellow-500" },
+    { label: "Accepted Offers", value: stats.acceptedOffers, icon: Building2, gradient: "from-emerald-400 to-green-500" },
+    { label: "Declined Offers", value: stats.declinedOffers, icon: X, gradient: "from-red-400 to-rose-500" },
+    { label: "Scheduled Visits", value: appointments.length, icon: CalendarIcon, gradient: "from-sky-400 to-blue-500" },
   ];
 
   return (
