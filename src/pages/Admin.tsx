@@ -82,6 +82,13 @@ export default function Admin() {
 
   const meta = sectionMeta[activeSection];
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <>
       <Helmet>
@@ -100,24 +107,33 @@ export default function Admin() {
             animate={{ opacity: 1, y: 0 }}
             className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border/50"
           >
-            <div className="flex items-center justify-between px-8 py-4">
+            <div className="flex items-center justify-between px-8 py-5">
               <div>
-                <h1 className="text-2xl font-display font-bold text-foreground">{meta.title}</h1>
-                <p className="text-sm text-muted-foreground">{meta.description}</p>
+                {activeSection === 'analytics' ? (
+                  <>
+                    <h1 className="text-2xl font-display font-bold text-foreground">
+                      {getGreeting()}, Admin 👋
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">Here's what's happening with your real estate platform</p>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-2xl font-display font-bold text-foreground">{meta.title}</h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">{meta.description}</p>
+                  </>
+                )}
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search..."
-                    className="pl-9 w-64 bg-muted/50 border-border/50 rounded-xl h-10"
+                    placeholder="Search properties, clients..."
+                    className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
                   />
                 </div>
-                <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                <button className="relative w-11 h-11 rounded-full bg-card border border-border/60 shadow-sm hover:shadow-md flex items-center justify-center transition-all">
                   <Bell className="h-5 w-5 text-muted-foreground" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
-                    3
-                  </span>
+                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-destructive rounded-full ring-2 ring-card" />
                 </button>
               </div>
             </div>
