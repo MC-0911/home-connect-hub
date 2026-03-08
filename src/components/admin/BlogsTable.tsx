@@ -94,7 +94,7 @@ interface Blog {
   published_at: string | null;
   created_at: string;
 }
-export function BlogsTable() {
+export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
