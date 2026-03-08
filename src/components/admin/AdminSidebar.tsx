@@ -17,6 +17,8 @@ export type AdminSection =
 interface AdminSidebarProps {
   activeSection: AdminSection;
   onSectionChange: (section: AdminSection) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard }[] = [
