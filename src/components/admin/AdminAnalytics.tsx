@@ -144,9 +144,10 @@ export function AdminAnalytics() {
         totalBlogViews={analytics.totalBlogViews}
       />
 
-      {/* Live Activity Feed + Activity Over Time */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Live Activity Feed + Quick Overview + Activity Over Time */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <LiveActivityFeed fromDate={dateRange.from} toDate={dateRange.to} />
+        <QuickOverviewPanel data={analytics.quickOverview} />
         <ActivityOverTimeChart
           listings={analytics.rawListings}
           users={analytics.rawUsers}
