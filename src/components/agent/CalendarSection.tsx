@@ -129,7 +129,7 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
       if (error) { toast.error("Failed to update appointment"); return; }
       toast.success("Appointment updated");
     } else {
-      const { error } = await supabase.from("agent_appointments").insert(payload);
+      const { error } = await supabase.from("agent_appointments" as any).insert(payload);
       if (error) { toast.error("Failed to create appointment"); return; }
       toast.success("Appointment created");
     }
