@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DashboardFooter } from "@/components/layout/DashboardFooter";
 import { AgentSidebar } from "@/components/agent/AgentSidebar";
 import { OverviewSection } from "@/components/agent/OverviewSection";
 import { ListingsSection } from "@/components/agent/ListingsSection";
@@ -113,8 +112,6 @@ export default function AgentDashboard() {
             {renderSection()}
           </motion.div>
         </div>
-
-        <DashboardFooter />
       </main>
     </div>
   );
