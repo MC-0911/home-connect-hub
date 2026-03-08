@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import { AnalyticsDateFilter, getDateRangeForPreset } from './analytics/AnalyticsDateFilter';
 import { AnalyticsStatsCards } from './analytics/AnalyticsStatsCards';
 import { LiveActivityFeed } from './analytics/LiveActivityFeed';
+import { QuickOverviewPanel } from './analytics/QuickOverviewPanel';
 import {
   ActivityOverTimeChart,
   UserGrowthChart,
