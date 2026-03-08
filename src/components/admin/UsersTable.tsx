@@ -40,6 +40,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [suspensionReason, setSuspensionReason] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [bulkSuspendDialogOpen, setBulkSuspendDialogOpen] = useState(false);
   const [bulkUnsuspendDialogOpen, setBulkUnsuspendDialogOpen] = useState(false);
   const [bulkSuspensionReason, setBulkSuspensionReason] = useState('');
@@ -256,7 +257,14 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
     }
   };
   const combinedSearch = globalSearch || searchTerm;
-  const filteredUsers = users.filter(user => user.full_name?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.email?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.location?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.user_id.toLowerCase().includes(combinedSearch.toLowerCase()));
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.full_name?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.email?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.location?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.user_id.toLowerCase().includes(combinedSearch.toLowerCase());
+    if (!matchesSearch) return false;
+    if (roleFilter === 'all') return true;
+    if (roleFilter === 'admin') return user.is_admin;
+    if (roleFilter === 'no_role') return !user.user_role && !user.is_admin;
+    return user.user_role === roleFilter;
+  });
   const {
     paginatedData,
     currentPage,
@@ -282,9 +290,24 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
   }
   return <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative flex-1 w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search users by name, email, location, or ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+        <div className="flex items-center gap-3 flex-1 w-full">
+          <div className="relative flex-1 sm:max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search users by name, email, location, or ID..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+          </div>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="buyer">Buyer / Tenant</SelectItem>
+              <SelectItem value="seller">Seller / Landlord</SelectItem>
+              <SelectItem value="agent">Agent</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="no_role">No Role</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => handleSelectAll(!allSelected)} className="gap-1.5">
