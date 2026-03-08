@@ -46,7 +46,7 @@ export default function AgentDashboard() {
       case "tenants": return <TenantsSection />;
       case "calendar": return <CalendarSection appointments={appointments} onRefresh={refreshAppointments} />;
       case "messages": return <MessagesSection unreadCount={unreadMessages} />;
-      case "documents": return <DocumentsSection documents={documents} onRefresh={refreshDocuments} />;
+      case "documents": return <DocumentsSection />;
       case "analytics": return <AnalyticsSection stats={stats} />;
       case "settings": return <SettingsSection />;
       default: return <OverviewSection stats={stats} recentActivity={recentActivity} onNavigate={setActiveSection} listings={listings} leads={leads} appointments={appointments} />;
