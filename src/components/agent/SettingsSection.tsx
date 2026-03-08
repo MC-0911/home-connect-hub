@@ -83,6 +83,8 @@ export function SettingsSection() {
           </div>
         </CardContent>
       </Card>
+
+      <NotificationSecurityCards />
     </div>
   );
 }

@@ -69,6 +69,8 @@ export function BuyerSettingsSection() {
           </div>
         </CardContent>
       </Card>
+
+      <NotificationSecurityCards />
     </div>
   );
 }
