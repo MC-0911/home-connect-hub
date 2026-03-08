@@ -33,7 +33,7 @@ interface ServiceBooking {
   user_id: string | null;
 }
 
-export function ServiceBookingsTable() {
+export function ServiceBookingsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [bookings, setBookings] = useState<ServiceBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
