@@ -16,6 +16,7 @@ type Property = Tables<"properties">;
 
 export function DiscoverSection() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
