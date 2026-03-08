@@ -33,6 +33,7 @@ export function useBlogAutosave(
   onDraftCreated?: (id: string) => void
 ) {
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const lastSavedSnapshot = useRef<string>('');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const creatingRef = useRef(false); // guards against double-insert
