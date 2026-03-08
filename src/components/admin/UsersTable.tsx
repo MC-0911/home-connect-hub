@@ -153,6 +153,31 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
       toast.error('Failed to remove admin role');
     }
   };
+  const changeUserRole = async (user: Profile, newRole: string) => {
+    try {
+      // Delete existing non-admin roles
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.user_id)
+        .in('role', ['buyer', 'seller', 'agent']);
+      if (deleteError) throw deleteError;
+
+      // Insert new role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: user.user_id, role: newRole as any });
+      if (insertError) throw insertError;
+
+      const roleLabels: Record<string, string> = { buyer: 'Buyer/Tenant', seller: 'Seller/Landlord', agent: 'Agent' };
+      toast.success(`${user.full_name || 'User'} role changed to ${roleLabels[newRole]}`);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error changing user role:', error);
+      toast.error('Failed to change user role');
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
