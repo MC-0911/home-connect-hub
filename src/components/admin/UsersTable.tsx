@@ -256,7 +256,14 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
     }
   };
   const combinedSearch = globalSearch || searchTerm;
-  const filteredUsers = users.filter(user => user.full_name?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.email?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.location?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.user_id.toLowerCase().includes(combinedSearch.toLowerCase()));
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.full_name?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.email?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.location?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.user_id.toLowerCase().includes(combinedSearch.toLowerCase());
+    if (!matchesSearch) return false;
+    if (roleFilter === 'all') return true;
+    if (roleFilter === 'admin') return user.is_admin;
+    if (roleFilter === 'no_role') return !user.user_role && !user.is_admin;
+    return user.user_role === roleFilter;
+  });
   const {
     paginatedData,
     currentPage,
