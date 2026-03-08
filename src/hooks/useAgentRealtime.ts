@@ -28,6 +28,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
   const [stats, setStats] = useState<AgentStats>({
     totalListings: 0, activeListings: 0, soldListings: 0,
     totalLeads: 0, newLeads: 0, totalViews: 0, monthlyCommission: 0,
@@ -76,6 +77,13 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     setUnreadMessages(count || 0);
   }, []);
 
+  const fetchUnreadAlerts = useCallback(async () => {
+    if (!userRef.current) return;
+    const { count } = await supabase.from("alerts").select("*", { count: "exact", head: true })
+      .eq("user_id", userRef.current.id).eq("is_read", false);
+    setUnreadAlerts(count || 0);
+  }, []);
+
   const fetchStats = useCallback(async () => {
     if (!userRef.current) return;
     const userId = userRef.current.id;
@@ -117,7 +125,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     setLoading(true);
     await Promise.all([
       fetchListings(), fetchLeads(), fetchAppointments(),
-      fetchDocuments(), fetchStats(), fetchUnreadMessages(),
+      fetchDocuments(), fetchStats(), fetchUnreadMessages(), fetchUnreadAlerts(),
     ]);
     setLoading(false);
   }, [user, fetchListings, fetchLeads, fetchAppointments, fetchDocuments, fetchStats, fetchUnreadMessages]);
@@ -257,7 +265,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
           event: "*", schema: "public", table: "alerts",
           filter: `user_id=eq.${user.id}`,
         }, () => {
-          // Alerts badge can be consumed by header
+          fetchUnreadAlerts();
         })
         .subscribe(),
     ];
@@ -265,10 +273,10 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     return () => {
       channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [user, fetchListings, fetchAppointments, fetchStats, fetchUnreadMessages, fetchLeads]);
+  }, [user, fetchListings, fetchAppointments, fetchStats, fetchUnreadMessages, fetchUnreadAlerts, fetchLeads]);
 
   return {
-    listings, leads, appointments, documents, unreadMessages,
+    listings, leads, appointments, documents, unreadMessages, unreadAlerts,
     stats, recentActivity, loading,
     refreshListings: fetchListings,
     refreshLeads: fetchLeads,

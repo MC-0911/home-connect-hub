@@ -22,7 +22,7 @@ export default function AgentDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const {
-    listings, leads, appointments, documents, unreadMessages,
+    listings, leads, appointments, documents, unreadMessages, unreadAlerts,
     stats, recentActivity, loading: dataLoading,
     refreshListings, refreshLeads, refreshAppointments, refreshDocuments,
   } = useAgentRealtime(setActiveSection);
@@ -69,7 +69,11 @@ export default function AgentDashboard() {
             <div className="flex items-center gap-4">
               <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                 <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                {unreadAlerts > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
+                    {unreadAlerts > 9 ? "9+" : unreadAlerts}
+                  </span>
+                )}
               </button>
               <button className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                 <MessageSquare className="h-5 w-5 text-muted-foreground" />
