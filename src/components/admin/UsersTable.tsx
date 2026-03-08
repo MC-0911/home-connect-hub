@@ -9,7 +9,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square, Home } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square, Home, Briefcase, Building2, Users as UsersIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
