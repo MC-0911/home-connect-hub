@@ -187,7 +187,7 @@ export default function Admin() {
               {activeSection === 'blogs' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <BlogsTable />
+                    <BlogsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
