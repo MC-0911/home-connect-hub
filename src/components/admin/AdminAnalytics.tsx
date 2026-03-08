@@ -9,6 +9,7 @@ import { AnalyticsStatsCards } from './analytics/AnalyticsStatsCards';
 import { LiveActivityFeed } from './analytics/LiveActivityFeed';
 import { QuickOverviewPanel } from './analytics/QuickOverviewPanel';
 import { LatestListingsTable } from './analytics/LatestListingsTable';
+import { RecentOffersPanel } from './analytics/RecentOffersPanel';
 import {
   ActivityOverTimeChart,
   UserGrowthChart,
@@ -157,9 +158,11 @@ export function AdminAnalytics() {
         />
       </div>
 
-      {/* Latest Property Listings */}
-      <LatestListingsTable />
-
+      {/* Latest Listings + Recent Offers */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <LatestListingsTable />
+        <RecentOffersPanel />
+      </div>
       {/* Traffic Overview + Revenue Trend */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TrafficOverviewChart
