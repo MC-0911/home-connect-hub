@@ -107,6 +107,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
         ...profile,
         email: emailMap.get(profile.user_id) || null,
         is_admin: adminSet.has(profile.user_id),
+        user_role: roleMap.get(profile.user_id) || null,
         listings_count: listingsCountMap.get(profile.user_id) || 0
       }));
       setUsers(usersWithEmails);
