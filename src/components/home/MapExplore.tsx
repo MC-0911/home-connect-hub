@@ -16,6 +16,7 @@ const propertyPins = [
     price: "$250K",
     position: { top: "22%", left: "30%" },
     delay: 0,
+    type: "Houses",
     property: {
       title: "Modern Family Home",
       image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=300&h=200&fit=crop",
@@ -30,6 +31,7 @@ const propertyPins = [
     price: "$180K",
     position: { top: "52%", left: "55%" },
     delay: 0.2,
+    type: "Apartments",
     property: {
       title: "Cozy Studio Apartment",
       image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&h=200&fit=crop",
@@ -44,6 +46,7 @@ const propertyPins = [
     price: "$320K",
     position: { top: "68%", left: "22%" },
     delay: 0.4,
+    type: "Houses",
     property: {
       title: "Spacious Townhouse",
       image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop",
@@ -58,12 +61,13 @@ const propertyPins = [
     price: "$450K",
     position: { top: "35%", right: "20%" },
     delay: 0.3,
+    type: "Land",
     property: {
-      title: "Luxury Penthouse",
+      title: "Premium Plot",
       image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop",
-      beds: 3,
-      baths: 2,
-      sqft: 2100,
+      beds: 0,
+      baths: 0,
+      sqft: 5000,
       location: "City Center",
     },
   },
@@ -224,7 +228,9 @@ export function MapExplore({ className }: { className?: string }) {
               </motion.div>
 
               {/* Animated Pins */}
-              {propertyPins.map((pin) => (
+              {propertyPins
+                .filter((pin) => activeFilter === "All" || pin.type === activeFilter)
+                .map((pin) => (
                 <motion.div
                   key={pin.id}
                   className="absolute cursor-pointer z-10"
