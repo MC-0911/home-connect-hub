@@ -527,6 +527,26 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     fetchTasks();
   };
 
+  const openTagDialog = (task: TaskItem) => {
+    setTaggingTask(task);
+    setTagDialogOpen(true);
+  };
+
+  const handleSetTag = async (tagValue: TagValue) => {
+    if (!taggingTask) return;
+    // Optimistic update
+    setCustomTasks(prev => prev.map(t => t.id === taggingTask.id ? { ...t, tag: tagValue } : t));
+    const { error } = await supabase.from("agent_tasks").update({ tag: tagValue }).eq("id", taggingTask.id);
+    if (error) {
+      toast.error("Failed to update tag");
+      fetchTasks();
+      return;
+    }
+    setTagDialogOpen(false);
+    setTaggingTask(null);
+    toast.success(tagValue ? "Tag applied" : "Tag removed");
+  };
+
   return (
     <Card className="lg:col-span-3 border border-border/50 shadow-sm">
       <CardHeader className="pb-3">
