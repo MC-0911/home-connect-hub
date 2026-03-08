@@ -486,6 +486,30 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     toast.success("Task removed");
   };
 
+  const openEditDialog = (task: TaskItem) => {
+    setEditingTask(task);
+    setNewTitle(task.title);
+    setNewDate(task.rawDate ? new Date(task.rawDate + "T00:00:00") : undefined);
+    setNewTimeSlot(task.rawTime || "9:00 AM");
+    setNewPriority(task.priority);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditTask = async () => {
+    if (!editingTask || !newTitle.trim()) return;
+    const { error } = await supabase.from("agent_tasks").update({
+      title: newTitle.trim(),
+      task_date: newDate ? format(newDate, "yyyy-MM-dd") : null,
+      task_time: newTimeSlot,
+      priority: newPriority,
+    }).eq("id", editingTask.id);
+    if (error) { toast.error("Failed to update task"); return; }
+    setEditDialogOpen(false);
+    setEditingTask(null);
+    toast.success("Task updated");
+    fetchTasks();
+  };
+
   return (
     <Card className="lg:col-span-3 border border-border/50 shadow-sm">
       <CardHeader className="pb-3">
