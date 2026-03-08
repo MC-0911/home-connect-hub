@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { formatPrice } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useAuth } from "@/hooks/useAuth";
 
 type Property = Tables<"properties">;
 
