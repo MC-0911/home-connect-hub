@@ -1,21 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, TrendingUp, DollarSign, Clock, Users, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle, DollarSign, Clock, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-const sellerBenefits = ["List your property for free", "Reach real buyers instantly", "Get real-time views, no middlemen", "Secure transactions & support"];
-const sellerStats = [{
-  icon: TrendingUp,
-  value: "30%",
-  label: "Price Drop"
-}, {
-  icon: DollarSign,
-  value: "$0",
-  label: "Listing Fee"
-}, {
-  icon: Users,
-  value: "10K+",
-  label: "Sell Requests"
-}];
 export function CTASection() {
   return <section className="py-20 sm:py-28 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
