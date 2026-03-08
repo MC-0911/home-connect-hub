@@ -188,8 +188,9 @@ export function ListingsTable({ globalSearch = '' }: { globalSearch?: string }) 
       toast.error('Failed to update listings');
     }
   };
+  const combinedSearch = globalSearch || searchTerm;
   const filteredListings = listings.filter(listing => {
-    const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) || listing.city.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = listing.title.toLowerCase().includes(combinedSearch.toLowerCase()) || listing.city.toLowerCase().includes(combinedSearch.toLowerCase());
     const matchesStatus = statusFilter === 'all' || listing.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
