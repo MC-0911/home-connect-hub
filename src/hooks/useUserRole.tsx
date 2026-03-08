@@ -30,6 +30,7 @@ export function useUserRole() {
           setPrimaryRole(null);
         } else {
           const userRoles = (data || []).map(r => r.role as UserRole);
+          console.log('[useUserRole] Fetched roles for user:', user.id, userRoles);
           setRoles(userRoles);
           // Priority: admin > agent > seller > buyer
           const priority: UserRole[] = ['admin', 'agent', 'seller', 'buyer', 'moderator', 'user'];
