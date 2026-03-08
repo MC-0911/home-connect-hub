@@ -490,7 +490,7 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                      {autosaveStatus === 'idle' && (
                        <>
                          <Save className="h-3 w-3" />
-                         <span>Autosave on</span>
+                         <span>{lastSavedAt ? `Last saved at ${lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : 'Autosave on'}</span>
                        </>
                      )}
                    </div>
