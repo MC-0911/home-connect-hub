@@ -581,7 +581,17 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                 )}
               </button>
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium text-foreground", task.isCompleted && "line-through text-muted-foreground")}>{task.title}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className={cn("text-sm font-medium text-foreground", task.isCompleted && "line-through text-muted-foreground")}>{task.title}</p>
+                  {task.tag && (() => {
+                    const tagOption = TAG_OPTIONS.find(t => t.value === task.tag);
+                    return tagOption ? (
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white ${tagOption.color}`}>
+                        {tagOption.label}
+                      </span>
+                    ) : null;
+                  })()}
+                </div>
                 <p className="text-xs text-muted-foreground">{task.time}</p>
               </div>
               <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
@@ -599,7 +609,7 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-36">
-                    <DropdownMenuItem onClick={() => openEditDialog(task)}>
+                    <DropdownMenuItem onClick={() => openTagDialog(task)}>
                       <Tag className="h-3.5 w-3.5 mr-2" />
                       Tag
                     </DropdownMenuItem>
