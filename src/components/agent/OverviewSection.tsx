@@ -463,6 +463,16 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     fetchTasks();
   };
 
+  const handleToggleComplete = async (id: string, currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+    setCustomTasks(prev => prev.map(t => t.id === id ? { ...t, isCompleted: newStatus } : t));
+    const { error } = await supabase.from("agent_tasks").update({ is_completed: newStatus }).eq("id", id);
+    if (error) {
+      setCustomTasks(prev => prev.map(t => t.id === id ? { ...t, isCompleted: currentStatus } : t));
+      toast.error("Failed to update task");
+    }
+  };
+
   const handleDeleteTask = async (id: string) => {
     const { error } = await supabase.from("agent_tasks").delete().eq("id", id);
     if (error) { toast.error("Failed to delete task"); return; }
