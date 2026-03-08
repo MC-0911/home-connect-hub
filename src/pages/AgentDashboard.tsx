@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AgentSidebar } from "@/components/agent/AgentSidebar";
 import { OverviewSection } from "@/components/agent/OverviewSection";
