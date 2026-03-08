@@ -49,7 +49,7 @@ export function DiscoverSection() {
       .eq("listing_type", listingType)
       .lte("price", maxPrice[0]);
 
-    if (propertyType !== "any") query = query.eq("property_type", propertyType);
+    if (propertyType !== "any") query = query.eq("property_type", propertyType as any);
     if (bedrooms !== "any") query = query.gte("bedrooms", parseInt(bedrooms));
     if (searchQuery) query = query.or(`city.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%,state.ilike.%${searchQuery}%`);
 

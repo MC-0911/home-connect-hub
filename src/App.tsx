@@ -22,6 +22,7 @@ import BlogPost from "./pages/BlogPost";
 import Messages from "./pages/Messages";
 import ServiceDetail from "./pages/ServiceDetail";
 import AgentDashboard from "./pages/AgentDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => <HelmetProvider>
