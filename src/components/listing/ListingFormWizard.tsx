@@ -10,6 +10,7 @@ import NeighborhoodStep from './steps/NeighborhoodStep';
 import LandFeaturesStep from './steps/LandFeaturesStep';
 import ImagesStep from './steps/ImagesStep';
 import SuccessStep from './steps/SuccessStep';
+import ListingLivePreviewCard from './ListingLivePreviewCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
@@ -272,7 +273,7 @@ const ListingFormContent = ({
     return <SuccessStep />;
   }
   return <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-3xl mx-auto py-[75px]">
+      <div className="max-w-6xl mx-auto py-[75px]">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
             {editMode ? 'Edit Your Property' : 'List Your Property'}
@@ -284,47 +285,57 @@ const ListingFormContent = ({
 
         <StepIndicator currentStep={currentStep} totalSteps={actualTotalSteps} isLandProperty={isLandProperty} />
 
-        <Card className="mt-8">
-          <CardContent className="p-6 md:p-8">
-            <AnimatePresence mode="wait">
-              <motion.div key={currentStep} initial={{
-              opacity: 0,
-              x: 20
-            }} animate={{
-              opacity: 1,
-              x: 0
-            }} exit={{
-              opacity: 0,
-              x: -20
-            }} transition={{
-              duration: 0.3
-            }}>
-                <CurrentStepComponent />
-              </motion.div>
-            </AnimatePresence>
+        <div className="mt-8 flex flex-col lg:flex-row gap-8">
+          {/* Main Form */}
+          <div className="flex-1 min-w-0">
+            <Card>
+              <CardContent className="p-6 md:p-8">
+                <AnimatePresence mode="wait">
+                  <motion.div key={currentStep} initial={{
+                  opacity: 0,
+                  x: 20
+                }} animate={{
+                  opacity: 1,
+                  x: 0
+                }} exit={{
+                  opacity: 0,
+                  x: -20
+                }} transition={{
+                  duration: 0.3
+                }}>
+                    <CurrentStepComponent />
+                  </motion.div>
+                </AnimatePresence>
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-6 border-t border-border">
-              <Button type="button" variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Previous
-              </Button>
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-8 pt-6 border-t border-border">
+                  <Button type="button" variant="outline" onClick={handlePrevious} disabled={currentStep === 1} className="gap-2">
+                    <ArrowLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
 
-              {currentStep < actualTotalSteps ? <Button type="button" onClick={handleNext} className="gap-2">
-                  Next
-                  <ArrowRight className="w-4 h-4" />
-                </Button> : <Button type="button" onClick={handleSubmit} disabled={isSubmitting} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
-                  {isSubmitting ? <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      {editMode ? 'Updating...' : 'Submitting...'}
-                    </> : <>
-                      <Check className="w-4 h-4" />
-                      {editMode ? 'Update Listing' : 'Publish Listing'}
-                    </>}
-                </Button>}
-            </div>
-          </CardContent>
-        </Card>
+                  {currentStep < actualTotalSteps ? <Button type="button" onClick={handleNext} className="gap-2">
+                      Next
+                      <ArrowRight className="w-4 h-4" />
+                    </Button> : <Button type="button" onClick={handleSubmit} disabled={isSubmitting} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                      {isSubmitting ? <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          {editMode ? 'Updating...' : 'Submitting...'}
+                        </> : <>
+                          <Check className="w-4 h-4" />
+                          {editMode ? 'Update Listing' : 'Publish Listing'}
+                        </>}
+                    </Button>}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Live Preview Sidebar */}
+          <div className="hidden lg:block w-[320px] flex-shrink-0">
+            <ListingLivePreviewCard />
+          </div>
+        </div>
       </div>
     </div>;
 };
