@@ -53,6 +53,12 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setViewingsCount(visitCount || 0);
+
+      const { count: favCount } = await supabase
+        .from("favorites" as any)
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      setFavoritesCount(favCount || 0);
     };
 
     fetchCounts();
@@ -67,9 +73,15 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
       .on("postgres_changes", { event: "*", schema: "public", table: "property_visits" }, fetchCounts)
       .subscribe();
 
+    const favChannel = supabase
+      .channel("buyer-sidebar-favorites")
+      .on("postgres_changes", { event: "*", schema: "public", table: "favorites" }, fetchCounts)
+      .subscribe();
+
     return () => {
       supabase.removeChannel(msgChannel);
       supabase.removeChannel(visitChannel);
+      supabase.removeChannel(favChannel);
     };
   }, [user]);
 
