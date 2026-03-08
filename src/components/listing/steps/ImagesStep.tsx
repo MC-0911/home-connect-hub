@@ -7,6 +7,7 @@ import ListingPreview from '../ListingPreview';
 
 const ImagesStep = () => {
   const { formData, updateFormData } = useListingForm();
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
