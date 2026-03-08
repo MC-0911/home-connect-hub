@@ -40,6 +40,7 @@ export default function AgentDashboard() {
   const renderSection = () => {
     switch (activeSection) {
       case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} />;
+      case "offers": return <OffersSection onRefresh={refreshListings} />;
       case "leads": return <LeadsSection leads={leads} onRefresh={refreshLeads} />;
       case "calendar": return <CalendarSection appointments={appointments} onRefresh={refreshAppointments} />;
       case "messages": return <MessagesSection unreadCount={unreadMessages} />;
