@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BuyerSidebar } from "@/components/buyer/BuyerSidebar";
@@ -27,17 +27,12 @@ type SearchFilters = {
 };
 
 export default function BuyerDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("discover");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pendingFilters, setPendingFilters] = useState<SearchFilters | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [user, authLoading, navigate]);
-
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return null;
 
   const handleRunSearch = (filters: SearchFilters) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Home, Building2, Briefcase } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,30 +9,42 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
+import { useUserRole } from "@/hooks/useUserRole";
+
+type AccountType = "buyer" | "seller" | "agent";
+
+const accountTypes: { value: AccountType; label: string; description: string; icon: typeof Home }[] = [
+  { value: "buyer", label: "Buyer / Tenant", description: "Search and rent or buy properties", icon: Home },
+  { value: "seller", label: "Seller / Landlord", description: "List and manage your properties", icon: Building2 },
+  { value: "agent", label: "Real Estate Agent", description: "Manage clients and listings", icon: Briefcase },
+];
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">(searchParams.get("mode") === "signup" ? "signup" : "login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [accountType, setAccountType] = useState<AccountType>("buyer");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: ""
   });
+  const { getDashboardPath, primaryRole, loading: roleLoading } = useUserRole();
 
   // Get redirect URL from query params, default to "/"
   const redirectTo = searchParams.get("redirect") || "/";
 
-  // Check if user is already logged in
+  // Check if user is already logged in and redirect to their dashboard
   useEffect(() => {
     const {
       data: {
         subscription
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        navigate(redirectTo);
+      if (session?.user && !roleLoading && primaryRole) {
+        const target = redirectTo !== "/" ? redirectTo : getDashboardPath();
+        navigate(target);
       }
     });
     supabase.auth.getSession().then(({
@@ -40,12 +52,13 @@ export default function Auth() {
         session
       }
     }) => {
-      if (session?.user) {
-        navigate(redirectTo);
+      if (session?.user && !roleLoading && primaryRole) {
+        const target = redirectTo !== "/" ? redirectTo : getDashboardPath();
+        navigate(target);
       }
     });
     return () => subscription.unsubscribe();
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, roleLoading, primaryRole, getDashboardPath]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
@@ -68,7 +81,8 @@ export default function Auth() {
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
-              full_name: formData.name
+              full_name: formData.name,
+              account_type: accountType
             }
           }
         });
@@ -82,6 +96,11 @@ export default function Auth() {
           if (data.user.identities?.length === 0) {
             toast.error("This email is already registered. Please sign in instead.");
           } else {
+            // Assign role to the new user
+            await supabase.rpc('assign_user_role', {
+              _user_id: data.user.id,
+              _role: accountType
+            });
             toast.success("Account created! Please check your email to verify your account.", {
               duration: 5000
             });
@@ -104,7 +123,7 @@ export default function Auth() {
           }
         } else {
           toast.success("Welcome back!");
-          navigate(redirectTo);
+          // Will be redirected by the useEffect after roles load
         }
       }
     } catch (error) {
@@ -172,13 +191,40 @@ export default function Auth() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === "signup" && <div className="relative">
+              {mode === "signup" && <>
+                <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input placeholder="Full Name" className="pl-10 h-12" value={formData.name} onChange={e => setFormData({
                 ...formData,
                 name: e.target.value
               })} disabled={loading} />
-                </div>}
+                </div>
+
+                {/* Account Type Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">I am a...</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {accountTypes.map(type => {
+                      const Icon = type.icon;
+                      return (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => setAccountType(type.value)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
+                            accountType === type.value
+                              ? "border-accent bg-accent/10 text-accent"
+                              : "border-border hover:border-accent/50 text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span className="text-xs font-medium leading-tight">{type.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>}
 
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

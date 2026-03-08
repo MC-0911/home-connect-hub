@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedDashboard } from "@/components/auth/ProtectedDashboard";
 import Index from "./pages/Index";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
@@ -42,15 +43,27 @@ const App = () => <HelmetProvider>
               <Route path="/profile" element={<Profile />} />
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/edit-property/:id" element={<EditProperty />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={
+                <ProtectedDashboard allowedRoles={['seller']}>
+                  <Dashboard />
+                </ProtectedDashboard>
+              } />
               <Route path="/property-requirements" element={<PropertyRequirements />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/services/:slug" element={<ServiceDetail />} />
-              <Route path="/agent-dashboard" element={<AgentDashboard />} />
-              <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+              <Route path="/agent-dashboard" element={
+                <ProtectedDashboard allowedRoles={['agent']}>
+                  <AgentDashboard />
+                </ProtectedDashboard>
+              } />
+              <Route path="/buyer-dashboard" element={
+                <ProtectedDashboard allowedRoles={['buyer']}>
+                  <BuyerDashboard />
+                </ProtectedDashboard>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
