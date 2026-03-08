@@ -154,12 +154,6 @@ export function AdminSidebar({ activeSection, onSectionChange, collapsed, onTogg
           </AnimatePresence>
         </button>
 
-        <button
-          onClick={onToggleCollapse}
-          className="w-full flex items-center justify-center p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all"
-        >
-          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-        </button>
       </div>
     </motion.aside>
   );
