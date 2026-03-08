@@ -315,8 +315,9 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const generateSlug = (title: string) => {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   };
+  const combinedSearch = globalSearch || searchTerm;
   const filteredBlogs = blogs.filter(blog => {
-    const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = blog.title.toLowerCase().includes(combinedSearch.toLowerCase());
     let matchesStatus = false;
     if (statusFilter === 'all') {
       matchesStatus = true;
