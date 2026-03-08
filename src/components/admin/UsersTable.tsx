@@ -9,7 +9,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
-import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square, Home } from 'lucide-react';
+import { Search, UserX, UserCheck, Eye, Mail, Phone, MapPin, Calendar, MoreVertical, MoreHorizontal, Shield, CheckSquare, Square, Home, Briefcase, Building2, Users as UsersIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useTableUtils } from '@/hooks/useTableUtils';
@@ -29,6 +30,7 @@ interface Profile {
   suspension_reason: string | null;
   email?: string | null;
   is_admin?: boolean;
+  user_role?: string | null;
   listings_count?: number;
 }
 export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
@@ -58,11 +60,11 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
         error: emailsError
       } = await supabase.rpc('get_user_emails');
 
-      // Fetch admin roles
+      // Fetch all user roles
       const {
         data: rolesData,
         error: rolesError
-      } = await supabase.from('user_roles').select('user_id, role').eq('role', 'admin');
+      } = await supabase.from('user_roles').select('user_id, role');
 
       // Fetch listings count per user
       const {
@@ -82,21 +84,21 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
       // Create a map of user_id to email
       const emailMap = new Map<string, string>();
       if (!emailsError && emailsData) {
-        emailsData.forEach((item: {
-          user_id: string;
-          email: string;
-        }) => {
+        emailsData.forEach((item: { user_id: string; email: string }) => {
           emailMap.set(item.user_id, item.email);
         });
       }
 
-      // Create a set of admin user_ids
+      // Create maps for roles
       const adminSet = new Set<string>();
+      const roleMap = new Map<string, string>();
       if (!rolesError && rolesData) {
-        rolesData.forEach((item: {
-          user_id: string;
-        }) => {
-          adminSet.add(item.user_id);
+        rolesData.forEach((item: { user_id: string; role: string }) => {
+          if (item.role === 'admin') adminSet.add(item.user_id);
+          // Store primary non-admin role (buyer/seller/agent)
+          if (['buyer', 'seller', 'agent'].includes(item.role)) {
+            roleMap.set(item.user_id, item.role);
+          }
         });
       }
 
@@ -105,6 +107,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
         ...profile,
         email: emailMap.get(profile.user_id) || null,
         is_admin: adminSet.has(profile.user_id),
+        user_role: roleMap.get(profile.user_id) || null,
         listings_count: listingsCountMap.get(profile.user_id) || 0
       }));
       setUsers(usersWithEmails);
@@ -150,6 +153,31 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
       toast.error('Failed to remove admin role');
     }
   };
+  const changeUserRole = async (user: Profile, newRole: string) => {
+    try {
+      // Delete existing non-admin roles
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.user_id)
+        .in('role', ['buyer', 'seller', 'agent']);
+      if (deleteError) throw deleteError;
+
+      // Insert new role
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: user.user_id, role: newRole as any });
+      if (insertError) throw insertError;
+
+      const roleLabels: Record<string, string> = { buyer: 'Buyer/Tenant', seller: 'Seller/Landlord', agent: 'Agent' };
+      toast.success(`${user.full_name || 'User'} role changed to ${roleLabels[newRole]}`);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error changing user role:', error);
+      toast.error('Failed to change user role');
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -301,7 +329,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
             <TableRow className="bg-muted/50">
               <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
-              <SortableTableHead label="Ph No." sortKey="phone" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Role" sortKey="user_role" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Listings" sortKey="listings_count" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
@@ -337,10 +365,37 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {user.phone ? <span className="flex items-center gap-1.5 text-sm">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                        {user.phone}
-                      </span> : <span className="text-muted-foreground">-</span>}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {user.is_admin && <Badge variant="secondary" className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
+                          <Shield className="h-3 w-3" />
+                          Admin
+                        </Badge>}
+                      <Select value={user.user_role || ''} onValueChange={(value) => changeUserRole(user, value)}>
+                        <SelectTrigger className="h-7 w-[130px] text-xs">
+                          <SelectValue placeholder="No role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buyer">
+                            <span className="flex items-center gap-1.5">
+                              <Home className="h-3 w-3" />
+                              Buyer/Tenant
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="seller">
+                            <span className="flex items-center gap-1.5">
+                              <Building2 className="h-3 w-3" />
+                              Seller/Landlord
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="agent">
+                            <span className="flex items-center gap-1.5">
+                              <Briefcase className="h-3 w-3" />
+                              Agent
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap items-center gap-1.5">
