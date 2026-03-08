@@ -555,12 +555,22 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                 {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
               </span>
               {!task.isAppointment && (
-                <button
-                  onClick={() => handleDeleteTask(task.id)}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => openEditDialog(task)}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    title="Edit task"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    title="Delete task"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               )}
             </div>
           ))
