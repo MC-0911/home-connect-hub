@@ -159,10 +159,10 @@ export default function Admin() {
                     className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
                   />
                 </div>
-                <button className="relative w-11 h-11 rounded-full bg-card border border-border/60 shadow-sm hover:shadow-md flex items-center justify-center transition-all">
-                  <Bell className="h-5 w-5 text-muted-foreground" />
-                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-destructive rounded-full ring-2 ring-card" />
-                </button>
+                <AlertsDropdown
+                  unreadCount={unreadAlerts}
+                  onMarkRead={() => setUnreadAlerts(0)}
+                />
               </div>
             </div>
           </motion.header>
