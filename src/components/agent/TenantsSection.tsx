@@ -367,6 +367,7 @@ export function TenantsSection() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Stats */}
