@@ -110,13 +110,6 @@ const ListingLivePreviewCard = () => {
 
         {/* Card Body */}
         <div className="p-4 space-y-3">
-          {/* Title */}
-          <h3 className={cn(
-            "font-display font-semibold line-clamp-1 text-sm",
-            formData.title ? "text-foreground" : "text-destructive/60 italic"
-          )}>
-            {formData.title || '⚠ Add a title'}
-          </h3>
 
           {/* Location */}
           <div className="flex items-center gap-1.5">
