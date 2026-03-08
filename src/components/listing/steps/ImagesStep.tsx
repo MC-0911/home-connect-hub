@@ -1,11 +1,13 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useListingForm } from '../ListingFormContext';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, GripVertical } from 'lucide-react';
+import { ImagePlus, X, GripVertical, Eye, PenLine } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ListingPreview from '../ListingPreview';
 
 const ImagesStep = () => {
   const { formData, updateFormData } = useListingForm();
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -47,7 +49,22 @@ const ImagesStep = () => {
       <div className="text-center mb-8">
         <h2 className="text-2xl font-display font-semibold text-foreground">Property Photos</h2>
         <p className="text-muted-foreground mt-1">Add photos to showcase your property</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3 gap-2"
+          onClick={() => setShowPreview(!showPreview)}
+        >
+          {showPreview ? <PenLine className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          {showPreview ? 'Back to Editor' : 'Preview Listing'}
+        </Button>
       </div>
+
+      {showPreview ? (
+        <ListingPreview />
+      ) : (
+        <>
 
       {/* Upload Area */}
       <div className="relative">
@@ -186,7 +203,7 @@ const ImagesStep = () => {
       )}
 
       {totalImages === 0 && (
-        <div className="rounded-lg p-4 text-center bg-sky-50">
+        <div className="rounded-lg p-4 text-center bg-muted/50">
           <p className="text-muted-foreground">
             Add at least one photo of your property. High-quality images help attract more buyers.
           </p>
@@ -224,6 +241,8 @@ const ImagesStep = () => {
           You can always edit your listing later if needed.
         </p>
       </div>
+      </>
+      )}
     </div>
   );
 };
