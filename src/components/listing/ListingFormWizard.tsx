@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useListingForm, ListingFormProvider, ListingFormData } from './ListingFormContext';
 import StepIndicator from './StepIndicator';
@@ -13,7 +13,8 @@ import SuccessStep from './steps/SuccessStep';
 import ListingLivePreviewCard from './ListingLivePreviewCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Loader2, Eye } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -331,10 +332,27 @@ const ListingFormContent = ({
             </Card>
           </div>
 
-          {/* Live Preview Sidebar */}
+          {/* Live Preview Sidebar - Desktop */}
           <div className="hidden lg:block w-[320px] flex-shrink-0">
             <ListingLivePreviewCard />
           </div>
+        </div>
+
+        {/* Mobile Preview Drawer */}
+        <div className="lg:hidden fixed bottom-6 right-4 z-50">
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button size="lg" className="rounded-full shadow-lg gap-2 px-5">
+                <Eye className="w-4 h-4" />
+                Preview
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[85vh]">
+              <div className="overflow-y-auto px-4 pb-8 pt-2">
+                <ListingLivePreviewCard />
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </div>
     </div>;
