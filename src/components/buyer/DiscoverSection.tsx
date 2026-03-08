@@ -112,7 +112,33 @@ export function DiscoverSection() {
 
         <div className="flex gap-3 mt-6">
           <Button onClick={handleSearch} className="flex-1 gap-2"><Search className="h-4 w-4" /> Search Properties</Button>
-          <Button variant="outline" className="gap-2" onClick={() => toast({ title: "Search saved", description: "You'll be notified of new matches." })}><Bookmark className="h-4 w-4" /> Save Search</Button>
+          <Button variant="outline" className="gap-2" onClick={async () => {
+            if (!user) {
+              toast({ title: "Sign in required", description: "Please sign in to save searches.", variant: "destructive" });
+              return;
+            }
+            const parts: string[] = [];
+            if (searchQuery) parts.push(searchQuery);
+            if (propertyType !== "any") parts.push(propertyType);
+            if (bedrooms !== "any") parts.push(`${bedrooms}+ beds`);
+            parts.push(listingType === "rent" ? "Rent" : "Buy");
+            const name = parts.length > 1 ? parts.slice(0, 3).join(" · ") : `${listingType === "rent" ? "Rental" : "Sale"} Search`;
+
+            const { error } = await (supabase.from("saved_searches" as any) as any).insert({
+              user_id: user.id,
+              name,
+              listing_type: listingType,
+              property_type: propertyType,
+              bedrooms,
+              max_price: maxPrice[0],
+              search_query: searchQuery,
+            });
+            if (!error) {
+              toast({ title: "Search saved!", description: "Find it in the Saved Searches tab." });
+            } else {
+              toast({ title: "Error", description: "Failed to save search.", variant: "destructive" });
+            }
+          }}><Bookmark className="h-4 w-4" /> Save Search</Button>
         </div>
       </div>
 
