@@ -93,10 +93,10 @@ export function Header() {
                 {link.label}
                 {location.pathname === link.href && <motion.div layoutId="activeNav" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
               </Link>)}
-            {user && <Link to="/dashboard" className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === "/dashboard" && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
+            {user && <Link to={dashboardPath} className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === dashboardPath && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
                 <LayoutDashboard className="w-4 h-4" />
-                Dashboard
-                {location.pathname === "/dashboard" && <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
+                My Dashboard
+                {location.pathname === dashboardPath && <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />}
               </Link>}
             {user && <Link to="/messages" className={cn("text-sm font-medium transition-colors hover:text-accent relative py-2 flex items-center gap-2", isHomePage && !isScrolled ? "text-primary-foreground/90" : "text-muted-foreground", location.pathname === "/messages" && (isHomePage && !isScrolled ? "text-primary-foreground" : "text-foreground"))}>
                 <div className="relative">
