@@ -689,6 +689,42 @@ export type Database = {
           },
         ]
       }
+      saved_searches: {
+        Row: {
+          bedrooms: string | null
+          created_at: string
+          id: string
+          listing_type: string
+          max_price: number | null
+          name: string
+          property_type: string | null
+          search_query: string | null
+          user_id: string
+        }
+        Insert: {
+          bedrooms?: string | null
+          created_at?: string
+          id?: string
+          listing_type?: string
+          max_price?: number | null
+          name: string
+          property_type?: string | null
+          search_query?: string | null
+          user_id: string
+        }
+        Update: {
+          bedrooms?: string | null
+          created_at?: string
+          id?: string
+          listing_type?: string
+          max_price?: number | null
+          name?: string
+          property_type?: string | null
+          search_query?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_bookings: {
         Row: {
           admin_notes: string | null
