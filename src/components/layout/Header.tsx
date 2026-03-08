@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, Search, Heart, User, LogIn, LogOut, LayoutDashboard, ClipboardList, Shield, MessageSquare } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useMessages } from "@/hooks/useMessages";
 import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
