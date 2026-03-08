@@ -202,6 +202,31 @@ export function useAnalyticsData(dateRange: DateRange) {
         name: name.charAt(0).toUpperCase() + name.slice(1), value,
       }));
 
+      // Quick Overview: buyers = unique offer makers, sellers = unique listing owners
+      const uniqueOfferUsers = new Set(offers.map((o: any) => o.user_id).filter(Boolean));
+      const uniqueSellerUsers = new Set(listings.map((l: any) => l.user_id).filter(Boolean));
+      const buyerCount = Math.max(uniqueOfferUsers.size, leads.length);
+      const sellerCount = uniqueSellerUsers.size;
+
+      // Top agent: seller with most listings
+      const sellerListingCounts: Record<string, number> = {};
+      listings.forEach((l: any) => {
+        if (l.user_id) sellerListingCounts[l.user_id] = (sellerListingCounts[l.user_id] || 0) + 1;
+      });
+      let topAgentData: QuickOverviewData['topAgent'] = null;
+      const topSellerId = Object.entries(sellerListingCounts).sort(([, a], [, b]) => b - a)[0];
+      if (topSellerId) {
+        const { data: topProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', topSellerId[0])
+          .single();
+        topAgentData = {
+          name: topProfile?.full_name || 'Unknown',
+          deals: topSellerId[1],
+        };
+      }
+
       setAnalytics({
         totalUsers: users.length, activeUsers, suspendedUsers,
         totalListings: listings.length, activeListings, pendingListings, soldListings,
@@ -219,6 +244,12 @@ export function useAnalyticsData(dateRange: DateRange) {
         rawBlogs: blogs.map((b) => ({ created_at: b.created_at })),
         deviceTraffic,
         totalSessions: totalPageSessions,
+        quickOverview: {
+          buyerCount,
+          sellerCount,
+          agentCount: sellerCount,
+          topAgent: topAgentData,
+        },
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
