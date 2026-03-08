@@ -187,58 +187,10 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
       </div>
 
       {/* Recent Properties Table */}
-      <Card className="border border-border/50 shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">Recent Properties</CardTitle>
-            <Button onClick={() => navigate("/add-property")} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl gap-2" size="sm">
-              <Plus className="h-4 w-4" /> Add New Property
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {recentProperties.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No properties yet. Add your first property to get started.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Property</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Type</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Price</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentProperties.map((prop) => (
-                    <tr key={prop.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                      <td className="py-3 px-2">
-                        <p className="font-semibold text-sm text-foreground">{prop.title}</p>
-                        <p className="text-xs text-muted-foreground">{prop.address}, {prop.city}</p>
-                      </td>
-                      <td className="py-3 px-2 text-sm text-foreground capitalize">{prop.property_type}</td>
-                      <td className="py-3 px-2 text-sm font-medium text-foreground">{formatPrice(prop.price)}</td>
-                      <td className="py-3 px-2">
-                        <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[prop.status || "active"] || "bg-muted text-muted-foreground"}`}>
-                          {(prop.status || "active").replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2">
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => navigate(`/edit-property/${prop.id}`)} className="text-muted-foreground hover:text-foreground transition-colors"><Edit className="h-4 w-4" /></button>
-                          <button onClick={() => navigate(`/property/${prop.id}`)} className="text-muted-foreground hover:text-foreground transition-colors"><Eye className="h-4 w-4" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <RecentPropertiesCard 
+        listings={listings} 
+        navigate={navigate} 
+      />
 
       {/* Bottom Row: Tasks + Clients */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
