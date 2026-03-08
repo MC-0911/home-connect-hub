@@ -241,6 +241,8 @@ const ImagesStep = () => {
           You can always edit your listing later if needed.
         </p>
       </div>
+      </>
+      )}
     </div>
   );
 };
