@@ -123,7 +123,7 @@ export default function Auth() {
           }
         } else {
           toast.success("Welcome back!");
-          navigate(redirectTo);
+          // Will be redirected by the useEffect after roles load
         }
       }
     } catch (error) {
