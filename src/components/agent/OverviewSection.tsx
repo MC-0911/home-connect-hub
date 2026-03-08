@@ -259,6 +259,23 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchViewCounts = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase.rpc("get_property_view_counts", { _user_id: user.id });
+      if (!error && data) {
+        const counts: Record<string, number> = {};
+        data.forEach((row: { property_id: string; view_count: number }) => {
+          counts[row.property_id] = Number(row.view_count);
+        });
+        setViewCounts(counts);
+      }
+    };
+    fetchViewCounts();
+  }, [listings]);
 
   const filtered = useMemo(() => {
     const base = listings.slice(0, 8);
