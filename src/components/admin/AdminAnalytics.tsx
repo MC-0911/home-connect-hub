@@ -8,6 +8,7 @@ import { AnalyticsDateFilter, getDateRangeForPreset } from './analytics/Analytic
 import { AnalyticsStatsCards } from './analytics/AnalyticsStatsCards';
 import { LiveActivityFeed } from './analytics/LiveActivityFeed';
 import { QuickOverviewPanel } from './analytics/QuickOverviewPanel';
+import { LatestListingsTable } from './analytics/LatestListingsTable';
 import {
   ActivityOverTimeChart,
   UserGrowthChart,
@@ -155,6 +156,9 @@ export function AdminAnalytics() {
           toDate={dateRange.to}
         />
       </div>
+
+      {/* Latest Property Listings */}
+      <LatestListingsTable />
 
       {/* Traffic Overview + Revenue Trend */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
