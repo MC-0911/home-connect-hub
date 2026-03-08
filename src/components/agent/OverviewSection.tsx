@@ -1,4 +1,4 @@
-import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X } from "lucide-react";
+import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X, CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
