@@ -125,7 +125,7 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
     };
 
     if (editingAppt) {
-      const { error } = await supabase.from("agent_appointments").update(payload).eq("id", editingAppt.id);
+      const { error } = await supabase.from("agent_appointments" as any).update(payload).eq("id", editingAppt.id);
       if (error) { toast.error("Failed to update appointment"); return; }
       toast.success("Appointment updated");
     } else {
