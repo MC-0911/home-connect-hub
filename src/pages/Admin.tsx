@@ -31,6 +31,7 @@ export default function Admin() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdmin();
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
