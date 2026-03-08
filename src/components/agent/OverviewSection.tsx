@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import type { Tables } from "@/integrations/supabase/types";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -259,6 +259,23 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchViewCounts = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data, error } = await supabase.rpc("get_property_view_counts", { _user_id: user.id });
+      if (!error && data) {
+        const counts: Record<string, number> = {};
+        data.forEach((row: { property_id: string; view_count: number }) => {
+          counts[row.property_id] = Number(row.view_count);
+        });
+        setViewCounts(counts);
+      }
+    };
+    fetchViewCounts();
+  }, [listings]);
 
   const filtered = useMemo(() => {
     const base = listings.slice(0, 8);
@@ -351,7 +368,7 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
                       </span>
                     </td>
                     <td className="py-3 px-2 text-center text-sm font-medium text-muted-foreground">
-                      {Math.floor(Math.random() * 500) + 50}
+                      {viewCounts[prop.id] || 0}
                     </td>
                     <td className="py-3 px-2">
                       <div className="flex items-center gap-1.5">
