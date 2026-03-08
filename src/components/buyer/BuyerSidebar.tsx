@@ -1,6 +1,6 @@
 import {
   Compass, Heart, Bookmark, CalendarDays, Scale, Calculator,
-  MessageSquare, Settings, Crown, ChevronLeft, ChevronRight, Home
+  MessageSquare, Settings, Crown, ChevronLeft, ChevronRight, Home, FileText
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ const menuItems = [
   { id: "favorites", label: "Favorites", icon: Heart },
   { id: "saved-searches", label: "Saved Searches", icon: Bookmark },
   { id: "viewings", label: "Viewings", icon: CalendarDays },
+  { id: "offers", label: "My Offers", icon: FileText },
   { id: "compare", label: "Compare", icon: Scale },
   { id: "calculator", label: "Mortgage Calc", icon: Calculator },
   { id: "messages", label: "Messages", icon: MessageSquare },

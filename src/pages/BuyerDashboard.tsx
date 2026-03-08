@@ -10,6 +10,7 @@ import { CompareSection } from "@/components/buyer/CompareSection";
 import { MortgageCalculatorSection } from "@/components/buyer/MortgageCalculatorSection";
 import { BuyerMessagesSection } from "@/components/buyer/BuyerMessagesSection";
 import { BuyerSettingsSection } from "@/components/buyer/BuyerSettingsSection";
+import { BuyerOffersSection } from "@/components/buyer/BuyerOffersSection";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings, Bell } from "lucide-react";
 import { motion } from "framer-motion";
@@ -48,6 +49,7 @@ export default function BuyerDashboard() {
     favorites: { title: "Favorites", subtitle: "Properties you've saved" },
     "saved-searches": { title: "Saved Searches", subtitle: "Your saved search criteria" },
     viewings: { title: "Viewings", subtitle: "Scheduled property viewings" },
+    offers: { title: "My Offers", subtitle: "Track and manage your property offers" },
     compare: { title: "Compare", subtitle: "Side-by-side property comparison" },
     calculator: { title: "Mortgage Calculator", subtitle: "Estimate your monthly payments" },
     messages: { title: "Messages", subtitle: "Your conversations" },
@@ -60,6 +62,7 @@ export default function BuyerDashboard() {
       case "favorites": return <FavoritesSection />;
       case "saved-searches": return <SavedSearchesSection onRunSearch={handleRunSearch} />;
       case "viewings": return <ViewingsSection />;
+      case "offers": return <BuyerOffersSection />;
       case "compare": return <CompareSection />;
       case "calculator": return <MortgageCalculatorSection />;
       case "messages": return <BuyerMessagesSection />;
