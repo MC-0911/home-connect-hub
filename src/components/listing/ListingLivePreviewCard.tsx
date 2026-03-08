@@ -38,7 +38,7 @@ const useFieldChecks = (formData: any, isLand: boolean): FieldCheck[] => {
 };
 
 const ListingLivePreviewCard = () => {
-  const { formData } = useListingForm();
+  const { formData, setCurrentStep } = useListingForm();
 
   const coverImage =
     formData.existingImageUrls[0] ||
