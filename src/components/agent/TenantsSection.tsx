@@ -11,11 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw } from "lucide-react";
+import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { cn } from "@/lib/utils";
+import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 
 interface Tenant {
   id: string;
@@ -146,6 +147,10 @@ export function TenantsSection() {
   const [renewingTenant, setRenewingTenant] = useState<Tenant | null>(null);
   const [newLeaseEnd, setNewLeaseEnd] = useState<Date | undefined>();
   const [newRent, setNewRent] = useState("");
+
+  // Payment history
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [paymentTenant, setPaymentTenant] = useState<Tenant | null>(null);
 
   const openRenew = (t: Tenant) => {
     setRenewingTenant(t);
@@ -354,6 +359,9 @@ export function TenantsSection() {
                         </SelectContent>
                       </Select>
                       <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Payment History" onClick={() => { setPaymentTenant(tenant); setPaymentDialogOpen(true); }}>
+                          <Receipt className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" title="Renew Lease" onClick={() => openRenew(tenant)}>
                           <RotateCcw className="h-4 w-4" />
                         </Button>
@@ -429,6 +437,17 @@ export function TenantsSection() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Payment History Dialog */}
+      {paymentTenant && (
+        <PaymentHistoryDialog
+          open={paymentDialogOpen}
+          onOpenChange={(o) => { setPaymentDialogOpen(o); if (!o) setPaymentTenant(null); }}
+          tenantId={paymentTenant.id}
+          tenantName={paymentTenant.tenant_name}
+          monthlyRent={paymentTenant.monthly_rent}
+        />
+      )}
     </div>
   );
 }
