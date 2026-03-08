@@ -9,9 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { format, differenceInDays, addMonths, addYears } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Tenant {
   id: string;
@@ -135,6 +139,42 @@ export function TenantsSection() {
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("tenants").update({ payment_status: status }).eq("id", id);
     if (error) toast.error("Failed to update status");
+  };
+
+  // Lease renewal
+  const [renewDialogOpen, setRenewDialogOpen] = useState(false);
+  const [renewingTenant, setRenewingTenant] = useState<Tenant | null>(null);
+  const [newLeaseEnd, setNewLeaseEnd] = useState<Date | undefined>();
+  const [newRent, setNewRent] = useState("");
+
+  const openRenew = (t: Tenant) => {
+    setRenewingTenant(t);
+    setNewLeaseEnd(t.lease_end ? addYears(new Date(t.lease_end), 1) : addYears(new Date(), 1));
+    setNewRent(String(t.monthly_rent || ""));
+    setRenewDialogOpen(true);
+  };
+
+  const handleRenew = async () => {
+    if (!renewingTenant || !newLeaseEnd) {
+      toast.error("Please select a new lease end date");
+      return;
+    }
+    const newStart = renewingTenant.lease_end || format(new Date(), "yyyy-MM-dd");
+    const { error } = await supabase
+      .from("tenants")
+      .update({
+        lease_start: newStart,
+        lease_end: format(newLeaseEnd, "yyyy-MM-dd"),
+        monthly_rent: Number(newRent) || renewingTenant.monthly_rent,
+      })
+      .eq("id", renewingTenant.id);
+    if (error) {
+      toast.error("Failed to renew lease");
+      return;
+    }
+    toast.success(`Lease renewed for ${renewingTenant.tenant_name}`);
+    setRenewDialogOpen(false);
+    setRenewingTenant(null);
   };
 
   const stats = {
@@ -288,6 +328,19 @@ export function TenantsSection() {
                       </div>
                     </div>
 
+                    {/* Lease info */}
+                    {tenant.lease_end && (
+                      <div className="text-xs text-muted-foreground">
+                        Lease: {tenant.lease_start ? format(new Date(tenant.lease_start), "MMM d, yyyy") : "N/A"} — {format(new Date(tenant.lease_end), "MMM d, yyyy")}
+                        {(() => {
+                          const days = differenceInDays(new Date(tenant.lease_end), new Date());
+                          if (days < 0) return <Badge variant="destructive" className="ml-2 text-[10px] px-1.5 py-0">Expired</Badge>;
+                          if (days <= 30) return <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">{days}d left</Badge>;
+                          return null;
+                        })()}
+                      </div>
+                    )}
+
                     {/* Footer */}
                     <div className="flex items-center justify-between pt-2 border-t border-border">
                       <Select value={tenant.payment_status} onValueChange={(v) => updateStatus(tenant.id, v)}>
@@ -301,6 +354,9 @@ export function TenantsSection() {
                         </SelectContent>
                       </Select>
                       <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Renew Lease" onClick={() => openRenew(tenant)}>
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(tenant)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -316,6 +372,63 @@ export function TenantsSection() {
           })}
         </div>
       )}
+
+      {/* Renew Lease Dialog */}
+      <Dialog open={renewDialogOpen} onOpenChange={(o) => { setRenewDialogOpen(o); if (!o) setRenewingTenant(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Renew Lease — {renewingTenant?.tenant_name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            {renewingTenant?.lease_end && (
+              <div className="text-sm text-muted-foreground">
+                Current lease ends: <span className="font-medium text-foreground">{format(new Date(renewingTenant.lease_end), "PPP")}</span>
+              </div>
+            )}
+            <div className="grid gap-2">
+              <Label>New Lease End Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !newLeaseEnd && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newLeaseEnd ? format(newLeaseEnd, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newLeaseEnd}
+                    onSelect={setNewLeaseEnd}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex gap-2">
+              {[6, 12, 24].map((m) => (
+                <Button
+                  key={m}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setNewLeaseEnd(addMonths(renewingTenant?.lease_end ? new Date(renewingTenant.lease_end) : new Date(), m))}
+                >
+                  +{m}mo
+                </Button>
+              ))}
+            </div>
+            <div className="grid gap-2">
+              <Label>Updated Monthly Rent ($)</Label>
+              <Input type="number" value={newRent} onChange={(e) => setNewRent(e.target.value)} placeholder="Keep current rent" />
+            </div>
+            <Button onClick={handleRenew} className="w-full gap-2">
+              <RotateCcw className="h-4 w-4" /> Renew Lease
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
