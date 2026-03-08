@@ -59,10 +59,11 @@ export function useUserRole() {
   const isAdmin = hasRole('admin');
 
   const getDashboardPath = (): string => {
-    if (isAdmin) return '/admin';
+    // Agent/seller/buyer dashboards take priority over admin for navigation
     if (hasRole('agent')) return '/agent-dashboard';
     if (hasRole('seller')) return '/dashboard';
     if (hasRole('buyer')) return '/buyer-dashboard';
+    if (isAdmin) return '/admin';
     return '/';
   };
 
