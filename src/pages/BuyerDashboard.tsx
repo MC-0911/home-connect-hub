@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BuyerSidebar } from "@/components/buyer/BuyerSidebar";
@@ -16,11 +16,20 @@ import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
 
+type SearchFilters = {
+  listingType: "sale" | "rent";
+  propertyType: string;
+  bedrooms: string;
+  maxPrice: number;
+  searchQuery: string;
+};
+
 export default function BuyerDashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("discover");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [pendingFilters, setPendingFilters] = useState<SearchFilters | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -28,6 +37,11 @@ export default function BuyerDashboard() {
 
   if (authLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return null;
+
+  const handleRunSearch = (filters: SearchFilters) => {
+    setPendingFilters(filters);
+    setActiveSection("discover");
+  };
 
   const sectionTitles: Record<string, { title: string; subtitle: string }> = {
     discover: { title: "Find Your Dream Home", subtitle: "Discover properties that match your criteria" },
@@ -42,15 +56,15 @@ export default function BuyerDashboard() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case "discover": return <DiscoverSection />;
+      case "discover": return <DiscoverSection initialFilters={pendingFilters} />;
       case "favorites": return <FavoritesSection />;
-      case "saved-searches": return <SavedSearchesSection />;
+      case "saved-searches": return <SavedSearchesSection onRunSearch={handleRunSearch} />;
       case "viewings": return <ViewingsSection />;
       case "compare": return <CompareSection />;
       case "calculator": return <MortgageCalculatorSection />;
       case "messages": return <BuyerMessagesSection />;
       case "settings": return <BuyerSettingsSection />;
-      default: return <DiscoverSection />;
+      default: return <DiscoverSection initialFilters={pendingFilters} />;
     }
   };
 

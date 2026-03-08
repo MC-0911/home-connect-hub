@@ -14,17 +14,37 @@ import { useAuth } from "@/hooks/useAuth";
 
 type Property = Tables<"properties">;
 
-export function DiscoverSection() {
+interface DiscoverSectionProps {
+  initialFilters?: {
+    listingType: "sale" | "rent";
+    propertyType: string;
+    bedrooms: string;
+    maxPrice: number;
+    searchQuery: string;
+  } | null;
+}
+
+export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [listingType, setListingType] = useState<"sale" | "rent">("sale");
-  const [propertyType, setPropertyType] = useState("any");
-  const [bedrooms, setBedrooms] = useState("any");
-  const [maxPrice, setMaxPrice] = useState([2000000]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [listingType, setListingType] = useState<"sale" | "rent">(initialFilters?.listingType || "sale");
+  const [propertyType, setPropertyType] = useState(initialFilters?.propertyType || "any");
+  const [bedrooms, setBedrooms] = useState(initialFilters?.bedrooms || "any");
+  const [maxPrice, setMaxPrice] = useState([initialFilters?.maxPrice || 2000000]);
+  const [searchQuery, setSearchQuery] = useState(initialFilters?.searchQuery || "");
+
+  useEffect(() => {
+    if (initialFilters) {
+      setListingType(initialFilters.listingType);
+      setPropertyType(initialFilters.propertyType);
+      setBedrooms(initialFilters.bedrooms);
+      setMaxPrice([initialFilters.maxPrice]);
+      setSearchQuery(initialFilters.searchQuery);
+    }
+  }, [initialFilters]);
 
   useEffect(() => {
     fetchProperties();
