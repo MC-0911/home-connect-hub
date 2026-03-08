@@ -200,15 +200,6 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-white/10 space-y-1">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all"
-        >
-          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-        </button>
-      </div>
     </motion.aside>
   );
 }
