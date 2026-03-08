@@ -32,7 +32,7 @@ export function Header() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAdmin } = useAdmin();
-  const { getDashboardPath, loading: roleLoading } = useUserRole();
+  const { loading: roleLoading } = useUserRole();
   const {
     profile
   } = useProfile();
