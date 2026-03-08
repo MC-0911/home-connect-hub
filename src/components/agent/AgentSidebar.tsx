@@ -212,6 +212,50 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
         })}
       </nav>
 
+      {/* Footer */}
+      <div className="px-3 py-4 border-t border-white/10 space-y-1">
+        <button
+          onClick={() => onSectionChange("settings")}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all",
+            activeSection === "settings"
+              ? "bg-white/20 text-white shadow-lg shadow-black/10"
+              : "text-white/60 hover:bg-white/10 hover:text-white"
+          )}
+        >
+          <Settings className="h-5 w-5 shrink-0" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-sm font-medium whitespace-nowrap"
+              >
+                Settings
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+        <button
+          onClick={() => navigate("/")}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-sm font-medium whitespace-nowrap"
+              >
+                Back to Site
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+      </div>
     </motion.aside>
   );
 }
