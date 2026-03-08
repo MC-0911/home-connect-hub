@@ -16,6 +16,7 @@ import { useAgentRealtime } from "@/hooks/useAgentRealtime";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings } from "lucide-react";
 import { motion } from "framer-motion";
+import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
 import { Footer } from "@/components/layout/Footer";
