@@ -14,6 +14,7 @@ import { useAgentRealtime } from "@/hooks/useAgentRealtime";
 import { Input } from "@/components/ui/input";
 import { Search, Bell, MessageSquare, Settings } from "lucide-react";
 import { motion } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function AgentDashboard() {
   const { user, loading: authLoading } = useAuth();
