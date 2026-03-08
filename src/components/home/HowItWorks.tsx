@@ -58,7 +58,8 @@ export function HowItWorks({ className }: { className?: string }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="relative flex flex-col items-center text-center group"
+                whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
+                className="relative flex flex-col items-center text-center group cursor-default rounded-3xl p-6 transition-shadow duration-300 hover:shadow-[0_20px_50px_-12px_hsl(var(--accent)/0.15)]"
               >
                 {/* Icon container with layered circles */}
                 <div className="relative mb-10">
