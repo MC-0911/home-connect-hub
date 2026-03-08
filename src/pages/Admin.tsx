@@ -203,7 +203,7 @@ export default function Admin() {
           <footer className="px-8 py-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
             <span>© {new Date().getFullYear()} Royal Landmark — Real estate management suite</span>
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               System online
             </span>
           </footer>
