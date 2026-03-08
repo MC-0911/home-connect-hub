@@ -31,17 +31,27 @@ export function LatestListingsTable() {
   const [listings, setListings] = useState<LatestListing[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('properties')
-        .select('id, title, property_type, price, status, created_at, city, state')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      if (data) setListings(data as LatestListing[]);
-    };
-    fetch();
+  const fetchListings = useCallback(async () => {
+    const { data } = await supabase
+      .from('properties')
+      .select('id, title, property_type, price, status, created_at, city, state')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    if (data) setListings(data as LatestListing[]);
   }, []);
+
+  useEffect(() => {
+    fetchListings();
+
+    const channel = supabase
+      .channel('latest-listings-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
+        fetchListings();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchListings]);
 
   const formatPrice = (price: number) =>
     price >= 1_000_000

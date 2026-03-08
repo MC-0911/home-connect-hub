@@ -25,22 +25,32 @@ const typeConfig: Record<string, { icon: typeof CalendarDays; tagLabel: string }
 export function UpcomingAppointmentsPanel() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      const today = format(startOfDay(new Date()), 'yyyy-MM-dd');
-      const { data } = await supabase
-        .from('agent_appointments')
-        .select('id, title, appointment_date, start_time, end_time, appointment_type')
-        .gte('appointment_date', today)
-        .eq('status', 'scheduled')
-        .order('appointment_date', { ascending: true })
-        .order('start_time', { ascending: true })
-        .limit(5);
+  const fetchAppointments = useCallback(async () => {
+    const today = format(startOfDay(new Date()), 'yyyy-MM-dd');
+    const { data } = await supabase
+      .from('agent_appointments')
+      .select('id, title, appointment_date, start_time, end_time, appointment_type')
+      .gte('appointment_date', today)
+      .eq('status', 'scheduled')
+      .order('appointment_date', { ascending: true })
+      .order('start_time', { ascending: true })
+      .limit(5);
 
-      if (data) setAppointments(data);
-    };
-    fetchAppointments();
+    if (data) setAppointments(data);
   }, []);
+
+  useEffect(() => {
+    fetchAppointments();
+
+    const channel = supabase
+      .channel('upcoming-appointments-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_appointments' }, () => {
+        fetchAppointments();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchAppointments]);
 
   return (
     <motion.div
