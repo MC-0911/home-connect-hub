@@ -192,12 +192,17 @@ const ListingLivePreviewCard = () => {
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {missingFields.map((f) => (
-                    <span
+                    <button
                       key={f.label}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive/80 border border-destructive/20"
+                      type="button"
+                      onClick={() => {
+                        setCurrentStep(f.step);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive/80 border border-destructive/20 hover:bg-destructive/20 hover:text-destructive transition-colors cursor-pointer"
                     >
-                      {f.label}
-                    </span>
+                      {f.label} →
+                    </button>
                   ))}
                 </div>
               </div>
