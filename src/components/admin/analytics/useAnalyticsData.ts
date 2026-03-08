@@ -89,7 +89,7 @@ export function useAnalyticsData(dateRange: DateRange) {
       let listingsQ = supabase.from('properties').select('id, status, property_type, created_at, price, updated_at, user_id');
       let blogsQ = supabase.from('blogs').select('id, title, slug, views, status, created_at');
       let leadsQ = supabase.from('buyer_requirements').select('id, created_at, status, requirement_type');
-      let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount');
+      let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount, user_id');
       let blogViewsQ = supabase.from('blog_views').select('id, viewed_at');
       let pageViewsQ = supabase.from('page_views').select('id, device_type, created_at');
 
