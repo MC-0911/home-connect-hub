@@ -1085,7 +1085,7 @@ export type Database = {
       increment_blog_views: { Args: { blog_slug: string }; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "buyer" | "seller" | "agent"
       listing_type: "sale" | "rent"
       property_status:
         | "active"
@@ -1228,7 +1228,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "buyer", "seller", "agent"],
       listing_type: ["sale", "rent"],
       property_status: [
         "active",
