@@ -16,6 +16,7 @@ import { Search, MessageSquare, Settings, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
+import { Footer } from "@/components/layout/Footer";
 
 type SearchFilters = {
   listingType: "sale" | "rent";
@@ -136,6 +137,7 @@ export default function BuyerDashboard() {
             {renderSection()}
           </motion.div>
         </div>
+        <Footer />
       </main>
     </div>
   );
