@@ -262,5 +262,6 @@ export default function Auth() {
           </motion.div>
         </div>
       </main>
+      <Footer />
     </div>;
 }
