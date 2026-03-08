@@ -206,6 +206,10 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
           if (msg.sender_id !== userRef.current?.id) {
             toast.info("New Message", {
               description: msg.content?.slice(0, 80) || "You have a new message",
+              action: onNavigate ? {
+                label: "View",
+                onClick: () => onNavigate("messages"),
+              } : undefined,
             });
           }
           fetchUnreadMessages();
