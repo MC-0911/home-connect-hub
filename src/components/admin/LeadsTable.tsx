@@ -35,7 +35,7 @@ interface Lead {
   status: string | null;
   created_at: string;
 }
-export function LeadsTable() {
+export function LeadsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
