@@ -308,6 +308,53 @@ export type Database = {
           },
         ]
       }
+      maintenance_requests: {
+        Row: {
+          created_at: string
+          description: string
+          due_date: string | null
+          id: string
+          priority: string
+          property_name: string
+          status: string
+          tenant_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          due_date?: string | null
+          id?: string
+          priority?: string
+          property_name: string
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          id?: string
+          priority?: string
+          property_name?: string
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           attachment_name: string | null
