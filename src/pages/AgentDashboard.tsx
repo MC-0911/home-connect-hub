@@ -133,7 +133,7 @@ export default function AgentDashboard() {
       case "documents": return <DocumentsSection documents={documents} onRefresh={fetchDocuments} />;
       case "analytics": return <AnalyticsSection stats={stats} />;
       case "settings": return <SettingsSection />;
-      default: return <OverviewSection stats={stats} recentActivity={recentActivity} onNavigate={setActiveSection} />;
+      default: return <OverviewSection stats={stats} recentActivity={recentActivity} onNavigate={setActiveSection} listings={listings} leads={leads} appointments={appointments} />;
     }
   };
 
