@@ -11,11 +11,13 @@ import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { AdminSidebar, type AdminSection } from '@/components/admin/AdminSidebar';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Crown, Search, Bell } from 'lucide-react';
+import { Shield, Crown, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { AlertsDropdown } from '@/components/agent/AlertsDropdown';
+import { useAuth } from '@/hooks/useAuth';
 
 const sectionMeta: Record<AdminSection, { title: string; description: string; icon: typeof Shield }> = {
   analytics: { title: 'Dashboard Overview', description: 'Platform analytics and performance metrics', icon: Crown },
