@@ -102,6 +102,7 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
     if (id === "messages") return unreadMessages;
     if (id === "viewings") return viewingsCount;
     if (id === "favorites") return favoritesCount;
+    if (id === "saved-searches") return savedSearchesCount;
     return 0;
   };
 
