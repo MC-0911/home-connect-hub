@@ -144,7 +144,7 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
   };
 
   const handleStatusChange = async (id: string, status: string) => {
-    const { error } = await supabase.from("agent_appointments").update({ status }).eq("id", id);
+    const { error } = await supabase.from("agent_appointments" as any).update({ status }).eq("id", id);
     if (error) toast.error("Failed to update status");
   };
 
