@@ -120,10 +120,10 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
   }, [leads]);
 
   const kpis = [
-    { label: "Total Properties", value: stats.totalListings, sub: `${stats.activeListings} active, ${stats.soldListings} sold/rented`, icon: Home, gradient: "from-blue-500 to-indigo-600", section: "listings" },
-    { label: "Active Listings", value: stats.activeListings, sub: `${listings.filter(l => l.listing_type === 'sale').length} for sale, ${listings.filter(l => l.listing_type === 'rent').length} for rent`, icon: Tag, gradient: "from-emerald-500 to-teal-600", section: "listings" },
-    { label: "Total Offers", value: stats.totalOffers, sub: `${stats.pendingOffers} pending, ${stats.acceptedOffers} accepted`, icon: DollarSign, gradient: "from-amber-500 to-orange-600", section: "offers" },
-    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: TrendingUp, gradient: "from-violet-500 to-purple-600", section: "analytics" },
+    { label: "Total Properties", value: stats.totalListings, sub: `${stats.activeListings} active, ${stats.soldListings} sold/rented`, icon: Home, gradient: "from-blue-500 to-indigo-600" },
+    { label: "Active Listings", value: stats.activeListings, sub: `${listings.filter(l => l.listing_type === 'sale').length} for sale, ${listings.filter(l => l.listing_type === 'rent').length} for rent`, icon: Tag, gradient: "from-emerald-500 to-teal-600" },
+    { label: "Total Offers", value: stats.totalOffers, sub: `${stats.pendingOffers} pending, ${stats.acceptedOffers} accepted`, icon: DollarSign, gradient: "from-amber-500 to-orange-600" },
+    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: TrendingUp, gradient: "from-violet-500 to-purple-600" },
   ];
 
   // Second row of KPIs for offer breakdown
@@ -140,10 +140,7 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {kpis.map((kpi, i) => (
           <motion.div key={kpi.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card
-              className="border border-border/50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
-              onClick={() => onNavigate(kpi.section)}
-            >
+            <Card className="border border-border/50 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
@@ -151,11 +148,8 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
                     <p className="text-2xl font-bold text-foreground mt-1">{kpi.value}</p>
                     <p className="text-xs text-muted-foreground mt-1">{kpi.sub}</p>
                   </div>
-                  <div className="flex flex-col items-center gap-1.5">
-                    <div className={`p-3 rounded-full bg-gradient-to-br ${kpi.gradient} text-white shadow-lg`}>
-                      <kpi.icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+                  <div className={`p-3 rounded-full bg-gradient-to-br ${kpi.gradient} text-white shadow-lg`}>
+                    <kpi.icon className="h-5 w-5" />
                   </div>
                 </div>
               </CardContent>
@@ -168,19 +162,15 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {offerKpis.map((kpi, i) => (
           <motion.div key={kpi.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.08 }}>
-            <Card
-              className="border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
-              onClick={() => onNavigate("offers")}
-            >
+            <Card className="border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2.5 rounded-xl bg-gradient-to-br ${kpi.gradient} text-white shadow-sm`}>
                   <kpi.icon className="h-4 w-4" />
                 </div>
-                <div className="flex-1">
+                <div>
                   <p className="text-xl font-bold text-foreground">{kpi.value}</p>
                   <p className="text-xs text-muted-foreground">{kpi.label}</p>
                 </div>
-                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
               </CardContent>
             </Card>
           </motion.div>
