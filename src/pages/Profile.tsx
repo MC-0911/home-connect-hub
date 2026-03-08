@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, FileText, Loader2, Upload, Pencil, Trash2, MoreVertical, LogOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import {
   DropdownMenu,
   DropdownMenuContent,
