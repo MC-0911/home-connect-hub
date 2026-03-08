@@ -33,6 +33,7 @@ export function useBlogAutosave(
   onDraftCreated?: (id: string) => void
 ) {
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const lastSavedSnapshot = useRef<string>('');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const creatingRef = useRef(false); // guards against double-insert
@@ -128,6 +129,7 @@ export function useBlogAutosave(
       }
 
       lastSavedSnapshot.current = snapshot;
+      setLastSavedAt(new Date());
       setAutosaveStatus('saved');
     } catch (err) {
       creatingRef.current = false;
@@ -158,5 +160,5 @@ export function useBlogAutosave(
     };
   }, [isDialogOpen, save, getSnapshot]);
 
-  return { autosaveStatus };
+  return { autosaveStatus, lastSavedAt };
 }

@@ -140,7 +140,7 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
     fetchBlogs();
   };
 
-  const { autosaveStatus } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen, handleDraftCreated);
+  const { autosaveStatus, lastSavedAt } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen, handleDraftCreated);
 
   const localDateTimeToIso = (localValue: string) => {
     if (!localValue) return null;
@@ -476,7 +476,9 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                      {autosaveStatus === 'saved' && (
                        <>
                          <Save className="h-3 w-3 text-green-600" />
-                         <span className="text-green-600">Autosaved</span>
+                         <span className="text-green-600">
+                           Autosaved{lastSavedAt ? ` at ${lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : ''}
+                         </span>
                        </>
                      )}
                      {autosaveStatus === 'error' && (
@@ -488,7 +490,7 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                      {autosaveStatus === 'idle' && (
                        <>
                          <Save className="h-3 w-3" />
-                         <span>Autosave on</span>
+                         <span>{lastSavedAt ? `Last saved at ${lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : 'Autosave on'}</span>
                        </>
                      )}
                    </div>
