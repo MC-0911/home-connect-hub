@@ -456,16 +456,16 @@ export default function Dashboard() {
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </Badge>}
                 </TabsTrigger>
+                <TabsTrigger value="bookings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Clipboard className="w-4 h-4 mr-1" />
+                  My Bookings
+                </TabsTrigger>
                 <TabsTrigger value="alerts" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   <Bell className="w-4 h-4 mr-1" />
                   Alerts
                   {unreadAlertsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
                       {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
                     </Badge>}
-                </TabsTrigger>
-                <TabsTrigger value="bookings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Clipboard className="w-4 h-4 mr-1" />
-                  My Bookings
                 </TabsTrigger>
               </TabsList>
 
