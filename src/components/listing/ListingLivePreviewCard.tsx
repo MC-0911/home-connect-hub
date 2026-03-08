@@ -8,28 +8,30 @@ import { cn } from '@/lib/utils';
 interface FieldCheck {
   label: string;
   filled: boolean;
+  step: number;
 }
 
 const useFieldChecks = (formData: any, isLand: boolean): FieldCheck[] => {
+  const lastStep = isLand ? 4 : 6;
   const checks: FieldCheck[] = [
-    { label: 'Property type', filled: !!formData.propertyType },
-    { label: 'Title', filled: !!formData.title },
-    { label: 'Price', filled: !!formData.price },
-    { label: 'Address', filled: !!formData.address },
-    { label: 'City', filled: !!formData.city },
-    { label: 'State', filled: !!formData.state },
-    { label: 'Photos', filled: formData.existingImageUrls.length > 0 || formData.imagePreviewUrls.length > 0 },
-    { label: 'Description', filled: !!formData.description },
+    { label: 'Property type', filled: !!formData.propertyType, step: 1 },
+    { label: 'Title', filled: !!formData.title, step: 1 },
+    { label: 'Price', filled: !!formData.price, step: 1 },
+    { label: 'Address', filled: !!formData.address, step: 2 },
+    { label: 'City', filled: !!formData.city, step: 2 },
+    { label: 'State', filled: !!formData.state, step: 2 },
+    { label: 'Photos', filled: formData.existingImageUrls.length > 0 || formData.imagePreviewUrls.length > 0, step: lastStep },
+    { label: 'Description', filled: !!formData.description, step: lastStep },
   ];
   if (!isLand) {
     checks.splice(3, 0,
-      { label: 'Bedrooms', filled: !!formData.bedrooms },
-      { label: 'Bathrooms', filled: !!formData.bathrooms },
-      { label: 'Square feet', filled: !!formData.squareFeet },
+      { label: 'Bedrooms', filled: !!formData.bedrooms, step: 1 },
+      { label: 'Bathrooms', filled: !!formData.bathrooms, step: 1 },
+      { label: 'Square feet', filled: !!formData.squareFeet, step: 1 },
     );
   } else {
     checks.splice(3, 0,
-      { label: 'Lot size', filled: !!formData.lotSize },
+      { label: 'Lot size', filled: !!formData.lotSize, step: 1 },
     );
   }
   return checks;
