@@ -163,7 +163,7 @@ export default function Admin() {
               {activeSection === 'listings' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <ListingsTable />
+                    <ListingsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
