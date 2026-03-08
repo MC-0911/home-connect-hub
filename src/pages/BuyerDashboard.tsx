@@ -42,7 +42,7 @@ export default function BuyerDashboard() {
   };
 
   const sectionTitles: Record<string, { title: string; subtitle: string }> = {
-    discover: { title: "Find Your Dream Home", subtitle: "Discover properties that match your criteria" },
+    discover: { title: "Buyer Dashboard", subtitle: format(new Date(), "EEEE, MMMM d, yyyy") },
     favorites: { title: "Favorites", subtitle: "Properties you've saved" },
     "saved-searches": { title: "Saved Searches", subtitle: "Your saved search criteria" },
     viewings: { title: "Viewings", subtitle: "Scheduled property viewings" },
