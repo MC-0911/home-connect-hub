@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useListingForm, ListingFormProvider, ListingFormData } from './ListingFormContext';
 import StepIndicator from './StepIndicator';
