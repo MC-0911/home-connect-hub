@@ -21,7 +21,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 type Property = Tables<"properties">;
 export default function Dashboard() {
   const {
@@ -99,7 +99,6 @@ export default function Dashboard() {
       fetchPendingVisitsCount();
       fetchPendingOffersCount();
 
-      // Subscribe to alerts changes
       const alertsChannel = supabase.channel("dashboard-alerts").on("postgres_changes", {
         event: "*",
         schema: "public",
@@ -109,14 +108,12 @@ export default function Dashboard() {
         fetchUnreadAlertsCount();
       }).subscribe();
 
-      // Subscribe to visits changes for real-time notifications
       const visitsChannel = supabase.channel("dashboard-visits").on("postgres_changes", {
         event: "*",
         schema: "public",
         table: "property_visits",
         filter: `seller_id=eq.${user.id}`
       }, (payload) => {
-        console.log("Visit change received:", payload);
         fetchPendingVisitsCount();
         if (payload.eventType === "INSERT") {
           toast({
@@ -126,14 +123,12 @@ export default function Dashboard() {
         }
       }).subscribe();
 
-      // Subscribe to offers changes for real-time notifications
       const offersChannel = supabase.channel("dashboard-offers").on("postgres_changes", {
         event: "*",
         schema: "public",
         table: "property_offers",
         filter: `seller_id=eq.${user.id}`
       }, (payload) => {
-        console.log("Offer change received:", payload);
         fetchPendingOffersCount();
         if (payload.eventType === "INSERT") {
           toast({
@@ -153,7 +148,6 @@ export default function Dashboard() {
 
   const fetchInquiriesData = async () => {
     try {
-      // Get all conversations where the user is the seller (property owner)
       const { data: allConversations, error: allError } = await supabase
         .from("conversations")
         .select("buyer_id, created_at, property_id")
@@ -161,11 +155,9 @@ export default function Dashboard() {
 
       if (allError) throw allError;
 
-      // Count unique buyers
       const uniqueBuyers = new Set(allConversations?.map(c => c.buyer_id) || []);
       const total = uniqueBuyers.size;
 
-      // Count new inquiries from the past week
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       
@@ -177,7 +169,6 @@ export default function Dashboard() {
 
       setInquiriesData({ total, weeklyNew });
 
-      // Count unique buyers per property
       const propertyBuyerCounts: Record<string, Set<string>> = {};
       allConversations?.forEach(c => {
         if (c.property_id) {
@@ -293,17 +284,17 @@ export default function Dashboard() {
   };
   const getStatusBadge = (status: string | null) => {
     const statusStyles: Record<string, string> = {
-      active: "bg-green-500/10 text-green-600 border-green-500/20",
-      pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-      sold: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-      rented: "bg-purple-500/10 text-purple-600 border-purple-500/20",
-      under_review: "bg-orange-500/10 text-orange-600 border-orange-500/20",
-      declined: "bg-red-500/10 text-red-600 border-red-500/20"
+      active: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      pending: "bg-amber-100 text-amber-700 border-amber-200",
+      sold: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      rented: "bg-rose-100 text-rose-700 border-rose-200",
+      under_review: "bg-orange-100 text-orange-700 border-orange-200",
+      declined: "bg-red-100 text-red-700 border-red-200"
     };
     const displayStatus = status === 'under_review' ? 'Under Review' : status || 'active';
-    return <Badge variant="outline" className={`capitalize ${statusStyles[status || "active"] || ""}`}>
+    return <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize ${statusStyles[status || "active"] || ""}`}>
         {displayStatus}
-      </Badge>;
+      </span>;
   };
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -323,84 +314,86 @@ export default function Dashboard() {
     title: "Total Listings",
     value: properties.length,
     icon: Home,
-    color: "text-accent",
     breakdown: [
-      { label: "active", count: activeCount, color: "text-green-600" },
+      { label: "active", count: activeCount, color: "text-emerald-600" },
       { label: "under review", count: underReviewCount, color: "text-orange-600" },
-      { label: "pending", count: pendingCount, color: "text-yellow-600" },
-      { label: "sold", count: soldCount, color: "text-blue-600" },
-      { label: "rented", count: rentedCount, color: "text-purple-600" },
+      { label: "pending", count: pendingCount, color: "text-amber-600" },
+      { label: "sold", count: soldCount, color: "text-indigo-600" },
+      { label: "rented", count: rentedCount, color: "text-rose-600" },
       { label: "declined", count: declinedCount, color: "text-red-600" }
     ].filter(item => item.count > 0)
   }, {
     title: "Total Value",
     value: formatPrice(properties.reduce((acc, p) => acc + p.price, 0)),
     icon: DollarSign,
-    color: "text-accent"
   }, {
     title: "Inquiries",
     value: inquiriesData.total,
     icon: MessageSquare,
-    color: "text-accent",
     trend: inquiriesData.weeklyNew > 0 ? `+${inquiriesData.weeklyNew} new this week` : null
   }, {
     title: "Alerts",
     value: unreadAlertsCount,
     icon: Bell,
-    color: "text-accent"
   }];
+
   if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">
+    return <div className="min-h-screen flex items-center justify-center bg-muted/30">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
       </div>;
   }
-  return <div className="min-h-screen bg-background">
+
+  return <div className="min-h-screen bg-muted/30">
       <Header />
-      <main className="pt-24 pb-16 bg-primary-foreground">
+      <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Page Header */}
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          {/* Top Header Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card rounded-2xl shadow-sm border border-border/50 p-5 sm:p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          >
             <div>
-              <h1 className="font-display text-3xl font-bold text-foreground">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
                 Seller Dashboard
               </h1>
-              <p className="text-muted-foreground mt-1">Track the performance & Manage your property listings</p>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {format(new Date(), "EEEE, MMMM d, yyyy")}
+              </p>
             </div>
-            <Button variant="gold" asChild>
-              <Link to="/add-property">
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Property
-              </Link>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="gold" asChild className="rounded-lg shadow-sm">
+                <Link to="/add-property">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Property
+                </Link>
+              </Button>
+            </div>
           </motion.div>
 
           {/* Stats Cards */}
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          delay: 0.1
-        }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat, index) => <Card key={index} className="bg-card border-border">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6"
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="bg-card rounded-2xl shadow-sm border border-border/50 p-5 flex items-center justify-between group hover:shadow-md transition-shadow"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
                     {stat.title}
-                  </CardTitle>
-                  <stat.icon className={`h-5 w-5 ${stat.color}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                    {stat.value}
+                  </p>
                   {'breakdown' in stat && stat.breakdown && stat.breakdown.length > 0 && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                       {stat.breakdown.map((item, i) => (
                         <span key={item.label}>
                           <span className={item.color}>{item.count} {item.label}</span>
@@ -410,148 +403,196 @@ export default function Dashboard() {
                     </p>
                   )}
                   {'trend' in stat && stat.trend && (
-                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1 font-medium">
                       <ArrowUpRight className="h-3 w-3" />
                       {stat.trend}
                     </p>
                   )}
-                </CardContent>
-              </Card>)}
+                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center text-accent-foreground shrink-0 ml-4 shadow-sm">
+                  <stat.icon className="h-5 w-5" />
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
 
           {/* Tab List Section */}
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          delay: 0.15
-        }} className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-0">
-                <TabsTrigger value="listings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  My Listings 
-                </TabsTrigger>
-                <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
-                  <CalendarCheck className="w-4 h-4 mr-1" />
-                  Visits
-                  {pendingVisitsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
-                      {pendingVisitsCount > 9 ? '9+' : pendingVisitsCount}
-                    </Badge>}
-                </TabsTrigger>
-                <TabsTrigger value="offers" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
-                  <DollarSign className="w-4 h-4 mr-1" />
-                  Offers
-                  {pendingOffersCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
-                      {pendingOffersCount > 9 ? '9+' : pendingOffersCount}
-                    </Badge>}
-                </TabsTrigger>
-                <TabsTrigger value="messages" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
-                  <MessageSquare className="w-4 h-4 mr-1" />
-                  Messages
-                  {unreadCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </Badge>}
-                </TabsTrigger>
-                <TabsTrigger value="bookings" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Clipboard className="w-4 h-4 mr-1" />
-                  My Bookings
-                </TabsTrigger>
-                <TabsTrigger value="alerts" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
-                  <Bell className="w-4 h-4 mr-1" />
-                  Alerts
-                  {unreadAlertsCount > 0 && <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs rounded-full">
-                      {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
-                    </Badge>}
-                </TabsTrigger>
-              </TabsList>
+              {/* Tab Navigation inside a card-like container */}
+              <div className="bg-card rounded-2xl shadow-sm border border-border/50 px-4 sm:px-6 pt-1 mb-6">
+                <TabsList className="w-full justify-start bg-transparent rounded-none h-auto p-0 gap-0 overflow-x-auto">
+                  <TabsTrigger
+                    value="listings"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+                  >
+                    <Building2 className="w-4 h-4 mr-1.5" />
+                    My Listings
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="visits"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors relative text-sm font-medium"
+                  >
+                    <CalendarCheck className="w-4 h-4 mr-1.5" />
+                    Visits
+                    {pendingVisitsCount > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
+                        {pendingVisitsCount > 9 ? '9+' : pendingVisitsCount}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="offers"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors relative text-sm font-medium"
+                  >
+                    <DollarSign className="w-4 h-4 mr-1.5" />
+                    Offers
+                    {pendingOffersCount > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
+                        {pendingOffersCount > 9 ? '9+' : pendingOffersCount}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="messages"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors relative text-sm font-medium"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-1.5" />
+                    Messages
+                    {unreadCount > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="bookings"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+                  >
+                    <Clipboard className="w-4 h-4 mr-1.5" />
+                    My Bookings
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="alerts"
+                    className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-2 border-transparent px-4 py-3.5 text-muted-foreground hover:text-foreground transition-colors relative text-sm font-medium"
+                  >
+                    <Bell className="w-4 h-4 mr-1.5" />
+                    Alerts
+                    {unreadAlertsCount > 0 && (
+                      <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
+                        {unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-              <TabsContent value="listings" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="font-display text-xl text-foreground">
+              {/* Tab Content */}
+              <TabsContent value="listings" className="mt-0">
+                <div className="bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden">
+                  <div className="p-5 sm:p-6 border-b border-border/50 flex items-center justify-between">
+                    <h3 className="font-display text-lg font-semibold text-foreground">
                       Your Properties
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? <div className="flex items-center justify-center py-12">
+                    </h3>
+                    <Button variant="outline" size="sm" asChild className="rounded-lg">
+                      <Link to="/add-property">
+                        <Plus className="w-4 h-4 mr-1.5" />
+                        Add Property
+                      </Link>
+                    </Button>
+                  </div>
+                  <div className="p-5 sm:p-6 pt-0 sm:pt-0">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
-                      </div> : properties.length === 0 ? <div className="text-center py-12">
-                        <Building2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium text-foreground mb-2">
+                      </div>
+                    ) : properties.length === 0 ? (
+                      <div className="text-center py-16">
+                        <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
+                          <Building2 className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">
                           No properties yet
                         </h3>
-                        <p className="text-muted-foreground mb-4">
+                        <p className="text-muted-foreground mb-6 text-sm">
                           Start by adding your first property listing
                         </p>
-                        <Button variant="gold" asChild>
+                        <Button variant="gold" asChild className="rounded-lg">
                           <Link to="/add-property">
                             <Plus className="w-4 h-4 mr-2" />
                             Add Property
                           </Link>
                         </Button>
-                      </div> : <div className="overflow-x-auto">
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto mt-5">
                         <Table>
                           <TableHeader>
-                            <TableRow>
-                              <TableHead>Property</TableHead>
-                              <TableHead>Type</TableHead>
-                              <TableHead>Price</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>
+                            <TableRow className="border-border/50">
+                              <TableHead className="text-muted-foreground font-medium">Property</TableHead>
+                              <TableHead className="text-muted-foreground font-medium">Type</TableHead>
+                              <TableHead className="text-muted-foreground font-medium">Price</TableHead>
+                              <TableHead className="text-muted-foreground font-medium">Status</TableHead>
+                              <TableHead className="text-muted-foreground font-medium">
                                 <div className="flex items-center gap-1">
-                                  <MessageSquare className="w-4 h-4" />
+                                  <MessageSquare className="w-3.5 h-3.5" />
                                   Inquiries
                                 </div>
                               </TableHead>
-                              <TableHead>Listed</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
+                              <TableHead className="text-muted-foreground font-medium">Listed</TableHead>
+                              <TableHead className="text-right text-muted-foreground font-medium">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {properties.map(property => <TableRow key={property.id}>
+                            {properties.map(property => (
+                              <TableRow key={property.id} className="border-border/50 hover:bg-muted/30 transition-colors">
                                 <TableCell>
                                   <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
-                                      {property.images && property.images[0] ? <img src={property.images[0]} alt={property.title} className="w-full h-full object-cover" /> : <Building2 className="w-6 h-6 text-muted-foreground" />}
+                                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                                      {property.images && property.images[0] ? (
+                                        <img src={property.images[0]} alt={property.title} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <Building2 className="w-5 h-5 text-muted-foreground" />
+                                      )}
                                     </div>
                                     <div>
-                                      <p className="font-medium text-foreground line-clamp-1">
+                                      <p className="font-medium text-foreground line-clamp-1 text-sm">
                                         {property.title}
                                       </p>
-                                      <p className="text-sm text-muted-foreground line-clamp-1">
+                                      <p className="text-xs text-muted-foreground line-clamp-1">
                                         {property.city}, {property.state}
                                       </p>
                                     </div>
                                   </div>
                                 </TableCell>
-                                <TableCell className="capitalize">
+                                <TableCell className="capitalize text-sm">
                                   {property.property_type}
                                 </TableCell>
-                                <TableCell className="font-medium">
+                                <TableCell className="font-semibold text-sm">
                                   {formatPrice(property.price)}
-                                  {property.listing_type === "rent" && <span className="text-muted-foreground text-sm">/mo</span>}
+                                  {property.listing_type === "rent" && <span className="text-muted-foreground text-xs font-normal">/mo</span>}
                                 </TableCell>
                                 <TableCell>{getStatusBadge(property.status)}</TableCell>
                                 <TableCell>
-                                  <span className={propertyInquiries[property.id] > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
+                                  <span className={`text-sm ${propertyInquiries[property.id] > 0 ? "text-primary font-semibold" : "text-muted-foreground"}`}>
                                     {propertyInquiries[property.id] || 0}
                                   </span>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground">
+                                <TableCell className="text-muted-foreground text-sm">
                                   {new Date(property.created_at).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="icon">
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
                                         <MoreVertical className="w-4 h-4" />
                                       </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="bg-popover">
+                                    <DropdownMenuContent align="end" className="bg-popover rounded-xl shadow-lg border border-border/50">
                                       <DropdownMenuItem asChild>
                                         <Link to={`/property/${property.id}`} className="flex items-center gap-2 cursor-pointer">
                                           <Eye className="w-4 h-4" />
@@ -564,7 +605,6 @@ export default function Dashboard() {
                                           Edit
                                         </Link>
                                       </DropdownMenuItem>
-                                      {/* Only show Change Status for listings that are not under_review or declined */}
                                       {property.status !== 'under_review' && property.status !== 'declined' && (
                                         <>
                                           <DropdownMenuSeparator />
@@ -573,23 +613,22 @@ export default function Dashboard() {
                                               <CheckCircle className="w-4 h-4" />
                                               Change Status
                                             </DropdownMenuSubTrigger>
-                                            <DropdownMenuSubContent className="bg-popover">
-                                              {/* Users can only set to Active if current status is sold or rented */}
+                                            <DropdownMenuSubContent className="bg-popover rounded-xl">
                                               {(property.status === 'sold' || property.status === 'rented') && (
                                                 <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'active')} className="flex items-center gap-2 cursor-pointer">
-                                                  <Home className="w-4 h-4 text-green-500" />
+                                                  <Home className="w-4 h-4 text-emerald-500" />
                                                   Active
                                                 </DropdownMenuItem>
                                               )}
                                               {property.status !== 'pending' && (
                                                 <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'pending')} className="flex items-center gap-2 cursor-pointer">
-                                                  <Clock className="w-4 h-4 text-yellow-500" />
+                                                  <Clock className="w-4 h-4 text-amber-500" />
                                                   Pending
                                                 </DropdownMenuItem>
                                               )}
                                               {property.status !== 'sold' && (
                                                 <DropdownMenuItem onClick={() => openStatusChangeDialog(property.id, property.title, 'sold')} className="flex items-center gap-2 cursor-pointer">
-                                                  <CheckCircle className="w-4 h-4 text-red-500" />
+                                                  <CheckCircle className="w-4 h-4 text-indigo-500" />
                                                   Sold
                                                 </DropdownMenuItem>
                                               )}
@@ -605,13 +644,13 @@ export default function Dashboard() {
                                       )}
                                       <DropdownMenuSeparator />
                                       <AlertDialog>
-                                        <AlertDialogTrigger asChild className="bg-primary-foreground">
+                                        <AlertDialogTrigger asChild>
                                           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive" onSelect={e => e.preventDefault()}>
                                             <Trash2 className="w-4 h-4" />
                                             Delete
                                           </DropdownMenuItem>
                                         </AlertDialogTrigger>
-                                        <AlertDialogContent>
+                                        <AlertDialogContent className="rounded-2xl">
                                           <AlertDialogHeader>
                                             <AlertDialogTitle>Delete Property</AlertDialogTitle>
                                             <AlertDialogDescription>
@@ -619,8 +658,8 @@ export default function Dashboard() {
                                             </AlertDialogDescription>
                                           </AlertDialogHeader>
                                           <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(property.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                            <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(property.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg">
                                               Delete
                                             </AlertDialogAction>
                                           </AlertDialogFooter>
@@ -629,77 +668,86 @@ export default function Dashboard() {
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 </TableCell>
-                              </TableRow>)}
+                              </TableRow>
+                            ))}
                           </TableBody>
                         </Table>
-                      </div>}
-                  </CardContent>
-                </Card>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </TabsContent>
 
-
-              <TabsContent value="visits" className="mt-6">
+              <TabsContent value="visits" className="mt-0">
                 <VisitsTab onDataChange={fetchPendingVisitsCount} />
               </TabsContent>
 
-              <TabsContent value="offers" className="mt-6">
+              <TabsContent value="offers" className="mt-0">
                 <OffersTab onDataChange={fetchPendingOffersCount} />
               </TabsContent>
 
-              <TabsContent value="messages" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-display text-xl text-foreground">Messages</CardTitle>
-                    <Button variant="outline" size="sm" asChild>
+              <TabsContent value="messages" className="mt-0">
+                <div className="bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden">
+                  <div className="p-5 sm:p-6 border-b border-border/50 flex items-center justify-between">
+                    <h3 className="font-display text-lg font-semibold text-foreground">Messages</h3>
+                    <Button variant="outline" size="sm" asChild className="rounded-lg">
                       <Link to="/messages">View All</Link>
                     </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {conversations.length === 0 ? <div className="text-center py-12">
-                        <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium text-foreground mb-2">No messages</h3>
-                        <p className="text-muted-foreground">Messages from buyers will appear here</p>
-                      </div> : <div className="divide-y divide-border">
+                  </div>
+                  <div className="p-5 sm:p-6">
+                    {conversations.length === 0 ? (
+                      <div className="text-center py-16">
+                        <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
+                          <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-foreground mb-2">No messages</h3>
+                        <p className="text-muted-foreground text-sm">Messages from buyers will appear here</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-border/50">
                         {conversations.slice(0, 5).map(conv => {
-                      const initials = conv.other_user?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
-                      return <Link key={conv.id} to="/messages" className="flex items-center gap-4 py-4 -mx-4 px-4 transition-colors bg-sidebar-foreground">
+                          const initials = conv.other_user?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
+                          return (
+                            <Link key={conv.id} to="/messages" className="flex items-center gap-4 py-4 first:pt-0 last:pb-0 hover:bg-muted/30 -mx-2 px-2 rounded-lg transition-colors">
                               <Avatar className="h-10 w-10">
                                 <AvatarImage src={conv.other_user?.avatar_url || undefined} />
-                                <AvatarFallback className="bg-primary/10 text-primary">
+                                <AvatarFallback className="bg-accent/10 text-accent text-sm">
                                   {initials}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
-                                  <p className="font-medium text-foreground truncate">
+                                  <p className="font-medium text-foreground truncate text-sm">
                                     {conv.other_user?.full_name || 'Unknown User'}
                                   </p>
                                   <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                    {formatDistanceToNow(new Date(conv.last_message_at), {
-                                addSuffix: true
-                              })}
+                                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
                                   </span>
                                 </div>
-                                {conv.property && <p className="text-xs text-primary truncate">Re: {conv.property.title}</p>}
+                                {conv.property && <p className="text-xs text-accent truncate">Re: {conv.property.title}</p>}
                                 <p className="text-sm text-muted-foreground truncate">
                                   {conv.last_message?.content || 'No messages yet'}
                                 </p>
                               </div>
-                              {conv.unread_count && conv.unread_count > 0 && <Badge className="bg-primary text-primary-foreground h-5 min-w-5 flex items-center justify-center rounded-full text-xs">
+                              {conv.unread_count && conv.unread_count > 0 && (
+                                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent text-accent-foreground px-1.5 text-[10px] font-semibold">
                                   {conv.unread_count}
-                                </Badge>}
-                            </Link>;
-                    })}
-                      </div>}
-                  </CardContent>
-                </Card>
+                                </span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </TabsContent>
 
-              <TabsContent value="alerts" className="mt-6">
+              <TabsContent value="alerts" className="mt-0">
                 <AlertsTab />
               </TabsContent>
 
-              <TabsContent value="bookings" className="mt-6">
+              <TabsContent value="bookings" className="mt-0">
                 <MyBookingsTab />
               </TabsContent>
             </Tabs>
@@ -710,12 +758,12 @@ export default function Dashboard() {
 
       {/* Status Change Confirmation Dialog */}
       <AlertDialog open={statusChangeDialog.isOpen} onOpenChange={open => !open && setStatusChangeDialog({
-      isOpen: false,
-      propertyId: null,
-      propertyTitle: "",
-      newStatus: ""
-    })}>
-        <AlertDialogContent>
+        isOpen: false,
+        propertyId: null,
+        propertyTitle: "",
+        newStatus: ""
+      })}>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Change Listing Status</AlertDialogTitle>
             <AlertDialogDescription>
@@ -723,8 +771,8 @@ export default function Dashboard() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmStatusChange}>
+            <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusChange} className="rounded-lg">
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
