@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const menuItems = [
-  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "listings", label: "My Properties", icon: Building2 },
   { id: "offers", label: "Offers", icon: DollarSign },
   { id: "leads", label: "Clients", icon: Users },
