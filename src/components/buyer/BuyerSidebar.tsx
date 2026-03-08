@@ -36,6 +36,7 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [viewingsCount, setViewingsCount] = useState(0);
+  const [savedSearchesCount, setSavedSearchesCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +60,12 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setFavoritesCount(favCount || 0);
+
+      const { count: searchCount } = await supabase
+        .from("saved_searches" as any)
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+      setSavedSearchesCount(searchCount || 0);
     };
 
     fetchCounts();
@@ -78,10 +85,16 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
       .on("postgres_changes", { event: "*", schema: "public", table: "favorites" }, fetchCounts)
       .subscribe();
 
+    const searchChannel = supabase
+      .channel("buyer-sidebar-searches")
+      .on("postgres_changes", { event: "*", schema: "public", table: "saved_searches" }, fetchCounts)
+      .subscribe();
+
     return () => {
       supabase.removeChannel(msgChannel);
       supabase.removeChannel(visitChannel);
       supabase.removeChannel(favChannel);
+      supabase.removeChannel(searchChannel);
     };
   }, [user]);
 
@@ -89,6 +102,7 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
     if (id === "messages") return unreadMessages;
     if (id === "viewings") return viewingsCount;
     if (id === "favorites") return favoritesCount;
+    if (id === "saved-searches") return savedSearchesCount;
     return 0;
   };
 
