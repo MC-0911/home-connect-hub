@@ -49,6 +49,7 @@ export default function BuyerDashboard() {
     favorites: { title: "Favorites", subtitle: "Properties you've saved" },
     "saved-searches": { title: "Saved Searches", subtitle: "Your saved search criteria" },
     viewings: { title: "Viewings", subtitle: "Scheduled property viewings" },
+    offers: { title: "My Offers", subtitle: "Track and manage your property offers" },
     compare: { title: "Compare", subtitle: "Side-by-side property comparison" },
     calculator: { title: "Mortgage Calculator", subtitle: "Estimate your monthly payments" },
     messages: { title: "Messages", subtitle: "Your conversations" },
