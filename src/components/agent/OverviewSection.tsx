@@ -197,33 +197,7 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
 
       {/* Bottom Row: Tasks + Clients */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <Card className="lg:col-span-3 border border-border/50 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Upcoming Appointments</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-0">
-            {upcomingTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">No upcoming appointments.</p>
-            ) : (
-              upcomingTasks.map((task, i) => (
-                <div key={i} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
-                  <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{task.title}</p>
-                    <p className="text-xs text-muted-foreground">{task.time}</p>
-                  </div>
-                  <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
-                    task.priority === "high" ? "bg-red-100 text-red-700" :
-                    task.priority === "medium" ? "bg-amber-100 text-amber-700" :
-                    "bg-emerald-100 text-emerald-700"
-                  }`}>
-                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                  </span>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
+        <UpcomingTasksCard appointments={appointments} />
 
         <Card className="lg:col-span-2 border border-border/50 shadow-sm">
           <CardHeader className="pb-3">
