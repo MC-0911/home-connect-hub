@@ -67,27 +67,44 @@ export default function AgentDashboard() {
                 className="pl-9 w-72 bg-muted/50 border-border/50 rounded-xl h-10"
               />
             </div>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setActiveSection("overview")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                {unreadAlerts > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
-                    {unreadAlerts > 9 ? "9+" : unreadAlerts}
-                  </span>
-                )}
-              </button>
-              <button onClick={() => setActiveSection("messages")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                <MessageSquare className="h-5 w-5 text-muted-foreground" />
-                {unreadMessages > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
-                    {unreadMessages > 9 ? "9+" : unreadMessages}
-                  </span>
-                )}
-              </button>
-              <button onClick={() => setActiveSection("settings")} className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                <Settings className="h-5 w-5 text-muted-foreground" />
-              </button>
-            </div>
+            <TooltipProvider delayDuration={200}>
+              <div className="flex items-center gap-4">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={() => setActiveSection("overview")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                      <Bell className="h-5 w-5 text-muted-foreground" />
+                      {unreadAlerts > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
+                          {unreadAlerts > 9 ? "9+" : unreadAlerts}
+                        </span>
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Notifications</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={() => setActiveSection("messages")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                      {unreadMessages > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
+                          {unreadMessages > 9 ? "9+" : unreadMessages}
+                        </span>
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Messages</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={() => setActiveSection("settings")} className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                      <Settings className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Settings</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
           </div>
         </motion.header>
 
