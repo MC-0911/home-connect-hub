@@ -402,6 +402,8 @@ interface TaskItem {
 
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskItem | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDate, setNewDate] = useState<Date>();
   const [newTimeSlot, setNewTimeSlot] = useState("9:00 AM");
