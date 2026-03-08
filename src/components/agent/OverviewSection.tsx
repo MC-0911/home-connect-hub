@@ -498,10 +498,23 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
           <p className="text-sm text-muted-foreground text-center py-6">No upcoming tasks. Add one to get started.</p>
         ) : (
           allTasks.map((task) => (
-            <div key={task.id} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
-              <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary" />
+            <div key={task.id} className={cn("flex items-center gap-3 py-3 border-b border-border/50 last:border-0 transition-opacity", task.isCompleted && "opacity-60")}>
+              <button
+                onClick={() => !task.isAppointment && handleToggleComplete(task.id, !!task.isCompleted)}
+                className={cn(
+                  "h-[18px] w-[18px] shrink-0 rounded border-2 flex items-center justify-center transition-colors",
+                  task.isCompleted
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-border hover:border-primary",
+                  task.isAppointment && "cursor-default"
+                )}
+              >
+                {task.isCompleted && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                )}
+              </button>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">{task.title}</p>
+                <p className={cn("text-sm font-medium text-foreground", task.isCompleted && "line-through text-muted-foreground")}>{task.title}</p>
                 <p className="text-xs text-muted-foreground">{task.time}</p>
               </div>
               <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
