@@ -36,6 +36,7 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [viewingsCount, setViewingsCount] = useState(0);
+  const [savedSearchesCount, setSavedSearchesCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
