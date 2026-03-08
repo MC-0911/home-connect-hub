@@ -83,9 +83,15 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
       .on("postgres_changes", { event: "*", schema: "public", table: "property_visits" }, fetchCounts)
       .subscribe();
 
+    const offerChannel = supabase
+      .channel("sidebar-offers")
+      .on("postgres_changes", { event: "*", schema: "public", table: "property_offers" }, fetchCounts)
+      .subscribe();
+
     return () => {
       supabase.removeChannel(msgChannel);
       supabase.removeChannel(visitChannel);
+      supabase.removeChannel(offerChannel);
     };
   }, [user]);
 
