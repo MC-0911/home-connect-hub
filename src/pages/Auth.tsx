@@ -24,11 +24,13 @@ export default function Auth() {
   const [mode, setMode] = useState<"login" | "signup">(searchParams.get("mode") === "signup" ? "signup" : "login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [accountType, setAccountType] = useState<AccountType>("buyer");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: ""
   });
+  const { getDashboardPath, primaryRole, loading: roleLoading } = useUserRole();
 
   // Get redirect URL from query params, default to "/"
   const redirectTo = searchParams.get("redirect") || "/";
