@@ -191,13 +191,40 @@ export default function Auth() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === "signup" && <div className="relative">
+              {mode === "signup" && <>
+                <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input placeholder="Full Name" className="pl-10 h-12" value={formData.name} onChange={e => setFormData({
                 ...formData,
                 name: e.target.value
               })} disabled={loading} />
-                </div>}
+                </div>
+
+                {/* Account Type Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">I am a...</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {accountTypes.map(type => {
+                      const Icon = type.icon;
+                      return (
+                        <button
+                          key={type.value}
+                          type="button"
+                          onClick={() => setAccountType(type.value)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
+                            accountType === type.value
+                              ? "border-accent bg-accent/10 text-accent"
+                              : "border-border hover:border-accent/50 text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span className="text-xs font-medium leading-tight">{type.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>}
 
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
