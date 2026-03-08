@@ -179,7 +179,7 @@ export default function Admin() {
               {activeSection === 'bookings' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <ServiceBookingsTable />
+                    <ServiceBookingsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
