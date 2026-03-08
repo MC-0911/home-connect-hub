@@ -20,6 +20,7 @@ export default function AgentDashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [listings, setListings] = useState<Tables<"properties">[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -139,9 +140,9 @@ export default function AgentDashboard() {
 
   return (
     <div className="min-h-screen flex bg-muted/30">
-      <AgentSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      <AgentSidebar activeSection={activeSection} onSectionChange={setActiveSection} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
-      <main className="flex-1 ml-[280px] transition-all duration-300">
+      <main className="flex-1 transition-all duration-300" style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}>
         {/* Top Header */}
         <motion.header
           initial={{ opacity: 0, y: -10 }}
