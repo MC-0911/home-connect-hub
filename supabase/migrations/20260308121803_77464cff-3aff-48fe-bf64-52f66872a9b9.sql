@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS notification_preferences jsonb NOT NULL DEFAULT '{"newLeadAlerts": true, "messageNotifications": true, "appointmentReminders": true, "pushNotifications": true}'::jsonb;

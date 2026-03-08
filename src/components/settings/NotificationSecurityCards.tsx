@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Bell, Shield, Lock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, Shield, Lock, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -11,22 +11,70 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+
+interface NotificationPreferences {
+  newLeadAlerts: boolean;
+  messageNotifications: boolean;
+  appointmentReminders: boolean;
+  pushNotifications: boolean;
+}
+
+const defaultPreferences: NotificationPreferences = {
+  newLeadAlerts: true,
+  messageNotifications: true,
+  appointmentReminders: true,
+  pushNotifications: true,
+};
 
 export function NotificationSecurityCards() {
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState({
-    newLeadAlerts: true,
-    messageNotifications: true,
-    appointmentReminders: true,
-    pushNotifications: true,
-  });
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<NotificationPreferences>(defaultPreferences);
+  const [loading, setLoading] = useState(true);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  // Load preferences from Supabase on mount
+  useEffect(() => {
+    if (!user) return;
+    const loadPreferences = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("notification_preferences")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!error && data?.notification_preferences) {
+        setNotifications({ ...defaultPreferences, ...(data.notification_preferences as unknown as NotificationPreferences) });
+      }
+      setLoading(false);
+    };
+    loadPreferences();
+  }, [user]);
+
+  const toggleNotification = async (key: keyof NotificationPreferences) => {
+    if (!user) return;
+    const updated = { ...notifications, [key]: !notifications[key] };
+    setNotifications(updated);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notification_preferences: updated as any })
+      .eq("user_id", user.id);
+
+    if (error) {
+      // Revert on failure
+      setNotifications(notifications);
+      toast({ title: "Error", description: "Failed to save preference.", variant: "destructive" });
+    } else {
+      toast({
+        title: updated[key] ? "Enabled" : "Disabled",
+        description: `${notificationItems.find(i => i.key === key)?.title} ${updated[key] ? "enabled" : "disabled"}.`,
+      });
+    }
   };
 
   const handleChangePassword = async () => {
@@ -69,21 +117,27 @@ export function NotificationSecurityCards() {
           <CardDescription>Choose how you want to be notified</CardDescription>
         </CardHeader>
         <CardContent className="space-y-0">
-          {notificationItems.map((item, i) => (
-            <div key={item.key}>
-              {i > 0 && <Separator />}
-              <div className="flex items-center justify-between py-4">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">{item.desc}</p>
-                </div>
-                <Switch
-                  checked={notifications[item.key]}
-                  onCheckedChange={() => toggleNotification(item.key)}
-                />
-              </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-          ))}
+          ) : (
+            notificationItems.map((item, i) => (
+              <div key={item.key}>
+                {i > 0 && <Separator />}
+                <div className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </div>
+                  <Switch
+                    checked={notifications[item.key]}
+                    onCheckedChange={() => toggleNotification(item.key)}
+                  />
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
 
