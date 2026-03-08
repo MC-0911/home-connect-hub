@@ -218,12 +218,13 @@ export function useAnalyticsData(dateRange: DateRange) {
       if (topSellerId) {
         const { data: topProfile } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('user_id', topSellerId[0])
           .single();
         topAgentData = {
           name: topProfile?.full_name || 'Unknown',
           deals: topSellerId[1],
+          avatarUrl: topProfile?.avatar_url || null,
         };
       }
 
