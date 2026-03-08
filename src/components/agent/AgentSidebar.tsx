@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Building2, Users, CalendarDays, MessageSquare,
+  LayoutDashboard, Building2, Users, UsersRound, CalendarDays, MessageSquare,
   FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ const menuItems = [
   { id: "listings", label: "My Properties", icon: Building2 },
   { id: "offers", label: "Offers", icon: DollarSign },
   { id: "leads", label: "Clients", icon: Users },
+  { id: "tenants", label: "Tenants", icon: UsersRound },
   { id: "calendar", label: "Appointments", icon: CalendarDays },
   { id: "messages", label: "Messages", icon: MessageSquare },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
