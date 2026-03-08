@@ -30,9 +30,8 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const {
-    isAdmin
-  } = useAdmin();
+  const { isAdmin } = useAdmin();
+  const { getDashboardPath, loading: roleLoading } = useUserRole();
   const {
     profile
   } = useProfile();
