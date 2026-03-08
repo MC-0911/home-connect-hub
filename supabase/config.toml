@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.check-lease-expiry]
 verify_jwt = false
+
+[functions.appointment-reminders]
+verify_jwt = false
