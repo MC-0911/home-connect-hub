@@ -365,10 +365,37 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {user.phone ? <span className="flex items-center gap-1.5 text-sm">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                        {user.phone}
-                      </span> : <span className="text-muted-foreground">-</span>}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {user.is_admin && <Badge variant="secondary" className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
+                          <Shield className="h-3 w-3" />
+                          Admin
+                        </Badge>}
+                      <Select value={user.user_role || ''} onValueChange={(value) => changeUserRole(user, value)}>
+                        <SelectTrigger className="h-7 w-[130px] text-xs">
+                          <SelectValue placeholder="No role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buyer">
+                            <span className="flex items-center gap-1.5">
+                              <Home className="h-3 w-3" />
+                              Buyer/Tenant
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="seller">
+                            <span className="flex items-center gap-1.5">
+                              <Building2 className="h-3 w-3" />
+                              Seller/Landlord
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="agent">
+                            <span className="flex items-center gap-1.5">
+                              <Briefcase className="h-3 w-3" />
+                              Agent
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap items-center gap-1.5">
