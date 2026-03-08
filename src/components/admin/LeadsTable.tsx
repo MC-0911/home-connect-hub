@@ -129,8 +129,9 @@ export function LeadsTable({ globalSearch = '' }: { globalSearch?: string }) {
       toast.error('Failed to update leads');
     }
   };
+  const combinedSearch = globalSearch || searchTerm;
   const filteredLeads = leads.filter(lead => {
-    const matchesSearch = lead.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || lead.email.toLowerCase().includes(searchTerm.toLowerCase()) || lead.phone?.includes(searchTerm);
+    const matchesSearch = lead.full_name.toLowerCase().includes(combinedSearch.toLowerCase()) || lead.email.toLowerCase().includes(combinedSearch.toLowerCase()) || lead.phone?.includes(combinedSearch);
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
