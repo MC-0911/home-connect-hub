@@ -107,12 +107,18 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="text-xl font-display font-bold text-white whitespace-nowrap"
+                className="text-xl font-display font-bold text-white whitespace-nowrap flex-1"
               >
                 Royal Landmark
               </motion.span>
             )}
           </AnimatePresence>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all shrink-0"
+          >
+            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 
