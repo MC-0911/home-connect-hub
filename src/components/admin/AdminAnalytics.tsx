@@ -158,9 +158,11 @@ export function AdminAnalytics() {
         />
       </div>
 
-      {/* Latest Property Listings */}
-      <LatestListingsTable />
-
+      {/* Latest Listings + Recent Offers */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <LatestListingsTable />
+        <RecentOffersPanel />
+      </div>
       {/* Traffic Overview + Revenue Trend */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TrafficOverviewChart
