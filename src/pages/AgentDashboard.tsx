@@ -25,7 +25,7 @@ export default function AgentDashboard() {
     listings, leads, appointments, documents, unreadMessages,
     stats, recentActivity, loading: dataLoading,
     refreshListings, refreshLeads, refreshAppointments, refreshDocuments,
-  } = useAgentRealtime();
+  } = useAgentRealtime(setActiveSection);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
