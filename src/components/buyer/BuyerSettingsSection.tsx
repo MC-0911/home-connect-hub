@@ -10,6 +10,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import { NotificationSecurityCards } from "@/components/settings/NotificationSecurityCards";
 
 export function BuyerSettingsSection() {
   const { user, signOut } = useAuth();
@@ -68,6 +69,8 @@ export function BuyerSettingsSection() {
           </div>
         </CardContent>
       </Card>
+
+      <NotificationSecurityCards />
     </div>
   );
 }
