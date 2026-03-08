@@ -12,6 +12,10 @@ interface AgentStats {
   newLeads: number;
   totalViews: number;
   monthlyCommission: number;
+  totalOffers: number;
+  pendingOffers: number;
+  acceptedOffers: number;
+  declinedOffers: number;
 }
 
 interface RecentActivity {
