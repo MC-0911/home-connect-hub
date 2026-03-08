@@ -21,7 +21,7 @@ interface RecentActivity {
   time: string;
 }
 
-export function useAgentRealtime() {
+export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const { user } = useAuth();
   const [listings, setListings] = useState<Tables<"properties">[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
