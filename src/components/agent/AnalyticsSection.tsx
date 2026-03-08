@@ -42,7 +42,7 @@ export function AnalyticsSection({ stats }: AnalyticsSectionProps) {
           { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary" },
           { label: "Conversion Rate", value: `${conversionRate}%`, icon: TrendingUp, color: "text-success" },
           { label: "Active Leads", value: stats.totalLeads, icon: Users, color: "text-info" },
-          { label: "Commission", value: `₦${stats.monthlyCommission.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
+          { label: "Commission", value: `$${stats.monthlyCommission.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
         ].map((item) => (
           <Card key={item.label} className="border border-border/50">
             <CardContent className="p-5">

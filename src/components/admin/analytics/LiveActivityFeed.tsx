@@ -101,7 +101,7 @@ export function LiveActivityFeed({ fromDate, toDate }: LiveActivityFeedProps) {
             id: `offer-${o.id}`,
             type: 'offer',
             title: 'New Offer',
-            description: `Offer of ₦${o.offer_amount?.toLocaleString()} submitted`,
+            description: `Offer of $${o.offer_amount?.toLocaleString()} submitted`,
             timestamp: o.created_at,
             metadata: { ...o, buyer_name: offerProfile?.full_name, buyer_email: emailMap.get(o.user_id), property_title: offerProperty?.title, property_location: [offerProperty?.city, offerProperty?.state].filter(Boolean).join(', '), owner_name: ownerProfile?.full_name, owner_email: emailMap.get(o.seller_id) },
           });

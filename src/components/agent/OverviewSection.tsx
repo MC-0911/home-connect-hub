@@ -43,9 +43,9 @@ const statusColors: Record<string, string> = {
 };
 
 function formatPrice(price: number) {
-  if (price >= 1_000_000) return `₦${(price / 1_000_000).toFixed(1)}M`;
-  if (price >= 1_000) return `₦${(price / 1_000).toFixed(0)}K`;
-  return `₦${price.toLocaleString()}`;
+  if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(1)}M`;
+  if (price >= 1_000) return `$${(price / 1_000).toFixed(0)}K`;
+  return `$${price.toLocaleString()}`;
 }
 
 export function OverviewSection({ stats, recentActivity, onNavigate, listings, leads, appointments }: OverviewSectionProps) {
@@ -108,7 +108,7 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
     { label: "Total Properties", value: stats.totalListings, sub: `${stats.activeListings} active, ${stats.soldListings} sold/rented`, icon: Home, gradient: "from-blue-500 to-indigo-600" },
     { label: "Active Listings", value: stats.activeListings, sub: `${listings.filter(l => l.listing_type === 'sale').length} for sale, ${listings.filter(l => l.listing_type === 'rent').length} for rent`, icon: Tag, gradient: "from-emerald-500 to-teal-600" },
     { label: "Pending Deals", value: stats.totalLeads, sub: `${appointments.length} visits scheduled`, icon: Clock, gradient: "from-amber-500 to-orange-600" },
-    { label: "Total Commission", value: `₦${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: DollarSign, gradient: "from-violet-500 to-purple-600" },
+    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: DollarSign, gradient: "from-violet-500 to-purple-600" },
   ];
 
   return (

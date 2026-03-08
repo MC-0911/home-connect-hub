@@ -46,7 +46,7 @@ function ListingDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Title" value={meta.title} />
       <DetailRow label="Property Type" value={meta.property_type} />
       <DetailRow label="Listing Type" value={meta.listing_type === 'sale' ? 'For Sale' : 'For Rent'} />
-      <DetailRow label="Price" value={meta.price ? `₦${Number(meta.price).toLocaleString()}` : undefined} />
+      <DetailRow label="Price" value={meta.price ? <DetailRow label="Price" value={meta.price ? `$${Number(meta.price).toLocaleString()}` : undefined} /> : undefined} />
       <DetailRow label="Location" value={[meta.city, meta.state].filter(Boolean).join(', ')} />
       <DetailRow label="Bedrooms" value={meta.bedrooms} />
       <DetailRow label="Bathrooms" value={meta.bathrooms} />
@@ -91,10 +91,10 @@ function SignupDetails({ meta }: { meta: Record<string, any> }) {
 function OfferDetails({ meta }: { meta: Record<string, any> }) {
   return (
     <div className="divide-y divide-border">
-      <DetailRow label="Offer Amount" value={meta.offer_amount ? `₦${Number(meta.offer_amount).toLocaleString()}` : undefined} />
+      <DetailRow label="Offer Amount" value={meta.offer_amount ? `$${Number(meta.offer_amount).toLocaleString()}` : undefined} />
       <DetailRow label="Status" value={<Badge variant="outline" className="text-xs">{meta.status}</Badge>} />
       <DetailRow label="Message" value={meta.message} />
-      <DetailRow label="Counter Amount" value={meta.counter_amount ? `₦${Number(meta.counter_amount).toLocaleString()}` : undefined} />
+      <DetailRow label="Counter Amount" value={meta.counter_amount ? <DetailRow label="Counter Amount" value={meta.counter_amount ? `$${Number(meta.counter_amount).toLocaleString()}` : undefined} /> : undefined} />
       <DetailRow label="Expires" value={meta.expires_at ? format(new Date(meta.expires_at), 'MMM d, yyyy h:mm a') : undefined} />
       <DetailRow label="Buyer" value={
         (meta.buyer_name || meta.buyer_email) ? (
@@ -171,7 +171,7 @@ function LeadDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Requirement Type" value={meta.requirement_type} />
       <DetailRow label="Budget Range" value={
         meta.min_budget || meta.max_budget
-          ? `₦${(meta.min_budget ?? 0).toLocaleString()} – ₦${(meta.max_budget ?? 0).toLocaleString()}`
+          ? `$${(meta.min_budget ?? 0).toLocaleString()} – $${(meta.max_budget ?? 0).toLocaleString()}`
           : undefined
       } />
       <DetailRow label="Bedrooms" value={meta.min_bedrooms ? `${meta.min_bedrooms}+` : undefined} />

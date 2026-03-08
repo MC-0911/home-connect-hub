@@ -102,7 +102,7 @@ export function LeadsSection({ leads, onRefresh }: LeadsSectionProps) {
 
                 {(lead.min_budget || lead.max_budget) && (
                   <p className="text-sm font-medium text-foreground">
-                    Budget: ₦{(lead.min_budget || 0).toLocaleString()} – ₦{(lead.max_budget || 0).toLocaleString()}
+                    Budget: ${(lead.min_budget || 0).toLocaleString()} – ${(lead.max_budget || 0).toLocaleString()}
                   </p>
                 )}
               </CardContent>
