@@ -113,6 +113,8 @@ export default function AgentDashboard() {
             {renderSection()}
           </motion.div>
         </div>
+
+        <DashboardFooter />
       </main>
     </div>
   );

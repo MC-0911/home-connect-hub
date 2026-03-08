@@ -137,6 +137,8 @@ export default function BuyerDashboard() {
             {renderSection()}
           </motion.div>
         </div>
+
+        <DashboardFooter />
       </main>
     </div>
   );
