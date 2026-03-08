@@ -200,7 +200,18 @@ export function useAgentRealtime() {
       supabase
         .channel("rt-agent-messages")
         .on("postgres_changes", {
-          event: "*", schema: "public", table: "messages",
+          event: "INSERT", schema: "public", table: "messages",
+        }, (payload) => {
+          const msg = payload.new as any;
+          if (msg.sender_id !== userRef.current?.id) {
+            toast.info("New Message", {
+              description: msg.content?.slice(0, 80) || "You have a new message",
+            });
+          }
+          fetchUnreadMessages();
+        })
+        .on("postgres_changes", {
+          event: "UPDATE", schema: "public", table: "messages",
         }, () => {
           fetchUnreadMessages();
         })
