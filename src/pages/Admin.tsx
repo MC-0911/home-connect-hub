@@ -32,6 +32,7 @@ export default function Admin() {
   const { isAdmin, loading } = useAdmin();
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
 
   useEffect(() => {
     const checkAuth = async () => {
