@@ -42,7 +42,7 @@ export function Header() {
   const unreadCount = getUnreadCount();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
-  const dashboardPath = getDashboardPath();
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
