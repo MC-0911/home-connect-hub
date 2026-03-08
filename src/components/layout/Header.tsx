@@ -175,10 +175,7 @@ export function Header() {
                   <link.icon className="w-5 h-5" />
                   {link.label}
                 </Link>)}
-              {user && <Link to={dashboardPath} onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === dashboardPath ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
-                  <LayoutDashboard className="w-5 h-5" />
-                  My Dashboard
-                </Link>}
+              {user && <RoleSwitcher variant="mobile" isHomePage={isHomePage} isScrolled={isScrolled} onMobileClose={() => setMobileMenuOpen(false)} />}
               {user && <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg transition-colors", location.pathname === "/messages" ? "bg-accent/20 text-accent-foreground" : "text-muted-foreground hover:bg-accent/10 hover:text-accent-foreground")}>
                   <div className="relative">
                     <MessageSquare className="w-5 h-5" />
