@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CalendarDays, Clock, Plus, Pencil, Trash2 } from "lucide-react";
-import { format, isSameDay } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CalendarDays, Clock, Plus, Pencil, Trash2, Repeat } from "lucide-react";
+import { format, isSameDay, addDays, addWeeks, addMonths, isBefore, isAfter, startOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,14 @@ interface AgentAppointment {
   appointment_date: string;
   user_id: string;
   created_at: string;
+  recurrence: string;
+  recurrence_end: string | null;
+}
+
+// A "virtual" occurrence of a recurring appointment on a specific date
+interface AppointmentOccurrence extends AgentAppointment {
+  occurrence_date: string;
+  is_recurring_instance: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -50,6 +58,50 @@ const timeSlots = [
   "5:00 PM", "5:30 PM", "6:00 PM",
 ];
 
+const recurrenceLabels: Record<string, string> = {
+  none: "Does not repeat",
+  daily: "Daily",
+  weekly: "Weekly",
+  biweekly: "Every 2 weeks",
+  monthly: "Monthly",
+};
+
+// Expand recurring appointments into occurrences within a window
+function expandRecurrences(appts: AgentAppointment[], windowStart: Date, windowEnd: Date): AppointmentOccurrence[] {
+  const results: AppointmentOccurrence[] = [];
+
+  for (const appt of appts) {
+    const baseDate = startOfDay(new Date(appt.appointment_date));
+    const recEnd = appt.recurrence_end ? startOfDay(new Date(appt.recurrence_end)) : addMonths(new Date(), 3);
+
+    if (appt.recurrence === "none" || !appt.recurrence) {
+      results.push({ ...appt, occurrence_date: appt.appointment_date, is_recurring_instance: false });
+      continue;
+    }
+
+    let cursor = baseDate;
+    const advanceFn =
+      appt.recurrence === "daily" ? (d: Date) => addDays(d, 1) :
+      appt.recurrence === "weekly" ? (d: Date) => addWeeks(d, 1) :
+      appt.recurrence === "biweekly" ? (d: Date) => addWeeks(d, 2) :
+      (d: Date) => addMonths(d, 1);
+
+    while (!isAfter(cursor, recEnd) && !isAfter(cursor, windowEnd)) {
+      if (!isBefore(cursor, windowStart)) {
+        const dateStr = format(cursor, "yyyy-MM-dd");
+        results.push({
+          ...appt,
+          occurrence_date: dateStr,
+          is_recurring_instance: dateStr !== appt.appointment_date,
+        });
+      }
+      cursor = advanceFn(cursor);
+    }
+  }
+
+  return results;
+}
+
 export function CalendarSection({ appointments, onRefresh }: CalendarSectionProps) {
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -63,6 +115,8 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
     end_time: "11:00 AM",
     notes: "",
     status: "scheduled",
+    recurrence: "none",
+    recurrence_end: "",
   });
 
   const fetchAppts = async () => {
@@ -85,8 +139,16 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
     return () => { supabase.removeChannel(channel); };
   }, [user]);
 
+  // Expand recurrences for a 6-month window
+  const windowStart = addMonths(new Date(), -1);
+  const windowEnd = addMonths(new Date(), 5);
+  const allOccurrences = useMemo(
+    () => expandRecurrences(agentAppts, windowStart, windowEnd),
+    [agentAppts]
+  );
+
   const resetForm = () => {
-    setForm({ title: "", appointment_type: "Meeting", start_time: "10:00 AM", end_time: "11:00 AM", notes: "", status: "scheduled" });
+    setForm({ title: "", appointment_type: "Meeting", start_time: "10:00 AM", end_time: "11:00 AM", notes: "", status: "scheduled", recurrence: "none", recurrence_end: "" });
     setEditingAppt(null);
   };
 
@@ -104,6 +166,8 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
       end_time: appt.end_time,
       notes: appt.notes || "",
       status: appt.status,
+      recurrence: appt.recurrence || "none",
+      recurrence_end: appt.recurrence_end || "",
     });
     setDialogOpen(true);
   };
@@ -122,6 +186,8 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
       notes: form.notes || null,
       status: form.status,
       appointment_date: format(selectedDate, "yyyy-MM-dd"),
+      recurrence: form.recurrence,
+      recurrence_end: form.recurrence !== "none" && form.recurrence_end ? form.recurrence_end : null,
     };
 
     if (editingAppt) {
@@ -148,15 +214,15 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
     if (error) toast.error("Failed to update status");
   };
 
-  // Combine property visits + agent appointments for selected date
+  // Day occurrences for selected date
   const dayVisits = appointments.filter((a) => isSameDay(new Date(a.preferred_date), selectedDate));
-  const dayAgentAppts = agentAppts.filter((a) => isSameDay(new Date(a.appointment_date), selectedDate));
+  const dayAgentAppts = allOccurrences.filter((a) => isSameDay(new Date(a.occurrence_date), selectedDate));
 
-  // Dates that have appointments (for calendar dots)
-  const appointmentDates = [
+  // Dates that have appointments (for calendar highlighting)
+  const appointmentDates = useMemo(() => [
     ...appointments.map((a) => new Date(a.preferred_date)),
-    ...agentAppts.map((a) => new Date(a.appointment_date)),
-  ];
+    ...allOccurrences.map((a) => new Date(a.occurrence_date)),
+  ], [appointments, allOccurrences]);
 
   const totalToday = dayVisits.length + dayAgentAppts.length;
 
@@ -190,7 +256,7 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
               <Button className="w-full mt-4 rounded-xl gap-2" onClick={openNewDialog}>
                 <Plus className="h-4 w-4" /> New Appointment
               </Button>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingAppt ? "Edit Appointment" : "New Appointment"}</DialogTitle>
                 </DialogHeader>
@@ -237,6 +303,34 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
                     <Label>Date</Label>
                     <Input type="date" value={format(selectedDate, "yyyy-MM-dd")} onChange={(e) => setSelectedDate(new Date(e.target.value))} />
                   </div>
+
+                  {/* Recurrence */}
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-1.5">
+                      <Repeat className="h-3.5 w-3.5" /> Repeat
+                    </Label>
+                    <Select value={form.recurrence} onValueChange={(v) => setForm({ ...form, recurrence: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(recurrenceLabels).map(([k, v]) => (
+                          <SelectItem key={k} value={k}>{v}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {form.recurrence !== "none" && (
+                    <div className="grid gap-2">
+                      <Label>Repeat Until</Label>
+                      <Input
+                        type="date"
+                        value={form.recurrence_end}
+                        onChange={(e) => setForm({ ...form, recurrence_end: e.target.value })}
+                        min={format(selectedDate, "yyyy-MM-dd")}
+                      />
+                      <p className="text-xs text-muted-foreground">Leave empty to repeat for 3 months</p>
+                    </div>
+                  )}
+
                   <div className="grid gap-2">
                     <Label>Notes</Label>
                     <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Additional details..." rows={3} />
@@ -263,10 +357,9 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
               <p className="text-sm text-muted-foreground text-center py-12">No appointments for this day</p>
             ) : (
               <>
-                {/* Agent custom appointments */}
                 {dayAgentAppts.map((appt, i) => (
                   <motion.div
-                    key={appt.id}
+                    key={`${appt.id}-${appt.occurrence_date}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -281,6 +374,12 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
                         <Badge className={cn("text-[11px]", statusColors[appt.status] || statusColors.scheduled)}>
                           {appt.status}
                         </Badge>
+                        {appt.recurrence !== "none" && (
+                          <Badge variant="outline" className="text-[11px] gap-1">
+                            <Repeat className="h-3 w-3" />
+                            {recurrenceLabels[appt.recurrence] || appt.recurrence}
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground">{appt.appointment_type}</p>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
@@ -311,7 +410,6 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
                   </motion.div>
                 ))}
 
-                {/* Property visit requests */}
                 {dayVisits.map((apt, i) => (
                   <motion.div
                     key={apt.id}
@@ -351,20 +449,37 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
         </CardHeader>
         <CardContent>
           {(() => {
+            const today = startOfDay(new Date());
             const upcoming = [
-              ...agentAppts
-                .filter((a) => new Date(a.appointment_date) >= new Date())
-                .map((a) => ({ id: a.id, title: a.title, date: a.appointment_date, time: `${a.start_time} - ${a.end_time}`, status: a.status, type: a.appointment_type })),
+              ...allOccurrences
+                .filter((a) => new Date(a.occurrence_date) >= today)
+                .map((a) => ({
+                  id: `${a.id}-${a.occurrence_date}`,
+                  title: a.title,
+                  date: a.occurrence_date,
+                  time: `${a.start_time} - ${a.end_time}`,
+                  status: a.status,
+                  type: a.appointment_type,
+                  recurrence: a.recurrence,
+                })),
               ...appointments
-                .filter((a) => new Date(a.preferred_date) >= new Date())
-                .map((a) => ({ id: a.id, title: a.property_title || "Property Visit", date: a.preferred_date, time: a.preferred_time, status: a.status, type: "Visit Request" })),
+                .filter((a) => new Date(a.preferred_date) >= today)
+                .map((a) => ({
+                  id: a.id,
+                  title: a.property_title || "Property Visit",
+                  date: a.preferred_date,
+                  time: a.preferred_time,
+                  status: a.status,
+                  type: "Visit Request",
+                  recurrence: "none",
+                })),
             ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
             if (upcoming.length === 0) return <p className="text-sm text-muted-foreground text-center py-8">No upcoming appointments</p>;
 
             return (
               <div className="space-y-2">
-                {upcoming.slice(0, 10).map((item) => (
+                {upcoming.slice(0, 15).map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-3 rounded-lg border border-border/30 hover:bg-muted/30 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="text-center min-w-[48px]">
@@ -372,7 +487,12 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
                         <p className="text-lg font-bold text-foreground">{format(new Date(item.date), "d")}</p>
                       </div>
                       <div>
-                        <p className="font-medium text-foreground text-sm">{item.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-foreground text-sm">{item.title}</p>
+                          {item.recurrence !== "none" && (
+                            <Repeat className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">{item.type} · {item.time}</p>
                       </div>
                     </div>

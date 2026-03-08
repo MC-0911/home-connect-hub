@@ -22,6 +22,8 @@ export type Database = {
           end_time: string
           id: string
           notes: string | null
+          recurrence: string
+          recurrence_end: string | null
           reminder_sent: boolean
           start_time: string
           status: string
@@ -36,6 +38,8 @@ export type Database = {
           end_time?: string
           id?: string
           notes?: string | null
+          recurrence?: string
+          recurrence_end?: string | null
           reminder_sent?: boolean
           start_time?: string
           status?: string
@@ -50,6 +54,8 @@ export type Database = {
           end_time?: string
           id?: string
           notes?: string | null
+          recurrence?: string
+          recurrence_end?: string | null
           reminder_sent?: boolean
           start_time?: string
           status?: string
