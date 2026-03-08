@@ -31,7 +31,7 @@ interface Profile {
   is_admin?: boolean;
   listings_count?: number;
 }
-export function UsersTable() {
+export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
