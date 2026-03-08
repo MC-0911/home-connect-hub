@@ -719,6 +719,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_property_view_counts: {
+        Args: { _user_id: string }
+        Returns: {
+          property_id: string
+          view_count: number
+        }[]
+      }
       get_user_emails: {
         Args: never
         Returns: {
