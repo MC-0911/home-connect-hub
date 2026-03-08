@@ -400,7 +400,8 @@ interface TaskItem {
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newTime, setNewTime] = useState("");
+  const [newDate, setNewDate] = useState<Date>();
+  const [newTimeSlot, setNewTimeSlot] = useState("9:00 AM");
   const [newPriority, setNewPriority] = useState<"high" | "medium" | "low">("medium");
 
   // Build tasks from appointments + custom tasks stored in localStorage
