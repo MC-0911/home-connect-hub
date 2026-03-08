@@ -125,22 +125,7 @@ const ImagesStep = () => {
       <div className="text-center mb-8">
         <h2 className="text-2xl font-display font-semibold text-foreground">Property Photos</h2>
         <p className="text-muted-foreground mt-1">Add photos to showcase your property</p>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-3 gap-2"
-          onClick={() => setShowPreview(!showPreview)}
-        >
-          {showPreview ? <PenLine className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          {showPreview ? 'Back to Editor' : 'Preview Listing'}
-        </Button>
       </div>
-
-      {showPreview ? (
-        <ListingPreview />
-      ) : (
-        <>
           {/* Upload Area */}
           <div className="relative">
             <input
