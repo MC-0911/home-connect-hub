@@ -153,6 +153,11 @@ export function TenantsSection() {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentTenant, setPaymentTenant] = useState<Tenant | null>(null);
 
+  // PDF export date range
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFrom, setExportFrom] = useState<Date | undefined>(new Date(new Date().getFullYear(), 0, 1));
+  const [exportTo, setExportTo] = useState<Date | undefined>(new Date());
+
   const openRenew = (t: Tenant) => {
     setRenewingTenant(t);
     setNewLeaseEnd(t.lease_end ? addYears(new Date(t.lease_end), 1) : addYears(new Date(), 1));
@@ -184,15 +189,20 @@ export function TenantsSection() {
   };
 
   const exportPDF = async () => {
-    if (!user) return;
+    if (!user || !exportFrom || !exportTo) {
+      toast.error("Please select a date range");
+      return;
+    }
+
     const { data: payments } = await supabase
       .from("rent_payments")
       .select("*")
       .eq("user_id", user.id)
+      .gte("payment_date", format(exportFrom, "yyyy-MM-dd"))
+      .lte("payment_date", format(exportTo, "yyyy-MM-dd"))
       .order("payment_date", { ascending: false });
 
     const doc = new jsPDF();
-    const now = new Date();
     const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
     // Title
@@ -202,8 +212,9 @@ export function TenantsSection() {
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100);
-    doc.text(`Generated: ${format(now, "PPP")}`, 14, 28);
-    doc.text(`Total Tenants: ${tenants.length}`, 14, 34);
+    doc.text(`Period: ${format(exportFrom, "PPP")} — ${format(exportTo, "PPP")}`, 14, 28);
+    doc.text(`Generated: ${format(new Date(), "PPP")}`, 14, 34);
+    doc.text(`Total Tenants: ${tenants.length}`, 14, 40);
 
     // Summary
     const totalExpected = tenants.reduce((s, t) => s + (t.monthly_rent || 0), 0);
@@ -211,20 +222,19 @@ export function TenantsSection() {
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
-    doc.text("Summary", 14, 46);
+    doc.text("Summary", 14, 52);
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Total Monthly Expected: $${totalExpected.toLocaleString()}`, 14, 54);
-    doc.text(`Total Collected (All Time): $${totalCollected.toLocaleString()}`, 14, 60);
+    doc.text(`Total Monthly Expected: $${totalExpected.toLocaleString()}`, 14, 60);
+    doc.text(`Total Collected (Period): $${totalCollected.toLocaleString()}`, 14, 66);
 
     // Tenant table
-    let y = 74;
+    let y = 80;
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("Tenant Details", 14, y);
     y += 8;
 
-    // Table header
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.setFillColor(240, 240, 240);
@@ -249,12 +259,12 @@ export function TenantsSection() {
       y += 7;
     });
 
-    // Monthly breakdown
+    // Monthly breakdown — generate months within the selected range
     y += 6;
     if (y > 250) { doc.addPage(); y = 20; }
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text(`Monthly Breakdown — ${now.getFullYear()}`, 14, y);
+    doc.text("Monthly Breakdown", 14, y);
     y += 8;
 
     doc.setFontSize(9);
@@ -268,21 +278,25 @@ export function TenantsSection() {
     y += 8;
 
     doc.setFont("helvetica", "normal");
-    monthNames.forEach((month, idx) => {
+    let cursor = new Date(exportFrom.getFullYear(), exportFrom.getMonth(), 1);
+    const end = new Date(exportTo.getFullYear(), exportTo.getMonth(), 1);
+    while (cursor <= end) {
       if (y > 275) { doc.addPage(); y = 20; }
-      const label = `${month} ${now.getFullYear()}`;
+      const label = `${monthNames[cursor.getMonth()]} ${cursor.getFullYear()}`;
       const collected = (payments || [])
         .filter((p: any) => p.payment_month === label)
         .reduce((s, p: any) => s + Number(p.amount), 0);
       const rate = totalExpected > 0 ? Math.round((collected / totalExpected) * 100) : 0;
-      doc.text(month, 16, y);
+      doc.text(label, 16, y);
       doc.text(`$${totalExpected.toLocaleString()}`, 80, y);
       doc.text(`$${collected.toLocaleString()}`, 120, y);
       doc.text(`${rate}%`, 165, y);
       y += 7;
-    });
+      cursor = addMonths(cursor, 1);
+    }
 
-    doc.save(`rent-collection-report-${format(now, "yyyy-MM")}.pdf`);
+    doc.save(`rent-report-${format(exportFrom, "yyyy-MM")}-to-${format(exportTo, "yyyy-MM")}.pdf`);
+    setExportDialogOpen(false);
     toast.success("PDF report downloaded");
   };
 
@@ -304,9 +318,51 @@ export function TenantsSection() {
           <p className="text-muted-foreground text-sm mt-1">Manage your tenants and track rent payments</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="rounded-xl gap-2" onClick={exportPDF}>
-            <FileDown className="h-4 w-4" /> Export PDF
-          </Button>
+          <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="rounded-xl gap-2">
+                <FileDown className="h-4 w-4" /> Export PDF
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Export Rent Report</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-2">
+                <div className="grid gap-2">
+                  <Label>From</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !exportFrom && "text-muted-foreground")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {exportFrom ? format(exportFrom, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={exportFrom} onSelect={setExportFrom} initialFocus className="p-3 pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="grid gap-2">
+                  <Label>To</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !exportTo && "text-muted-foreground")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {exportTo ? format(exportTo, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={exportTo} onSelect={setExportTo} initialFocus className="p-3 pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Button onClick={exportPDF} className="w-full gap-2">
+                  <FileDown className="h-4 w-4" /> Generate Report
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
           <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
             <DialogTrigger asChild>
               <Button className="rounded-xl gap-2">
