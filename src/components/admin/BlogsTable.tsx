@@ -522,16 +522,12 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                 <div className="space-y-2">
                   <Label htmlFor="content">Content</Label>
 
-                  <Tabs defaultValue="edit" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="edit">Edit</TabsTrigger>
-                      <TabsTrigger value="preview">
-                        <Eye className="h-3.5 w-3.5 mr-1.5" />
-                        Preview
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="edit" className="mt-3">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Editor Pane */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <span>Editor</span>
+                      </div>
                       <RichTextEditor
                         value={formData.content}
                         onChange={(value) =>
@@ -542,21 +538,30 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                         }
                         placeholder="Write your blog content here..."
                       />
-                    </TabsContent>
+                    </div>
 
-                    <TabsContent value="preview" className="mt-3">
-                      <div className="rounded-md border bg-background p-6 max-h-[60vh] overflow-y-auto">
-                        <BlogPostPreview
-                          title={formData.title}
-                          content={formData.content}
-                          coverImage={formData.cover_image}
-                          excerpt={formData.excerpt}
-                          authorName={formData.author_name}
-                          authorAvatarUrl={formData.author_avatar_url}
-                        />
+                    {/* Live Preview Pane */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <Eye className="h-3.5 w-3.5" />
+                        <span>Live Preview</span>
                       </div>
-                    </TabsContent>
-                  </Tabs>
+                      <div className="rounded-md border bg-background p-6 max-h-[60vh] min-h-[200px] overflow-y-auto">
+                        {formData.content ? (
+                          <BlogPostPreview
+                            title={formData.title}
+                            content={formData.content}
+                            coverImage={formData.cover_image}
+                            excerpt={formData.excerpt}
+                            authorName={formData.author_name}
+                            authorAvatarUrl={formData.author_avatar_url}
+                          />
+                        ) : (
+                          <p className="text-muted-foreground text-sm italic">Start typing to see a live preview…</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cover_image">Cover Image URL</Label>
