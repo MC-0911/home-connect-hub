@@ -43,11 +43,13 @@ export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
       setBedrooms(initialFilters.bedrooms);
       setMaxPrice([initialFilters.maxPrice]);
       setSearchQuery(initialFilters.searchQuery);
+      // Trigger filtered search after state updates
+      setTimeout(() => handleSearchWithParams(initialFilters), 0);
     }
   }, [initialFilters]);
 
   useEffect(() => {
-    fetchProperties();
+    if (!initialFilters) fetchProperties();
   }, [listingType]);
 
   const fetchProperties = async () => {
