@@ -230,6 +230,12 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Tenants + Maintenance Requests */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <RecentTenantsCard onNavigate={onNavigate} />
+        <MaintenanceRequestsCard onNavigate={onNavigate} />
+      </div>
     </div>
   );
 }
