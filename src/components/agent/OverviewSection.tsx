@@ -395,6 +395,7 @@ interface TaskItem {
   time: string;
   priority: "high" | "medium" | "low";
   isAppointment?: boolean;
+  isCompleted?: boolean;
 }
 
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
