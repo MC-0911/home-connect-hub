@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useListingForm } from '../ListingFormContext';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, GripVertical } from 'lucide-react';
+import { ImagePlus, X, GripVertical, Eye, PenLine } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ListingPreview from '../ListingPreview';
 
 const ImagesStep = () => {
   const { formData, updateFormData } = useListingForm();
