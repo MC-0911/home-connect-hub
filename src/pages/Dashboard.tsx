@@ -362,12 +362,43 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="gold" asChild className="rounded-lg shadow-sm">
-                <Link to="/add-property">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Property
-                </Link>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="gold" className="rounded-lg shadow-sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Quick Add
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
+                  <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
+                    <Link to="/add-property" className="flex items-center gap-3">
+                      <Plus className="w-4 h-4 text-accent" />
+                      <span className="font-medium">Add Property</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate("/property-requirements")}
+                    className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                  >
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="font-medium">Buyer Requirements</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setActiveTab("visits")}
+                    className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                  >
+                    <CalendarCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="font-medium">Manage Visits</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setActiveTab("offers")}
+                    className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                  >
+                    <DollarSign className="w-4 h-4 text-indigo-600" />
+                    <span className="font-medium">View Offers</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </motion.div>
 
