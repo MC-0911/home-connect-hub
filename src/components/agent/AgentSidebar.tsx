@@ -37,6 +37,7 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingVisits, setPendingVisits] = useState(0);
   const [listingsCount, setListingsCount] = useState(0);
+  const [pendingOffers, setPendingOffers] = useState(0);
 
   useEffect(() => {
     if (!user) return;
