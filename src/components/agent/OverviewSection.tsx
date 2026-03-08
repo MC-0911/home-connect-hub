@@ -729,3 +729,194 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     </Card>
   );
 }
+
+// --- Recent Tenants Card ---
+function RecentTenantsCard({ onNavigate }: { onNavigate: (section: string) => void }) {
+  const [tenants, setTenants] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("tenants")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (data) setTenants(data);
+    };
+    fetch();
+  }, []);
+
+  const statusStyle: Record<string, string> = {
+    paid: "bg-emerald-100 text-emerald-700",
+    pending: "bg-amber-100 text-amber-700",
+    overdue: "bg-red-100 text-red-700",
+  };
+
+  return (
+    <Card className="border border-border/50 shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-semibold">Recent Tenants</CardTitle>
+          <Button size="sm" className="rounded-xl gap-2" onClick={() => onNavigate("tenants")}>
+            <Plus className="h-4 w-4" /> Add Tenant
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-0">
+        {tenants.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No tenants yet.</p>
+        ) : (
+          tenants.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                {t.tenant_name?.charAt(0) || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">{t.tenant_name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t.property_name || "No property"} • ${Number(t.monthly_rent || 0).toLocaleString()}/mo
+                </p>
+              </div>
+              <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full ${statusStyle[t.payment_status] || statusStyle.pending}`}>
+                {t.payment_status}
+              </span>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// --- Maintenance Requests Card ---
+const priorityStyle: Record<string, string> = {
+  low: "bg-emerald-100 text-emerald-700",
+  medium: "bg-amber-100 text-amber-700",
+  high: "bg-red-100 text-red-700",
+};
+
+const priorityBorder: Record<string, string> = {
+  low: "border-l-emerald-500",
+  medium: "border-l-amber-500",
+  high: "border-l-red-500",
+};
+
+function MaintenanceRequestsCard({ onNavigate }: { onNavigate: (section: string) => void }) {
+  const [requests, setRequests] = useState<any[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [form, setForm] = useState({ property_name: "", description: "", priority: "medium", due_date: "", status: "pending" });
+
+  const fetchRequests = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("maintenance_requests")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+    if (data) setRequests(data);
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  const handleSubmit = async () => {
+    if (!form.property_name.trim() || !form.description.trim()) {
+      toast.error("Property and description are required");
+      return;
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from("maintenance_requests").insert({
+      user_id: user.id,
+      property_name: form.property_name,
+      description: form.description,
+      priority: form.priority,
+      due_date: form.due_date || null,
+      status: form.status,
+    });
+    if (error) {
+      toast.error("Failed to create request");
+      return;
+    }
+    toast.success("Maintenance request created");
+    setDialogOpen(false);
+    setForm({ property_name: "", description: "", priority: "medium", due_date: "", status: "pending" });
+    fetchRequests();
+  };
+
+  return (
+    <Card className="border border-border/50 shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-semibold">Maintenance Requests</CardTitle>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <Button size="sm" className="rounded-xl gap-2" onClick={() => setDialogOpen(true)}>
+              <Plus className="h-4 w-4" /> New Request
+            </Button>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>New Maintenance Request</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-2">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Property *</label>
+                  <Input value={form.property_name} onChange={(e) => setForm({ ...form, property_name: e.target.value })} placeholder="e.g. Sunset Villa" />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Description *</label>
+                  <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="e.g. Leaky faucet" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium">Priority</label>
+                    <Select value={form.priority} onValueChange={(v) => setForm({ ...form, priority: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium">Due Date</label>
+                    <Input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
+                  </div>
+                </div>
+                <Button onClick={handleSubmit} className="w-full">Create Request</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-0">
+        {requests.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No maintenance requests yet.</p>
+        ) : (
+          requests.map((r) => (
+            <div key={r.id} className={`py-3 pl-3 border-l-4 ${priorityBorder[r.priority] || priorityBorder.medium} border-b border-border/50 last:border-b-0`}>
+              <div className="flex items-start justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-foreground">{r.property_name}</p>
+                  <p className="text-sm text-muted-foreground">{r.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {r.due_date ? `Due: ${r.due_date}` : "No due date"} • Status: {r.status}
+                  </p>
+                </div>
+                <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0 ml-2 ${priorityStyle[r.priority] || priorityStyle.medium}`}>
+                  {r.priority}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
