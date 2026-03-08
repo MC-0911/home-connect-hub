@@ -148,6 +148,10 @@ export function TenantsSection() {
   const [newLeaseEnd, setNewLeaseEnd] = useState<Date | undefined>();
   const [newRent, setNewRent] = useState("");
 
+  // Payment history
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [paymentTenant, setPaymentTenant] = useState<Tenant | null>(null);
+
   const openRenew = (t: Tenant) => {
     setRenewingTenant(t);
     setNewLeaseEnd(t.lease_end ? addYears(new Date(t.lease_end), 1) : addYears(new Date(), 1));
