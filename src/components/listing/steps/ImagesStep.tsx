@@ -120,6 +120,30 @@ const ImagesStep = () => {
     setDragOverIndex(null);
   };
 
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= unifiedImages.length) return;
+    const reordered = [...unifiedImages];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    const newExisting: string[] = [];
+    const newPreviewUrls: string[] = [];
+    const newFiles: File[] = [];
+    for (const item of reordered) {
+      if (item.type === 'existing') {
+        newExisting.push(item.url);
+      } else {
+        newPreviewUrls.push(item.url);
+        newFiles.push(formData.images[item.originalIndex]);
+      }
+    }
+    updateFormData({
+      existingImageUrls: newExisting,
+      imagePreviewUrls: newPreviewUrls,
+      images: newFiles,
+    });
+  };
+
   const totalImages = unifiedImages.length;
 
   return (
@@ -154,8 +178,11 @@ const ImagesStep = () => {
                 <p className="text-sm font-medium text-foreground">
                   {totalImages} image{totalImages !== 1 ? 's' : ''} selected
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground hidden sm:block">
                   Drag to reorder · First image is the cover
+                </p>
+                <p className="text-sm text-muted-foreground sm:hidden">
+                  First image is the cover
                 </p>
               </div>
 
