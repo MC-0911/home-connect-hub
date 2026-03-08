@@ -41,6 +41,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [suspensionReason, setSuspensionReason] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [bulkSuspendDialogOpen, setBulkSuspendDialogOpen] = useState(false);
   const [bulkUnsuspendDialogOpen, setBulkUnsuspendDialogOpen] = useState(false);
   const [bulkSuspensionReason, setBulkSuspensionReason] = useState('');
   const fetchUsers = async () => {
