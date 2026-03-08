@@ -35,6 +35,29 @@ export default function Admin() {
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
+  const { user } = useAuth();
+
+  // Fetch unread alerts count
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      const { count } = await supabase
+        .from('alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      setUnreadAlerts(count || 0);
+    };
+    fetchUnread();
+
+    const channel = supabase
+      .channel('admin-alerts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'alerts', filter: `user_id=eq.${user.id}` }, () => fetchUnread())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   useEffect(() => {
     const checkAuth = async () => {
