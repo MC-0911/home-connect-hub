@@ -6,6 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { User, Mail, Phone, MapPin, ArrowRight, LogOut } from "lucide-react";
+import { NotificationSecurityCards } from "@/components/settings/NotificationSecurityCards";
 
 export function SettingsSection() {
   const { user, signOut } = useAuth();
