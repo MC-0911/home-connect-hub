@@ -98,7 +98,7 @@ export default function Admin() {
       </Helmet>
 
       <div className="min-h-screen flex bg-muted/30">
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <AdminSidebar activeSection={activeSection} onSectionChange={(s) => { setActiveSection(s); setGlobalSearch(''); }} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
         {/* Main content area — shifts based on sidebar */}
         <main className="flex-1 transition-all duration-300" style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}>
