@@ -65,6 +65,7 @@ const INITIAL: AnalyticsData = {
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
   rawBlogViews: [], rawSoldListings: [], rawBlogs: [],
   deviceTraffic: [], totalSessions: 0,
+  quickOverview: { buyerCount: 0, sellerCount: 0, agentCount: 0, topAgent: null },
 };
 
 export function useAnalyticsData(dateRange: DateRange) {
