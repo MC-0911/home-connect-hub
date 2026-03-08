@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { cn } from "@/lib/utils";
 import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
+import jsPDF from "jspdf";
 
 interface Tenant {
   id: string;
