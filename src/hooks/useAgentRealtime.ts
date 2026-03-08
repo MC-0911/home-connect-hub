@@ -273,7 +273,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     return () => {
       channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [user, fetchListings, fetchAppointments, fetchStats, fetchUnreadMessages, fetchLeads]);
+  }, [user, fetchListings, fetchAppointments, fetchStats, fetchUnreadMessages, fetchUnreadAlerts, fetchLeads]);
 
   return {
     listings, leads, appointments, documents, unreadMessages,
