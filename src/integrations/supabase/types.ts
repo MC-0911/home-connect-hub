@@ -528,6 +528,7 @@ export type Database = {
           id: string
           is_suspended: boolean | null
           location: string | null
+          notification_preferences: Json
           phone: string | null
           suspended_at: string | null
           suspension_reason: string | null
@@ -542,6 +543,7 @@ export type Database = {
           id?: string
           is_suspended?: boolean | null
           location?: string | null
+          notification_preferences?: Json
           phone?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
@@ -556,6 +558,7 @@ export type Database = {
           id?: string
           is_suspended?: boolean | null
           location?: string | null
+          notification_preferences?: Json
           phone?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
