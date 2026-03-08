@@ -564,10 +564,6 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-36">
                     <DropdownMenuItem onClick={() => openEditDialog(task)}>
-                      <Tag className="h-3.5 w-3.5 mr-2" />
-                      Tag
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openEditDialog(task)}>
                       <Pencil className="h-3.5 w-3.5 mr-2" />
                       Edit
                     </DropdownMenuItem>
