@@ -66,23 +66,31 @@ export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
     setLoading(false);
   };
 
-  const handleSearch = async () => {
+  const handleSearchWithParams = async (filters: {
+    listingType: "sale" | "rent";
+    propertyType: string;
+    bedrooms: string;
+    maxPrice: number;
+    searchQuery: string;
+  }) => {
     setLoading(true);
     let query = supabase
       .from("properties")
       .select("*")
       .eq("status", "active")
-      .eq("listing_type", listingType)
-      .lte("price", maxPrice[0]);
+      .eq("listing_type", filters.listingType)
+      .lte("price", filters.maxPrice);
 
-    if (propertyType !== "any") query = query.eq("property_type", propertyType as any);
-    if (bedrooms !== "any") query = query.gte("bedrooms", parseInt(bedrooms));
-    if (searchQuery) query = query.or(`city.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%,state.ilike.%${searchQuery}%`);
+    if (filters.propertyType !== "any") query = query.eq("property_type", filters.propertyType as any);
+    if (filters.bedrooms !== "any") query = query.gte("bedrooms", parseInt(filters.bedrooms));
+    if (filters.searchQuery) query = query.or(`city.ilike.%${filters.searchQuery}%,title.ilike.%${filters.searchQuery}%,state.ilike.%${filters.searchQuery}%`);
 
     const { data, error } = await query.order("created_at", { ascending: false }).limit(24);
     if (!error && data) setProperties(data);
     setLoading(false);
   };
+
+  const handleSearch = () => handleSearchWithParams({ listingType, propertyType, bedrooms, maxPrice: maxPrice[0], searchQuery });
 
   return (
     <div className="space-y-6">
