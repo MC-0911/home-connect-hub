@@ -70,19 +70,7 @@ export default function AgentDashboard() {
             </div>
             <TooltipProvider delayDuration={200}>
               <div className="flex items-center gap-4">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button onClick={() => setActiveSection("overview")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                      <Bell className="h-5 w-5 text-muted-foreground" />
-                      {unreadAlerts > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[10px] flex items-center justify-center font-bold">
-                          {unreadAlerts > 9 ? "9+" : unreadAlerts}
-                        </span>
-                      )}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>Notifications</TooltipContent>
-                </Tooltip>
+                <AlertsDropdown unreadCount={unreadAlerts} />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button onClick={() => setActiveSection("messages")} className="relative p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
