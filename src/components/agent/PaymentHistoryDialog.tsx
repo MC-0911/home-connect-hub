@@ -93,10 +93,11 @@ export function PaymentHistoryDialog({ open, onOpenChange, tenantId, tenantName,
       toast.error("Amount and month are required");
       return;
     }
+    const paymentAmount = Number(form.amount);
     const { error } = await supabase.from("rent_payments").insert({
       tenant_id: tenantId,
       user_id: user.id,
-      amount: Number(form.amount),
+      amount: paymentAmount,
       payment_date: form.payment_date,
       payment_month: form.payment_month,
       payment_method: form.payment_method,
@@ -106,7 +107,16 @@ export function PaymentHistoryDialog({ open, onOpenChange, tenantId, tenantName,
       toast.error("Failed to record payment");
       return;
     }
-    toast.success("Payment recorded");
+
+    // Auto-update tenant status to 'paid' if payment covers current month's rent
+    const currentMonthLabel = `${monthOptions[new Date().getMonth()]} ${new Date().getFullYear()}`;
+    if (form.payment_month === currentMonthLabel && paymentAmount >= monthlyRent) {
+      await supabase.from("tenants").update({ payment_status: "paid" }).eq("id", tenantId);
+      toast.success("Payment recorded — status updated to Paid");
+    } else {
+      toast.success("Payment recorded");
+    }
+
     setShowForm(false);
     fetchPayments();
   };
