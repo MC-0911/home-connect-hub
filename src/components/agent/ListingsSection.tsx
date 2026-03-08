@@ -138,7 +138,7 @@ export function ListingsSection({ listings, onRefresh }: ListingsSectionProps) {
                   <h3 className="font-semibold text-foreground truncate">{listing.title}</h3>
                   <p className="text-sm text-muted-foreground">{listing.city}, {listing.state}</p>
                 </div>
-                <p className="font-bold text-primary whitespace-nowrap">₦{listing.price.toLocaleString()}</p>
+                <p className="font-bold text-primary whitespace-nowrap">${listing.price.toLocaleString()}</p>
                 <Badge className={statusColors[listing.status || "under_review"]}>{listing.status?.replace("_", " ")}</Badge>
                 <div className="flex gap-1">
                   <Button size="sm" variant="ghost" onClick={() => navigate(`/edit-property/${listing.id}`)}><Pencil className="h-4 w-4" /></Button>
