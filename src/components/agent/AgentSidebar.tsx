@@ -197,32 +197,6 @@ export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarPro
       {/* Footer */}
       <div className="px-3 py-4 border-t border-white/10 space-y-1">
         <button
-          onClick={() => navigate("/")}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white transition-all"
-        >
-          <Home className="h-5 w-5 shrink-0" />
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm font-medium whitespace-nowrap">
-                Back to Site
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-        <button
-          onClick={async () => { await signOut(); navigate("/auth"); }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 hover:bg-white/10 hover:text-white transition-all"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-sm font-medium whitespace-nowrap">
-                Sign Out
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-        <button
           onClick={() => setCollapsed(!collapsed)}
           className="w-full flex items-center justify-center p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all"
         >
