@@ -1,11 +1,14 @@
-import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare } from "lucide-react";
+import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import type { Tables } from "@/integrations/supabase/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface Stats {
   totalListings: number;
@@ -184,58 +187,10 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
       </div>
 
       {/* Recent Properties Table */}
-      <Card className="border border-border/50 shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold">Recent Properties</CardTitle>
-            <Button onClick={() => navigate("/add-property")} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl gap-2" size="sm">
-              <Plus className="h-4 w-4" /> Add New Property
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {recentProperties.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No properties yet. Add your first property to get started.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Property</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Type</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Price</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentProperties.map((prop) => (
-                    <tr key={prop.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                      <td className="py-3 px-2">
-                        <p className="font-semibold text-sm text-foreground">{prop.title}</p>
-                        <p className="text-xs text-muted-foreground">{prop.address}, {prop.city}</p>
-                      </td>
-                      <td className="py-3 px-2 text-sm text-foreground capitalize">{prop.property_type}</td>
-                      <td className="py-3 px-2 text-sm font-medium text-foreground">{formatPrice(prop.price)}</td>
-                      <td className="py-3 px-2">
-                        <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[prop.status || "active"] || "bg-muted text-muted-foreground"}`}>
-                          {(prop.status || "active").replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
-                        </span>
-                      </td>
-                      <td className="py-3 px-2">
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => navigate(`/edit-property/${prop.id}`)} className="text-muted-foreground hover:text-foreground transition-colors"><Edit className="h-4 w-4" /></button>
-                          <button onClick={() => navigate(`/property/${prop.id}`)} className="text-muted-foreground hover:text-foreground transition-colors"><Eye className="h-4 w-4" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <RecentPropertiesCard 
+        listings={listings} 
+        navigate={navigate} 
+      />
 
       {/* Bottom Row: Tasks + Clients */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
@@ -294,5 +249,143 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
         </Card>
       </div>
     </div>
+  );
+}
+
+// --- Recent Properties Card Component ---
+const filterTabs = ["All", "Active", "Pending", "Sold"] as const;
+
+function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"properties">[]; navigate: (path: string) => void }) {
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const base = listings.slice(0, 8);
+    if (activeFilter === "All") return base;
+    return base.filter(p => (p.status || "active") === activeFilter.toLowerCase());
+  }, [listings, activeFilter]);
+
+  const handleDelete = async () => {
+    if (!deletingId) return;
+    try {
+      const { error } = await supabase.from("properties").delete().eq("id", deletingId);
+      if (error) throw error;
+      toast.success("Property deleted successfully");
+      setDeleteDialogOpen(false);
+      setDeletingId(null);
+      window.location.reload();
+    } catch {
+      toast.error("Failed to delete property");
+    }
+  };
+
+  return (
+    <Card className="border border-border/50 shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <CardTitle className="text-base font-semibold">Recent Properties</CardTitle>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-1 bg-muted/50 rounded-full p-1">
+              {filterTabs.map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveFilter(tab)}
+                  className={`text-xs font-medium px-4 py-1.5 rounded-full transition-all ${
+                    activeFilter === tab
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <Button onClick={() => navigate("/add-property")} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl gap-2" size="sm">
+              <Plus className="h-4 w-4" /> Add New Property
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">No properties found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Property</th>
+                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Type</th>
+                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Price</th>
+                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Status</th>
+                  <th className="text-center py-3 px-2 text-xs font-medium text-muted-foreground">Views</th>
+                  <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((prop) => (
+                  <tr key={prop.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                    <td className="py-3 px-2">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-muted overflow-hidden shrink-0">
+                          {prop.images && prop.images.length > 0 ? (
+                            <img src={prop.images[0]} alt={prop.title} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center">
+                              <Home className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-sm text-foreground truncate">{prop.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">{prop.address}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-2 text-sm text-foreground capitalize">{prop.property_type}</td>
+                    <td className="py-3 px-2 text-sm font-semibold text-foreground">${prop.price.toLocaleString()}</td>
+                    <td className="py-3 px-2">
+                      <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[prop.status || "active"] || "bg-muted text-muted-foreground"}`}>
+                        {(prop.status || "active").replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-center text-sm font-medium text-muted-foreground">
+                      {Math.floor(Math.random() * 500) + 50}
+                    </td>
+                    <td className="py-3 px-2">
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => navigate(`/edit-property/${prop.id}`)} className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="Edit">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => navigate(`/property/${prop.id}`)} className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="View">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => { setDeletingId(prop.id); setDeleteDialogOpen(true); }} className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Delete">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Property</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to delete this property? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
   );
 }
