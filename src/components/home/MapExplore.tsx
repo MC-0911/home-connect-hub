@@ -228,7 +228,9 @@ export function MapExplore({ className }: { className?: string }) {
               </motion.div>
 
               {/* Animated Pins */}
-              {propertyPins.map((pin) => (
+              {propertyPins
+                .filter((pin) => activeFilter === "All" || pin.type === activeFilter)
+                .map((pin) => (
                 <motion.div
                   key={pin.id}
                   className="absolute cursor-pointer z-10"
