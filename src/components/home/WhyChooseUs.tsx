@@ -29,11 +29,6 @@ const features = [
   { icon: Rocket, title: "Fast & Efficient", desc: "Average closing time just 21 days" },
 ];
 
-const bottomStats = [
-  { value: "98%", label: "Satisfaction Rate", icon: CheckCircle },
-  { value: "24/7", label: "Customer Support", icon: Clock },
-  { value: "100%", label: "Secure Platform", icon: Lock },
-];
 
 export function WhyChooseUs() {
   return (
