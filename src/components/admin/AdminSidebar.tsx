@@ -46,22 +46,23 @@ export function AdminSidebar({ activeSection, onSectionChange, collapsed, onTogg
     >
       {/* Header */}
       <div className="p-5 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-white/10 shrink-0">
-            <Crown className="h-6 w-6 text-white" />
-          </div>
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="text-xl font-display font-bold text-white whitespace-nowrap"
-              >
+        <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")}>
+          {!collapsed && (
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 rounded-xl bg-white/10 shrink-0">
+                <Crown className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xl font-display font-bold text-white whitespace-nowrap">
                 Royal Landmark
-              </motion.span>
-            )}
-          </AnimatePresence>
+              </span>
+            </div>
+          )}
+          <button
+            onClick={onToggleCollapse}
+            className="p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all shrink-0"
+          >
+            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 
