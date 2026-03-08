@@ -11,11 +11,13 @@ import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { AdminSidebar, type AdminSection } from '@/components/admin/AdminSidebar';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Crown, Search, Bell } from 'lucide-react';
+import { Shield, Crown, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { AlertsDropdown } from '@/components/agent/AlertsDropdown';
+import { useAuth } from '@/hooks/useAuth';
 
 const sectionMeta: Record<AdminSection, { title: string; description: string; icon: typeof Shield }> = {
   analytics: { title: 'Dashboard Overview', description: 'Platform analytics and performance metrics', icon: Crown },
@@ -33,6 +35,29 @@ export default function Admin() {
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
+  const { user } = useAuth();
+
+  // Fetch unread alerts count
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      const { count } = await supabase
+        .from('alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      setUnreadAlerts(count || 0);
+    };
+    fetchUnread();
+
+    const channel = supabase
+      .channel('admin-alerts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'alerts', filter: `user_id=eq.${user.id}` }, () => fetchUnread())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -134,10 +159,10 @@ export default function Admin() {
                     className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
                   />
                 </div>
-                <button className="relative w-11 h-11 rounded-full bg-card border border-border/60 shadow-sm hover:shadow-md flex items-center justify-center transition-all">
-                  <Bell className="h-5 w-5 text-muted-foreground" />
-                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-destructive rounded-full ring-2 ring-card" />
-                </button>
+                <AlertsDropdown
+                  unreadCount={unreadAlerts}
+                  onMarkRead={() => setUnreadAlerts(0)}
+                />
               </div>
             </div>
           </motion.header>
