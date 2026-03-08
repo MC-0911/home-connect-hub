@@ -31,8 +31,7 @@ const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard 
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function AdminSidebar({ activeSection, onSectionChange, collapsed, onToggleCollapse }: AdminSidebarProps) {
   const navigate = useNavigate();
   const { profile } = useProfile();
 
