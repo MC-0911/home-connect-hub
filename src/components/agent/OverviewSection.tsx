@@ -427,6 +427,8 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
         time: t.task_date ? `${format(new Date(t.task_date + "T00:00:00"), "MMM d, yyyy")}, ${t.task_time}` : t.task_time,
         priority: t.priority as "high" | "medium" | "low",
         isCompleted: t.is_completed,
+        rawDate: t.task_date,
+        rawTime: t.task_time,
       })));
     }
     setLoading(false);
