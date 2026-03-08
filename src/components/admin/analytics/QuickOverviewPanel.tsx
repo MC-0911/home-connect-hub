@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { Users, Home, Trophy, UserCheck } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { QuickOverviewData } from './useAnalyticsData';
 
 interface QuickOverviewPanelProps {
@@ -50,9 +51,12 @@ export function QuickOverviewPanel({ data }: QuickOverviewPanelProps) {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-4 w-4 text-primary" />
-                  </div>
+                  <Avatar className="h-8 w-8 border border-primary/20">
+                    <AvatarImage src={data.topAgent.avatarUrl || ''} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                      {data.topAgent.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="text-sm font-medium text-foreground">{data.topAgent.name}</span>
                 </div>
                 <span className="text-sm font-bold text-accent">
