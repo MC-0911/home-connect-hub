@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { User, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { User, Mail, Phone, MapPin, ArrowRight, LogOut } from "lucide-react";
 
 export function SettingsSection() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
 
