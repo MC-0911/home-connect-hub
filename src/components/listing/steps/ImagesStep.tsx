@@ -1,9 +1,7 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { useListingForm } from '../ListingFormContext';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, GripVertical, Eye, PenLine } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ListingPreview from '../ListingPreview';
+import { ImagePlus, X, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type UnifiedImage = 
