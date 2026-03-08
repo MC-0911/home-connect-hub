@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck, Clipboard } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck, Clipboard } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
