@@ -162,15 +162,19 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {offerKpis.map((kpi, i) => (
           <motion.div key={kpi.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.08 }}>
-            <Card className="border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
+            <Card
+              className="border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+              onClick={() => onNavigate("offers")}
+            >
               <CardContent className="p-4 flex items-center gap-3">
                 <div className={`p-2.5 rounded-xl bg-gradient-to-br ${kpi.gradient} text-white shadow-sm`}>
                   <kpi.icon className="h-4 w-4" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-xl font-bold text-foreground">{kpi.value}</p>
                   <p className="text-xs text-muted-foreground">{kpi.label}</p>
                 </div>
+                <span className="text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
               </CardContent>
             </Card>
           </motion.div>
