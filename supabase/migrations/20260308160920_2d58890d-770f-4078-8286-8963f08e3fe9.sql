@@ -1,0 +1,2 @@
+ALTER TABLE public.buyer_requirements DROP CONSTRAINT buyer_requirements_status_check;
+ALTER TABLE public.buyer_requirements ADD CONSTRAINT buyer_requirements_status_check CHECK (status = ANY (ARRAY['new'::text, 'contacted'::text, 'qualified'::text, 'converted'::text, 'matched'::text, 'closed'::text]));
