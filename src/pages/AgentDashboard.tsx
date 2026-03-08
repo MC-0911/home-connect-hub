@@ -77,16 +77,20 @@ export default function AgentDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border/50"
         >
-          <div className="flex items-center justify-between px-8 py-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search properties, clients..."
-                className="pl-9 w-72 bg-muted/50 border-border/50 rounded-xl h-10"
-              />
+          <div className="flex items-center justify-between px-6 sm:px-8 py-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">{currentSection.title}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">{currentSection.subtitle}</p>
             </div>
             <TooltipProvider delayDuration={200}>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="relative hidden sm:block">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search..."
+                    className="pl-9 w-56 bg-muted/50 border-border/50 rounded-xl h-10"
+                  />
+                </div>
                 <AlertsDropdown unreadCount={unreadAlerts} />
                 <Tooltip>
                   <TooltipTrigger asChild>

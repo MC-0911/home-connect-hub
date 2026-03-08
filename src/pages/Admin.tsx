@@ -133,30 +133,30 @@ export default function Admin() {
             animate={{ opacity: 1, y: 0 }}
             className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border/50"
           >
-            <div className="flex items-center justify-between px-8 py-5">
+            <div className="flex items-center justify-between px-6 sm:px-8 py-4">
               <div>
                 {activeSection === 'analytics' ? (
                   <>
-                    <h1 className="text-2xl font-display font-bold text-foreground">
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">
                       {getGreeting()}, Admin 👋
                     </h1>
                     <p className="text-sm text-muted-foreground mt-0.5">Here's what's happening with your real estate platform</p>
                   </>
                 ) : (
                   <>
-                    <h1 className="text-2xl font-display font-bold text-foreground">{meta.title}</h1>
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">{meta.title}</h1>
                     <p className="text-sm text-muted-foreground mt-0.5">{meta.description}</p>
                   </>
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative hidden sm:block">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search properties, clients..."
+                    placeholder="Search..."
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
-                    className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
+                    className="pl-9 w-56 bg-muted/50 border-border/50 rounded-xl h-10"
                   />
                 </div>
                 <AlertsDropdown
