@@ -30,6 +30,7 @@ interface Profile {
   suspension_reason: string | null;
   email?: string | null;
   is_admin?: boolean;
+  user_role?: string | null;
   listings_count?: number;
 }
 export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
