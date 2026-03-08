@@ -770,6 +770,40 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Tag Selection Dialog */}
+      <Dialog open={tagDialogOpen} onOpenChange={(open) => { setTagDialogOpen(open); if (!open) setTaggingTask(null); }}>
+        <DialogContent className="sm:max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Assign Tag</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-2 py-2">
+            {TAG_OPTIONS.map((tag) => {
+              const isSelected = taggingTask?.tag === tag.value;
+              return (
+                <button
+                  key={tag.value}
+                  onClick={() => handleSetTag(tag.value)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all text-sm font-medium text-left",
+                    isSelected
+                      ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50"
+                  )}
+                >
+                  <span className={`h-3 w-3 rounded-full shrink-0 ${tag.color}`} />
+                  {tag.label}
+                </button>
+              );
+            })}
+          </div>
+          {taggingTask?.tag && (
+            <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => handleSetTag(null)}>
+              Remove Tag
+            </Button>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
