@@ -154,6 +154,10 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
           const visit = payload.new as any;
           toast.info("New Visit Request", {
             description: `A visit has been scheduled for ${visit.preferred_date} at ${visit.preferred_time}`,
+            action: onNavigate ? {
+              label: "View",
+              onClick: () => onNavigate("calendar"),
+            } : undefined,
           });
           fetchAppointments();
           fetchStats();
