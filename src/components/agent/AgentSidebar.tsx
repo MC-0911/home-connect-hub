@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Building2, Users, CalendarDays, MessageSquare,
-  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight
+  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
