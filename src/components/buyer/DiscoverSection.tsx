@@ -14,20 +14,42 @@ import { useAuth } from "@/hooks/useAuth";
 
 type Property = Tables<"properties">;
 
-export function DiscoverSection() {
+interface DiscoverSectionProps {
+  initialFilters?: {
+    listingType: "sale" | "rent";
+    propertyType: string;
+    bedrooms: string;
+    maxPrice: number;
+    searchQuery: string;
+  } | null;
+}
+
+export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [listingType, setListingType] = useState<"sale" | "rent">("sale");
-  const [propertyType, setPropertyType] = useState("any");
-  const [bedrooms, setBedrooms] = useState("any");
-  const [maxPrice, setMaxPrice] = useState([2000000]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [listingType, setListingType] = useState<"sale" | "rent">(initialFilters?.listingType || "sale");
+  const [propertyType, setPropertyType] = useState(initialFilters?.propertyType || "any");
+  const [bedrooms, setBedrooms] = useState(initialFilters?.bedrooms || "any");
+  const [maxPrice, setMaxPrice] = useState([initialFilters?.maxPrice || 2000000]);
+  const [searchQuery, setSearchQuery] = useState(initialFilters?.searchQuery || "");
 
   useEffect(() => {
-    fetchProperties();
+    if (initialFilters) {
+      setListingType(initialFilters.listingType);
+      setPropertyType(initialFilters.propertyType);
+      setBedrooms(initialFilters.bedrooms);
+      setMaxPrice([initialFilters.maxPrice]);
+      setSearchQuery(initialFilters.searchQuery);
+      // Trigger filtered search after state updates
+      setTimeout(() => handleSearchWithParams(initialFilters), 0);
+    }
+  }, [initialFilters]);
+
+  useEffect(() => {
+    if (!initialFilters) fetchProperties();
   }, [listingType]);
 
   const fetchProperties = async () => {
@@ -44,23 +66,31 @@ export function DiscoverSection() {
     setLoading(false);
   };
 
-  const handleSearch = async () => {
+  const handleSearchWithParams = async (filters: {
+    listingType: "sale" | "rent";
+    propertyType: string;
+    bedrooms: string;
+    maxPrice: number;
+    searchQuery: string;
+  }) => {
     setLoading(true);
     let query = supabase
       .from("properties")
       .select("*")
       .eq("status", "active")
-      .eq("listing_type", listingType)
-      .lte("price", maxPrice[0]);
+      .eq("listing_type", filters.listingType)
+      .lte("price", filters.maxPrice);
 
-    if (propertyType !== "any") query = query.eq("property_type", propertyType as any);
-    if (bedrooms !== "any") query = query.gte("bedrooms", parseInt(bedrooms));
-    if (searchQuery) query = query.or(`city.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%,state.ilike.%${searchQuery}%`);
+    if (filters.propertyType !== "any") query = query.eq("property_type", filters.propertyType as any);
+    if (filters.bedrooms !== "any") query = query.gte("bedrooms", parseInt(filters.bedrooms));
+    if (filters.searchQuery) query = query.or(`city.ilike.%${filters.searchQuery}%,title.ilike.%${filters.searchQuery}%,state.ilike.%${filters.searchQuery}%`);
 
     const { data, error } = await query.order("created_at", { ascending: false }).limit(24);
     if (!error && data) setProperties(data);
     setLoading(false);
   };
+
+  const handleSearch = () => handleSearchWithParams({ listingType, propertyType, bedrooms, maxPrice: maxPrice[0], searchQuery });
 
   return (
     <div className="space-y-6">
