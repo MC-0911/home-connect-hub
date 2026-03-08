@@ -390,6 +390,17 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
 }
 
 // --- Upcoming Tasks Card Component ---
+const TAG_OPTIONS = [
+  { value: "urgent", label: "Urgent", color: "bg-red-500" },
+  { value: "follow-up", label: "Follow Up", color: "bg-amber-500" },
+  { value: "meeting", label: "Meeting", color: "bg-blue-500" },
+  { value: "personal", label: "Personal", color: "bg-violet-500" },
+  { value: "client", label: "Client", color: "bg-emerald-500" },
+  { value: "showing", label: "Showing", color: "bg-pink-500" },
+] as const;
+
+type TagValue = typeof TAG_OPTIONS[number]["value"] | null;
+
 interface TaskItem {
   id: string;
   title: string;
@@ -399,6 +410,7 @@ interface TaskItem {
   isCompleted?: boolean;
   rawDate?: string | null;
   rawTime?: string;
+  tag?: TagValue;
 }
 
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
