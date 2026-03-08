@@ -424,6 +424,9 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [customTasks, setCustomTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [taggingTask, setTaggingTask] = useState<TaskItem | null>(null);
+
   // Fetch tasks from Supabase
   const fetchTasks = async () => {
     const { data: { user } } = await supabase.auth.getUser();
