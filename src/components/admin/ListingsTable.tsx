@@ -29,7 +29,7 @@ interface Property {
   user_id: string;
   owner_name?: string;
 }
-export function ListingsTable() {
+export function ListingsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
