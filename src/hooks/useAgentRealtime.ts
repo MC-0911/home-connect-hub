@@ -125,7 +125,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     setLoading(true);
     await Promise.all([
       fetchListings(), fetchLeads(), fetchAppointments(),
-      fetchDocuments(), fetchStats(), fetchUnreadMessages(),
+      fetchDocuments(), fetchStats(), fetchUnreadMessages(), fetchUnreadAlerts(),
     ]);
     setLoading(false);
   }, [user, fetchListings, fetchLeads, fetchAppointments, fetchDocuments, fetchStats, fetchUnreadMessages]);
