@@ -22,7 +22,7 @@ export default function AgentDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const {
-    listings, leads, appointments, documents, unreadMessages,
+    listings, leads, appointments, documents, unreadMessages, unreadAlerts,
     stats, recentActivity, loading: dataLoading,
     refreshListings, refreshLeads, refreshAppointments, refreshDocuments,
   } = useAgentRealtime(setActiveSection);
