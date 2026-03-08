@@ -158,6 +158,25 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
         ))}
       </div>
 
+      {/* Offer Breakdown Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {offerKpis.map((kpi, i) => (
+          <motion.div key={kpi.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.08 }}>
+            <Card className="border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${kpi.gradient} text-white shadow-sm`}>
+                  <kpi.icon className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-foreground">{kpi.value}</p>
+                  <p className="text-xs text-muted-foreground">{kpi.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <Card className="lg:col-span-2 border border-border/50 shadow-sm">
