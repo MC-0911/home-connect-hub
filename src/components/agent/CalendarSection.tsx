@@ -138,7 +138,7 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("agent_appointments").delete().eq("id", id);
+    const { error } = await supabase.from("agent_appointments" as any).delete().eq("id", id);
     if (error) toast.error("Failed to delete");
     else toast.success("Appointment deleted");
   };
