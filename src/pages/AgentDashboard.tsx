@@ -36,6 +36,21 @@ export default function AgentDashboard() {
   if (dataLoading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!user) return null;
 
+  const sectionTitles: Record<string, { title: string; subtitle: string }> = {
+    overview: { title: "Agent Dashboard", subtitle: format(new Date(), "EEEE, MMMM d, yyyy") },
+    listings: { title: "My Listings", subtitle: "Manage your property listings" },
+    offers: { title: "Offers", subtitle: "Review and respond to property offers" },
+    leads: { title: "Leads", subtitle: "Track and manage your leads" },
+    tenants: { title: "Tenants", subtitle: "Manage tenants and leases" },
+    calendar: { title: "Calendar", subtitle: "Appointments and schedule" },
+    messages: { title: "Messages", subtitle: "Your conversations" },
+    documents: { title: "Documents", subtitle: "Manage your files and documents" },
+    analytics: { title: "Analytics", subtitle: "Performance metrics and insights" },
+    settings: { title: "Settings", subtitle: "Manage your account preferences" },
+  };
+
+  const currentSection = sectionTitles[activeSection] || sectionTitles.overview;
+
   const renderSection = () => {
     switch (activeSection) {
       case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} />;
