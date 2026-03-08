@@ -62,6 +62,13 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setListingsCount(propCount || 0);
+
+      const { count: offerCount } = await supabase
+        .from("property_offers")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("status", "pending");
+      setPendingOffers(offerCount || 0);
     };
 
     fetchCounts();
