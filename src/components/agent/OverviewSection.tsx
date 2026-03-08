@@ -445,6 +445,7 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
         isCompleted: t.is_completed,
         rawDate: t.task_date,
         rawTime: t.task_time,
+        tag: t.tag as TagValue,
       })));
     }
     setLoading(false);
