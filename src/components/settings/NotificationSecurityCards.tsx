@@ -48,7 +48,7 @@ export function NotificationSecurityCards() {
         .single();
 
       if (!error && data?.notification_preferences) {
-        setNotifications({ ...defaultPreferences, ...(data.notification_preferences as NotificationPreferences) });
+        setNotifications({ ...defaultPreferences, ...(data.notification_preferences as unknown as NotificationPreferences) });
       }
       setLoading(false);
     };
