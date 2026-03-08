@@ -383,3 +383,153 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
     </Card>
   );
 }
+
+// --- Upcoming Tasks Card Component ---
+interface TaskItem {
+  id: string;
+  title: string;
+  time: string;
+  priority: "high" | "medium" | "low";
+  isAppointment?: boolean;
+}
+
+function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTime, setNewTime] = useState("");
+  const [newPriority, setNewPriority] = useState<"high" | "medium" | "low">("medium");
+
+  // Build tasks from appointments + custom tasks stored in localStorage
+  const [customTasks, setCustomTasks] = useState<TaskItem[]>(() => {
+    try {
+      const stored = localStorage.getItem("agent_custom_tasks");
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("agent_custom_tasks", JSON.stringify(customTasks));
+  }, [customTasks]);
+
+  const appointmentTasks: TaskItem[] = useMemo(() => {
+    return appointments.slice(0, 4).map((a: any) => ({
+      id: a.id,
+      title: a.property_title ? `Property Showing - ${a.property_title}` : "Property Visit",
+      time: `${new Date(a.preferred_date).toLocaleDateString()}, ${a.preferred_time}`,
+      priority: (a.status === "pending" ? "high" : a.status === "confirmed" ? "medium" : "low") as "high" | "medium" | "low",
+      isAppointment: true,
+    }));
+  }, [appointments]);
+
+  const allTasks = [...appointmentTasks, ...customTasks];
+
+  const handleAddTask = () => {
+    if (!newTitle.trim()) return;
+    const task: TaskItem = {
+      id: crypto.randomUUID(),
+      title: newTitle.trim(),
+      time: newTime || "No time set",
+      priority: newPriority,
+    };
+    setCustomTasks(prev => [...prev, task]);
+    setNewTitle("");
+    setNewTime("");
+    setNewPriority("medium");
+    setAddDialogOpen(false);
+    toast.success("Task added");
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setCustomTasks(prev => prev.filter(t => t.id !== id));
+    toast.success("Task removed");
+  };
+
+  return (
+    <Card className="lg:col-span-3 border border-border/50 shadow-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-semibold">Upcoming Tasks</CardTitle>
+          <button
+            onClick={() => setAddDialogOpen(true)}
+            className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-0">
+        {allTasks.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No upcoming tasks. Add one to get started.</p>
+        ) : (
+          allTasks.map((task) => (
+            <div key={task.id} className="flex items-center gap-3 py-3 border-b border-border/50 last:border-0">
+              <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">{task.title}</p>
+                <p className="text-xs text-muted-foreground">{task.time}</p>
+              </div>
+              <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
+                task.priority === "high" ? "bg-red-100 text-red-700" :
+                task.priority === "medium" ? "bg-amber-100 text-amber-700" :
+                "bg-emerald-100 text-emerald-700"
+              }`}>
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </span>
+              {!task.isAppointment && (
+                <button
+                  onClick={() => handleDeleteTask(task.id)}
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </CardContent>
+
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Task Title</label>
+              <Input
+                placeholder="e.g. Client Meeting - Johnson Family"
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Time</label>
+              <Input
+                placeholder="e.g. Tomorrow, 10:30 AM"
+                value={newTime}
+                onChange={e => setNewTime(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Priority</label>
+              <Select value={newPriority} onValueChange={(v) => setNewPriority(v as "high" | "medium" | "low")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddTask} disabled={!newTitle.trim()}>Add Task</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}
