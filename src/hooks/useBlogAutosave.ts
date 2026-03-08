@@ -160,5 +160,5 @@ export function useBlogAutosave(
     };
   }, [isDialogOpen, save, getSnapshot]);
 
-  return { autosaveStatus };
+  return { autosaveStatus, lastSavedAt };
 }
