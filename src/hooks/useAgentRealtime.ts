@@ -265,7 +265,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
           event: "*", schema: "public", table: "alerts",
           filter: `user_id=eq.${user.id}`,
         }, () => {
-          // Alerts badge can be consumed by header
+          fetchUnreadAlerts();
         })
         .subscribe(),
     ];
