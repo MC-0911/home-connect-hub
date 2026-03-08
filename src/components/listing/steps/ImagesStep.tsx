@@ -11,6 +11,7 @@ type UnifiedImage =
 
 const ImagesStep = () => {
   const { formData, updateFormData } = useListingForm();
+  const isMobile = useIsMobile();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const dragCounter = useRef(0);
