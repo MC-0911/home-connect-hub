@@ -26,10 +26,6 @@ interface Stats {
   newLeads: number;
   totalViews: number;
   monthlyCommission: number;
-  totalOffers: number;
-  pendingOffers: number;
-  acceptedOffers: number;
-  declinedOffers: number;
 }
 
 interface Activity {
@@ -122,16 +118,8 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
   const kpis = [
     { label: "Total Properties", value: stats.totalListings, sub: `${stats.activeListings} active, ${stats.soldListings} sold/rented`, icon: Home, gradient: "from-blue-500 to-indigo-600" },
     { label: "Active Listings", value: stats.activeListings, sub: `${listings.filter(l => l.listing_type === 'sale').length} for sale, ${listings.filter(l => l.listing_type === 'rent').length} for rent`, icon: Tag, gradient: "from-emerald-500 to-teal-600" },
-    { label: "Total Offers", value: stats.totalOffers, sub: `${stats.pendingOffers} pending, ${stats.acceptedOffers} accepted`, icon: DollarSign, gradient: "from-amber-500 to-orange-600" },
-    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: TrendingUp, gradient: "from-violet-500 to-purple-600" },
-  ];
-
-  // Second row of KPIs for offer breakdown
-  const offerKpis = [
-    { label: "Pending Offers", value: stats.pendingOffers, icon: Clock, gradient: "from-amber-400 to-yellow-500" },
-    { label: "Accepted Offers", value: stats.acceptedOffers, icon: Building2, gradient: "from-emerald-400 to-green-500" },
-    { label: "Declined Offers", value: stats.declinedOffers, icon: X, gradient: "from-red-400 to-rose-500" },
-    { label: "Scheduled Visits", value: appointments.length, icon: CalendarIcon, gradient: "from-sky-400 to-blue-500" },
+    { label: "Pending Deals", value: stats.totalLeads, sub: `${appointments.length} visits scheduled`, icon: Clock, gradient: "from-amber-500 to-orange-600" },
+    { label: "Total Commission", value: `$${(stats.monthlyCommission).toLocaleString()}`, sub: `${stats.soldListings} completed deals`, icon: DollarSign, gradient: "from-violet-500 to-purple-600" },
   ];
 
   return (
@@ -151,25 +139,6 @@ export function OverviewSection({ stats, recentActivity, onNavigate, listings, l
                   <div className={`p-3 rounded-full bg-gradient-to-br ${kpi.gradient} text-white shadow-lg`}>
                     <kpi.icon className="h-5 w-5" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Offer Breakdown Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {offerKpis.map((kpi, i) => (
-          <motion.div key={kpi.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.08 }}>
-            <Card className="border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${kpi.gradient} text-white shadow-sm`}>
-                  <kpi.icon className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-foreground">{kpi.value}</p>
-                  <p className="text-xs text-muted-foreground">{kpi.label}</p>
                 </div>
               </CardContent>
             </Card>

@@ -12,10 +12,6 @@ interface AgentStats {
   newLeads: number;
   totalViews: number;
   monthlyCommission: number;
-  totalOffers: number;
-  pendingOffers: number;
-  acceptedOffers: number;
-  declinedOffers: number;
 }
 
 interface RecentActivity {
@@ -36,7 +32,6 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const [stats, setStats] = useState<AgentStats>({
     totalListings: 0, activeListings: 0, soldListings: 0,
     totalLeads: 0, newLeads: 0, totalViews: 0, monthlyCommission: 0,
-    totalOffers: 0, pendingOffers: 0, acceptedOffers: 0, declinedOffers: 0,
   });
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +90,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
 
     const [propsRes, offersRes, visitsRes] = await Promise.all([
       supabase.from("properties").select("price, status").eq("user_id", userId),
-      supabase.from("property_offers").select("id, created_at, status").eq("seller_id", userId),
+      supabase.from("property_offers").select("id, created_at").eq("seller_id", userId),
       supabase.from("property_visits").select("id, created_at").eq("seller_id", userId),
     ]);
 
@@ -108,16 +103,10 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     const sold = props?.filter((p) => p.status === "sold" || p.status === "rented").length || 0;
     const commission = sold * 15000;
 
-    const totalOffers = offersData?.length || 0;
-    const pendingOffers = offersData?.filter((o) => o.status === "pending").length || 0;
-    const acceptedOffers = offersData?.filter((o) => o.status === "accepted").length || 0;
-    const declinedOffers = offersData?.filter((o) => o.status === "declined").length || 0;
-
     setStats({
       totalListings: total, activeListings: active, soldListings: sold,
-      totalLeads: totalOffers, newLeads: 0,
+      totalLeads: offersData?.length || 0, newLeads: 0,
       totalViews: 0, monthlyCommission: commission,
-      totalOffers, pendingOffers, acceptedOffers, declinedOffers,
     });
 
     const activities: RecentActivity[] = [];
