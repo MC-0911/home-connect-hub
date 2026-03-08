@@ -368,7 +368,7 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
                       </span>
                     </td>
                     <td className="py-3 px-2 text-center text-sm font-medium text-muted-foreground">
-                      {Math.floor(Math.random() * 500) + 50}
+                      {viewCounts[prop.id] || 0}
                     </td>
                     <td className="py-3 px-2">
                       <div className="flex items-center gap-1.5">
