@@ -476,7 +476,9 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
                      {autosaveStatus === 'saved' && (
                        <>
                          <Save className="h-3 w-3 text-green-600" />
-                         <span className="text-green-600">Autosaved</span>
+                         <span className="text-green-600">
+                           Autosaved{lastSavedAt ? ` at ${lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : ''}
+                         </span>
                        </>
                      )}
                      {autosaveStatus === 'error' && (
