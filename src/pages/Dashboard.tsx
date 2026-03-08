@@ -637,17 +637,6 @@ export default function Dashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="saved" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No saved properties</h3>
-                      <p className="text-muted-foreground">Properties you save will appear here</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
               <TabsContent value="visits" className="mt-6">
                 <VisitsTab onDataChange={fetchPendingVisitsCount} />
