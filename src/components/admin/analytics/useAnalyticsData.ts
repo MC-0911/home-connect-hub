@@ -9,6 +9,13 @@ interface BlogViewData {
   slug: string;
 }
 
+export interface QuickOverviewData {
+  buyerCount: number;
+  sellerCount: number;
+  agentCount: number;
+  topAgent: { name: string; deals: number } | null;
+}
+
 export interface AnalyticsData {
   totalUsers: number;
   activeUsers: number;
@@ -43,6 +50,8 @@ export interface AnalyticsData {
   // Device traffic
   deviceTraffic: { name: string; value: number }[];
   totalSessions: number;
+  // Quick overview
+  quickOverview: QuickOverviewData;
 }
 
 const INITIAL: AnalyticsData = {
