@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { ArrowRight, DollarSign } from 'lucide-react';
@@ -24,34 +24,43 @@ const statusVariant: Record<string, { label: string; className: string }> = {
 export function RecentOffersPanel() {
   const [offers, setOffers] = useState<RecentOffer[]>([]);
 
-  useEffect(() => {
-    const fetchOffers = async () => {
-      const { data } = await supabase
-        .from('property_offers')
-        .select('id, offer_amount, status, created_at, property_id')
-        .order('created_at', { ascending: false })
-        .limit(5);
+  const fetchOffers = useCallback(async () => {
+    const { data } = await supabase
+      .from('property_offers')
+      .select('id, offer_amount, status, created_at, property_id')
+      .order('created_at', { ascending: false })
+      .limit(5);
 
-      if (!data) return;
+    if (!data) return;
 
-      // Fetch property titles
-      const propertyIds = [...new Set(data.map((o) => o.property_id))];
-      const { data: properties } = await supabase
-        .from('properties')
-        .select('id, title')
-        .in('id', propertyIds);
+    const propertyIds = [...new Set(data.map((o) => o.property_id))];
+    const { data: properties } = await supabase
+      .from('properties')
+      .select('id, title')
+      .in('id', propertyIds);
 
-      const titleMap = new Map(properties?.map((p) => [p.id, p.title]) || []);
+    const titleMap = new Map(properties?.map((p) => [p.id, p.title]) || []);
 
-      setOffers(
-        data.map((o) => ({
-          ...o,
-          property_title: titleMap.get(o.property_id) || 'Unknown Property',
-        }))
-      );
-    };
-    fetchOffers();
+    setOffers(
+      data.map((o) => ({
+        ...o,
+        property_title: titleMap.get(o.property_id) || 'Unknown Property',
+      }))
+    );
   }, []);
+
+  useEffect(() => {
+    fetchOffers();
+
+    const channel = supabase
+      .channel('recent-offers-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'property_offers' }, () => {
+        fetchOffers();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchOffers]);
 
   const formatPrice = (price: number) =>
     price >= 1_000_000
