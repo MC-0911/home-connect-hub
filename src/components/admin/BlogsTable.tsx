@@ -94,7 +94,7 @@ interface Blog {
   published_at: string | null;
   created_at: string;
 }
-export function BlogsTable() {
+export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -315,8 +315,9 @@ export function BlogsTable() {
   const generateSlug = (title: string) => {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   };
+  const combinedSearch = globalSearch || searchTerm;
   const filteredBlogs = blogs.filter(blog => {
-    const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = blog.title.toLowerCase().includes(combinedSearch.toLowerCase());
     let matchesStatus = false;
     if (statusFilter === 'all') {
       matchesStatus = true;

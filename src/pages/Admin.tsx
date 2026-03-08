@@ -32,6 +32,7 @@ export default function Admin() {
   const { isAdmin, loading } = useAdmin();
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -97,7 +98,7 @@ export default function Admin() {
       </Helmet>
 
       <div className="min-h-screen flex bg-muted/30">
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <AdminSidebar activeSection={activeSection} onSectionChange={(s) => { setActiveSection(s); setGlobalSearch(''); }} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
         {/* Main content area — shifts based on sidebar */}
         <main className="flex-1 transition-all duration-300" style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}>
@@ -128,6 +129,8 @@ export default function Admin() {
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search properties, clients..."
+                    value={globalSearch}
+                    onChange={(e) => setGlobalSearch(e.target.value)}
                     className="pl-10 w-72 bg-card border-border/60 rounded-full h-11 shadow-sm focus-visible:shadow-md transition-shadow"
                   />
                 </div>
@@ -152,7 +155,7 @@ export default function Admin() {
               {activeSection === 'users' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <UsersTable />
+                    <UsersTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
@@ -160,7 +163,7 @@ export default function Admin() {
               {activeSection === 'listings' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <ListingsTable />
+                    <ListingsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
@@ -168,7 +171,7 @@ export default function Admin() {
               {activeSection === 'leads' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <LeadsTable />
+                    <LeadsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
@@ -176,7 +179,7 @@ export default function Admin() {
               {activeSection === 'bookings' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <ServiceBookingsTable />
+                    <ServiceBookingsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
@@ -184,7 +187,7 @@ export default function Admin() {
               {activeSection === 'blogs' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <BlogsTable />
+                    <BlogsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}

@@ -33,7 +33,7 @@ interface ServiceBooking {
   user_id: string | null;
 }
 
-export function ServiceBookingsTable() {
+export function ServiceBookingsTable({ globalSearch = '' }: { globalSearch?: string }) {
   const [bookings, setBookings] = useState<ServiceBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,12 +126,13 @@ export function ServiceBookingsTable() {
 
   const uniqueServices = [...new Set(bookings.map(b => b.service_slug))];
 
+  const combinedSearch = globalSearch || searchTerm;
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = 
-      booking.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.phone.includes(searchTerm) ||
-      booking.service_name.toLowerCase().includes(searchTerm.toLowerCase());
+      booking.full_name.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      booking.email.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      booking.phone.includes(combinedSearch) ||
+      booking.service_name.toLowerCase().includes(combinedSearch.toLowerCase());
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
     const matchesService = serviceFilter === 'all' || booking.service_slug === serviceFilter;
     return matchesSearch && matchesStatus && matchesService;
