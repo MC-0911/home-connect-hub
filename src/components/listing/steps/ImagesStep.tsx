@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { useListingForm } from '../ListingFormContext';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, GripVertical } from 'lucide-react';
+import { ImagePlus, X, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type UnifiedImage = 
   | { type: 'existing'; url: string; originalIndex: number }
@@ -10,6 +11,7 @@ type UnifiedImage =
 
 const ImagesStep = () => {
   const { formData, updateFormData } = useListingForm();
+  const isMobile = useIsMobile();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const dragCounter = useRef(0);
@@ -118,6 +120,30 @@ const ImagesStep = () => {
     setDragOverIndex(null);
   };
 
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= unifiedImages.length) return;
+    const reordered = [...unifiedImages];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    const newExisting: string[] = [];
+    const newPreviewUrls: string[] = [];
+    const newFiles: File[] = [];
+    for (const item of reordered) {
+      if (item.type === 'existing') {
+        newExisting.push(item.url);
+      } else {
+        newPreviewUrls.push(item.url);
+        newFiles.push(formData.images[item.originalIndex]);
+      }
+    }
+    updateFormData({
+      existingImageUrls: newExisting,
+      imagePreviewUrls: newPreviewUrls,
+      images: newFiles,
+    });
+  };
+
   const totalImages = unifiedImages.length;
 
   return (
@@ -152,8 +178,11 @@ const ImagesStep = () => {
                 <p className="text-sm font-medium text-foreground">
                   {totalImages} image{totalImages !== 1 ? 's' : ''} selected
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground hidden sm:block">
                   Drag to reorder · First image is the cover
+                </p>
+                <p className="text-sm text-muted-foreground sm:hidden">
+                  First image is the cover
                 </p>
               </div>
 
@@ -161,15 +190,16 @@ const ImagesStep = () => {
                 {unifiedImages.map((item, index) => (
                   <div
                     key={`${item.type}-${item.url}`}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragEnter={(e) => handleDragEnter(e, index)}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, index)}
-                    onDragEnd={handleDragEnd}
+                    draggable={!isMobile}
+                    onDragStart={!isMobile ? (e) => handleDragStart(e, index) : undefined}
+                    onDragEnter={!isMobile ? (e) => handleDragEnter(e, index) : undefined}
+                    onDragLeave={!isMobile ? handleDragLeave : undefined}
+                    onDragOver={!isMobile ? handleDragOver : undefined}
+                    onDrop={!isMobile ? (e) => handleDrop(e, index) : undefined}
+                    onDragEnd={!isMobile ? handleDragEnd : undefined}
                     className={cn(
-                      "relative aspect-square group cursor-grab active:cursor-grabbing rounded-lg transition-all duration-200",
+                      "relative aspect-square group rounded-lg transition-all duration-200",
+                      !isMobile && "cursor-grab active:cursor-grabbing",
                       dragIndex === index && "opacity-40 scale-95",
                       dragOverIndex === index && dragIndex !== index && "ring-2 ring-primary ring-offset-2 ring-offset-background scale-105"
                     )}
@@ -194,8 +224,8 @@ const ImagesStep = () => {
                       </div>
                     )}
 
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors rounded-lg">
+                    {/* Desktop: hover overlay with drag hint */}
+                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors rounded-lg hidden sm:block">
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                         <Button
                           type="button"
@@ -210,13 +240,63 @@ const ImagesStep = () => {
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
-
                       <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="bg-card/90 text-foreground text-xs px-2 py-1 rounded flex items-center gap-1">
                           <GripVertical className="h-3 w-3" />
                           Drag to reorder
                         </div>
                       </div>
+                    </div>
+
+                    {/* Mobile: always-visible controls */}
+                    <div className="sm:hidden">
+                      {/* Delete button */}
+                      <div className="absolute top-1.5 right-1.5 z-20">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeImage(index);
+                          }}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+
+                      {/* Move up/down buttons */}
+                      {totalImages > 1 && (
+                        <div className="absolute bottom-1.5 right-1.5 z-20 flex gap-1">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            className="h-7 w-7"
+                            disabled={index === 0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveImage(index, index - 1);
+                            }}
+                          >
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            className="h-7 w-7"
+                            disabled={index === totalImages - 1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              moveImage(index, index + 1);
+                            }}
+                          >
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
