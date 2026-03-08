@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Users, DollarSign, Home, Star, Shield, CheckCircle, Clock, Quote, Headphones, Rocket, Award, Lock } from "lucide-react";
+import { Users, DollarSign, Home, Star, Shield, CheckCircle, Clock, Quote, Headphones, Rocket, Award } from "lucide-react";
 
 const stats = [
   { icon: Users, value: "50,000+", label: "Happy Users" },
