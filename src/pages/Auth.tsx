@@ -35,15 +35,16 @@ export default function Auth() {
   // Get redirect URL from query params, default to "/"
   const redirectTo = searchParams.get("redirect") || "/";
 
-  // Check if user is already logged in
+  // Check if user is already logged in and redirect to their dashboard
   useEffect(() => {
     const {
       data: {
         subscription
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        navigate(redirectTo);
+      if (session?.user && !roleLoading && primaryRole) {
+        const target = redirectTo !== "/" ? redirectTo : getDashboardPath();
+        navigate(target);
       }
     });
     supabase.auth.getSession().then(({
@@ -51,12 +52,13 @@ export default function Auth() {
         session
       }
     }) => {
-      if (session?.user) {
-        navigate(redirectTo);
+      if (session?.user && !roleLoading && primaryRole) {
+        const target = redirectTo !== "/" ? redirectTo : getDashboardPath();
+        navigate(target);
       }
     });
     return () => subscription.unsubscribe();
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, roleLoading, primaryRole, getDashboardPath]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
