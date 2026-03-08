@@ -199,7 +199,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
             description: `You received an offer of ${formatted} on your property`,
             action: onNavigate ? {
               label: "View",
-              onClick: () => onNavigate("listings"),
+              onClick: () => onNavigate("offers"),
             } : undefined,
           });
           fetchStats();
