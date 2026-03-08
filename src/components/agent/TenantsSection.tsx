@@ -11,12 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw, Receipt } from "lucide-react";
+import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw, Receipt, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { cn } from "@/lib/utils";
 import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
+import jsPDF from "jspdf";
 
 interface Tenant {
   id: string;
@@ -182,6 +183,109 @@ export function TenantsSection() {
     setRenewingTenant(null);
   };
 
+  const exportPDF = async () => {
+    if (!user) return;
+    const { data: payments } = await supabase
+      .from("rent_payments")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("payment_date", { ascending: false });
+
+    const doc = new jsPDF();
+    const now = new Date();
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    // Title
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Rent Collection Report", 14, 20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text(`Generated: ${format(now, "PPP")}`, 14, 28);
+    doc.text(`Total Tenants: ${tenants.length}`, 14, 34);
+
+    // Summary
+    const totalExpected = tenants.reduce((s, t) => s + (t.monthly_rent || 0), 0);
+    const totalCollected = (payments || []).reduce((s, p: any) => s + Number(p.amount), 0);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0);
+    doc.text("Summary", 14, 46);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total Monthly Expected: $${totalExpected.toLocaleString()}`, 14, 54);
+    doc.text(`Total Collected (All Time): $${totalCollected.toLocaleString()}`, 14, 60);
+
+    // Tenant table
+    let y = 74;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Tenant Details", 14, y);
+    y += 8;
+
+    // Table header
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setFillColor(240, 240, 240);
+    doc.rect(14, y - 4, 182, 8, "F");
+    doc.text("Tenant", 16, y);
+    doc.text("Property", 60, y);
+    doc.text("Rent", 110, y);
+    doc.text("Status", 140, y);
+    doc.text("Payments", 168, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    tenants.forEach((t) => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      const tenantPayments = (payments || []).filter((p: any) => p.tenant_id === t.id);
+      const tenantTotal = tenantPayments.reduce((s, p: any) => s + Number(p.amount), 0);
+      doc.text(t.tenant_name.substring(0, 22), 16, y);
+      doc.text((t.property_name || "N/A").substring(0, 22), 60, y);
+      doc.text(`$${(t.monthly_rent || 0).toLocaleString()}`, 110, y);
+      doc.text(t.payment_status.charAt(0).toUpperCase() + t.payment_status.slice(1), 140, y);
+      doc.text(`$${tenantTotal.toLocaleString()}`, 168, y);
+      y += 7;
+    });
+
+    // Monthly breakdown
+    y += 6;
+    if (y > 250) { doc.addPage(); y = 20; }
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Monthly Breakdown — ${now.getFullYear()}`, 14, y);
+    y += 8;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setFillColor(240, 240, 240);
+    doc.rect(14, y - 4, 182, 8, "F");
+    doc.text("Month", 16, y);
+    doc.text("Expected", 80, y);
+    doc.text("Collected", 120, y);
+    doc.text("Rate", 165, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    monthNames.forEach((month, idx) => {
+      if (y > 275) { doc.addPage(); y = 20; }
+      const label = `${month} ${now.getFullYear()}`;
+      const collected = (payments || [])
+        .filter((p: any) => p.payment_month === label)
+        .reduce((s, p: any) => s + Number(p.amount), 0);
+      const rate = totalExpected > 0 ? Math.round((collected / totalExpected) * 100) : 0;
+      doc.text(month, 16, y);
+      doc.text(`$${totalExpected.toLocaleString()}`, 80, y);
+      doc.text(`$${collected.toLocaleString()}`, 120, y);
+      doc.text(`${rate}%`, 165, y);
+      y += 7;
+    });
+
+    doc.save(`rent-collection-report-${format(now, "yyyy-MM")}.pdf`);
+    toast.success("PDF report downloaded");
+  };
+
   const stats = {
     total: tenants.length,
     paid: tenants.filter((t) => t.payment_status === "paid").length,
@@ -199,12 +303,16 @@ export function TenantsSection() {
           <h1 className="text-2xl font-bold text-foreground">Tenant Management</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage your tenants and track rent payments</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button className="rounded-xl gap-2">
-              <Plus className="h-4 w-4" /> Add Tenant
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="rounded-xl gap-2" onClick={exportPDF}>
+            <FileDown className="h-4 w-4" /> Export PDF
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
+            <DialogTrigger asChild>
+              <Button className="rounded-xl gap-2">
+                <Plus className="h-4 w-4" /> Add Tenant
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{editingTenant ? "Edit Tenant" : "Add Tenant"}</DialogTitle>
@@ -259,6 +367,7 @@ export function TenantsSection() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Stats */}
