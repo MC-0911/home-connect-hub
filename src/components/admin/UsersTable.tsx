@@ -329,7 +329,7 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
             <TableRow className="bg-muted/50">
               <SortableTableHead label="User" sortKey="full_name" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
-              <SortableTableHead label="Ph No." sortKey="phone" sortConfig={sortConfig} onSort={handleSort} />
+              <SortableTableHead label="Role" sortKey="user_role" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Status" sortKey="is_suspended" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Listings" sortKey="listings_count" sortConfig={sortConfig} onSort={handleSort} />
               <SortableTableHead label="Joined" sortKey="created_at" sortConfig={sortConfig} onSort={handleSort} />
