@@ -10,6 +10,7 @@ import { CompareSection } from "@/components/buyer/CompareSection";
 import { MortgageCalculatorSection } from "@/components/buyer/MortgageCalculatorSection";
 import { BuyerMessagesSection } from "@/components/buyer/BuyerMessagesSection";
 import { BuyerSettingsSection } from "@/components/buyer/BuyerSettingsSection";
+import { BuyerOffersSection } from "@/components/buyer/BuyerOffersSection";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings, Bell } from "lucide-react";
 import { motion } from "framer-motion";
