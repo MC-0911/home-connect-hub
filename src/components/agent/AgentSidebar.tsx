@@ -110,7 +110,7 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
             </div>
           )}
           <button
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={onToggleCollapse}
             className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all shrink-0"
           >
             {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}

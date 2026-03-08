@@ -20,6 +20,7 @@ export default function AgentDashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [listings, setListings] = useState<Tables<"properties">[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
