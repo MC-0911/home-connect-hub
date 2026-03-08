@@ -19,7 +19,6 @@ const menuItems = [
   { id: "compare", label: "Compare", icon: Scale },
   { id: "calculator", label: "Mortgage Calc", icon: Calculator },
   { id: "messages", label: "Messages", icon: MessageSquare },
-  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 interface BuyerSidebarProps {
