@@ -11,11 +11,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw } from "lucide-react";
+import { Plus, Mail, Phone, DollarSign, MessageSquare, Pencil, Trash2, Users, CalendarIcon, RotateCcw, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { cn } from "@/lib/utils";
+import { PaymentHistoryDialog } from "./PaymentHistoryDialog";
 
 interface Tenant {
   id: string;
