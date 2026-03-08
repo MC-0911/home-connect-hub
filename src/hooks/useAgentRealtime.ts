@@ -77,6 +77,13 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
     setUnreadMessages(count || 0);
   }, []);
 
+  const fetchUnreadAlerts = useCallback(async () => {
+    if (!userRef.current) return;
+    const { count } = await supabase.from("alerts").select("*", { count: "exact", head: true })
+      .eq("user_id", userRef.current.id).eq("is_read", false);
+    setUnreadAlerts(count || 0);
+  }, []);
+
   const fetchStats = useCallback(async () => {
     if (!userRef.current) return;
     const userId = userRef.current.id;
