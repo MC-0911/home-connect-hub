@@ -91,7 +91,7 @@ function SignupDetails({ meta }: { meta: Record<string, any> }) {
 function OfferDetails({ meta }: { meta: Record<string, any> }) {
   return (
     <div className="divide-y divide-border">
-      <DetailRow label="Offer Amount" value={meta.offer_amount ? `₦${Number(meta.offer_amount).toLocaleString()}` : undefined} />
+      <DetailRow label="Offer Amount" value={meta.offer_amount ? `$${Number(meta.offer_amount).toLocaleString()}` : undefined} />
       <DetailRow label="Status" value={<Badge variant="outline" className="text-xs">{meta.status}</Badge>} />
       <DetailRow label="Message" value={meta.message} />
       <DetailRow label="Counter Amount" value={meta.counter_amount ? `₦${Number(meta.counter_amount).toLocaleString()}` : undefined} />
