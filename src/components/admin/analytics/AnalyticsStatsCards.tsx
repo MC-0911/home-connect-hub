@@ -95,29 +95,34 @@ export function AnalyticsStatsCards(props: AnalyticsStatsCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.title}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.08 }}
+          whileHover={{ y: -4, transition: { duration: 0.2, ease: 'easeOut' } }}
         >
-          <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  {stat.title}
-                </span>
-                <div className={`p-1.5 rounded-lg ${stat.iconBg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.iconColor}`} />
+          <Card className="h-full border-border/50 shadow-[0_15px_30px_-12px_hsl(var(--primary)/0.12)] hover:shadow-[0_25px_40px_-16px_hsl(var(--primary)/0.2)] transition-shadow duration-300 rounded-2xl overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 rounded-2xl ${stat.iconBg} flex items-center justify-center shrink-0`}>
+                  <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-2xl font-bold text-foreground leading-tight">
+                    {stat.value.toLocaleString()}
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {stat.title}
+                  </span>
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-2">{stat.value.toLocaleString()}</div>
               {stat.breakdown.length > 0 && (
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs mt-3 pt-3 border-t border-border/50">
                   {stat.breakdown.map((item) => (
-                    <span key={item.label} className={item.colorClass}>
+                    <span key={item.label} className={`${item.colorClass} font-medium`}>
                       {item.value} {item.label}
                     </span>
                   ))}
