@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Home, Building2, Briefcase } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
+import { useUserRole } from "@/hooks/useUserRole";
+
+type AccountType = "buyer" | "seller" | "agent";
+
+const accountTypes: { value: AccountType; label: string; description: string; icon: typeof Home }[] = [
+  { value: "buyer", label: "Buyer / Tenant", description: "Search and rent or buy properties", icon: Home },
+  { value: "seller", label: "Seller / Landlord", description: "List and manage your properties", icon: Building2 },
+  { value: "agent", label: "Real Estate Agent", description: "Manage clients and listings", icon: Briefcase },
+];
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
