@@ -12,9 +12,10 @@ import { SettingsSection } from "@/components/agent/SettingsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentRealtime } from "@/hooks/useAgentRealtime";
 import { Input } from "@/components/ui/input";
-import { Search, Bell, MessageSquare, Settings } from "lucide-react";
+import { Search, MessageSquare, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
 
 export default function AgentDashboard() {
   const { user, loading: authLoading } = useAuth();
