@@ -31,6 +31,7 @@ export default function Admin() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAdmin();
   const [activeSection, setActiveSection] = useState<AdminSection>('analytics');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -89,10 +90,10 @@ export default function Admin() {
       </Helmet>
 
       <div className="min-h-screen flex bg-muted/30">
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
         {/* Main content area — shifts based on sidebar */}
-        <main className="flex-1 ml-[280px] transition-all duration-300">
+        <main className="flex-1 transition-all duration-300" style={{ marginLeft: sidebarCollapsed ? 80 : 280 }}>
           {/* Top Header Bar */}
           <motion.header
             initial={{ opacity: 0, y: -10 }}

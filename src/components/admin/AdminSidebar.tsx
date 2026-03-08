@@ -17,6 +17,8 @@ export type AdminSection =
 interface AdminSidebarProps {
   activeSection: AdminSection;
   onSectionChange: (section: AdminSection) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard }[] = [
@@ -29,8 +31,7 @@ const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard 
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function AdminSidebar({ activeSection, onSectionChange, collapsed, onToggleCollapse }: AdminSidebarProps) {
   const navigate = useNavigate();
   const { profile } = useProfile();
 
@@ -153,7 +154,7 @@ export function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarPro
         </button>
 
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={onToggleCollapse}
           className="w-full flex items-center justify-center p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/10 transition-all"
         >
           {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
