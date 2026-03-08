@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Building2, Users, CalendarDays, MessageSquare,
-  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight
+  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const menuItems = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "listings", label: "My Properties", icon: Building2 },
+  { id: "offers", label: "Offers", icon: DollarSign },
   { id: "leads", label: "Clients", icon: Users },
   { id: "calendar", label: "Appointments", icon: CalendarDays },
   { id: "messages", label: "Messages", icon: MessageSquare },
@@ -36,6 +37,7 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingVisits, setPendingVisits] = useState(0);
   const [listingsCount, setListingsCount] = useState(0);
+  const [pendingOffers, setPendingOffers] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +62,13 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id);
       setListingsCount(propCount || 0);
+
+      const { count: offerCount } = await supabase
+        .from("property_offers")
+        .select("*", { count: "exact", head: true })
+        .eq("seller_id", user.id)
+        .eq("status", "pending");
+      setPendingOffers(offerCount || 0);
     };
 
     fetchCounts();
@@ -74,9 +83,15 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
       .on("postgres_changes", { event: "*", schema: "public", table: "property_visits" }, fetchCounts)
       .subscribe();
 
+    const offerChannel = supabase
+      .channel("sidebar-offers")
+      .on("postgres_changes", { event: "*", schema: "public", table: "property_offers" }, fetchCounts)
+      .subscribe();
+
     return () => {
       supabase.removeChannel(msgChannel);
       supabase.removeChannel(visitChannel);
+      supabase.removeChannel(offerChannel);
     };
   }, [user]);
 
@@ -84,6 +99,7 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
     if (id === "messages") return unreadMessages;
     if (id === "calendar") return pendingVisits;
     if (id === "listings") return listingsCount;
+    if (id === "offers") return pendingOffers;
     return 0;
   };
 
