@@ -171,7 +171,7 @@ function LeadDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Requirement Type" value={meta.requirement_type} />
       <DetailRow label="Budget Range" value={
         meta.min_budget || meta.max_budget
-          ? `₦${(meta.min_budget ?? 0).toLocaleString()} – ₦${(meta.max_budget ?? 0).toLocaleString()}`
+          ? `$${(meta.min_budget ?? 0).toLocaleString()} – $${(meta.max_budget ?? 0).toLocaleString()}`
           : undefined
       } />
       <DetailRow label="Bedrooms" value={meta.min_bedrooms ? `${meta.min_bedrooms}+` : undefined} />
