@@ -1,6 +1,6 @@
 import {
   Compass, Heart, Bookmark, CalendarDays, Scale, Calculator,
-  MessageSquare, Settings, Crown, ChevronLeft, ChevronRight, Home, FileText
+  MessageSquare, Settings, Crown, ChevronLeft, ChevronRight, Home, FileText, LogOut
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
