@@ -227,7 +227,8 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
       toast.error('Failed to unsuspend users');
     }
   };
-  const filteredUsers = users.filter(user => user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || user.location?.toLowerCase().includes(searchTerm.toLowerCase()) || user.user_id.toLowerCase().includes(searchTerm.toLowerCase()));
+  const combinedSearch = globalSearch || searchTerm;
+  const filteredUsers = users.filter(user => user.full_name?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.email?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.location?.toLowerCase().includes(combinedSearch.toLowerCase()) || user.user_id.toLowerCase().includes(combinedSearch.toLowerCase()));
   const {
     paginatedData,
     currentPage,
