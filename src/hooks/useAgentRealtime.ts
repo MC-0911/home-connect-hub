@@ -276,7 +276,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
   }, [user, fetchListings, fetchAppointments, fetchStats, fetchUnreadMessages, fetchUnreadAlerts, fetchLeads]);
 
   return {
-    listings, leads, appointments, documents, unreadMessages,
+    listings, leads, appointments, documents, unreadMessages, unreadAlerts,
     stats, recentActivity, loading,
     refreshListings: fetchListings,
     refreshLeads: fetchLeads,
