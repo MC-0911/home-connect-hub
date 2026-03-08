@@ -430,15 +430,17 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
 
   const handleAddTask = () => {
     if (!newTitle.trim()) return;
+    const timeDisplay = newDate ? `${format(newDate, "MMM d, yyyy")}, ${newTimeSlot}` : newTimeSlot;
     const task: TaskItem = {
       id: crypto.randomUUID(),
       title: newTitle.trim(),
-      time: newTime || "No time set",
+      time: timeDisplay,
       priority: newPriority,
     };
     setCustomTasks(prev => [...prev, task]);
     setNewTitle("");
-    setNewTime("");
+    setNewDate(undefined);
+    setNewTimeSlot("9:00 AM");
     setNewPriority("medium");
     setAddDialogOpen(false);
     toast.success("Task added");
