@@ -140,7 +140,7 @@ export function BlogsTable({ globalSearch = '' }: { globalSearch?: string }) {
     fetchBlogs();
   };
 
-  const { autosaveStatus } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen, handleDraftCreated);
+  const { autosaveStatus, lastSavedAt } = useBlogAutosave(formData, editingBlog?.id ?? null, isDialogOpen, handleDraftCreated);
 
   const localDateTimeToIso = (localValue: string) => {
     if (!localValue) return null;
