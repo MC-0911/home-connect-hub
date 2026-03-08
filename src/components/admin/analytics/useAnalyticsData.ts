@@ -13,7 +13,7 @@ export interface QuickOverviewData {
   buyerCount: number;
   sellerCount: number;
   agentCount: number;
-  topAgent: { name: string; deals: number } | null;
+  topAgent: { name: string; deals: number; avatarUrl: string | null } | null;
 }
 
 export interface AnalyticsData {
