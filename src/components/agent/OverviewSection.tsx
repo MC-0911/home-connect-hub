@@ -1,4 +1,4 @@
-import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X } from "lucide-react";
+import { Building2, Users, TrendingUp, DollarSign, Plus, Home, Tag, Clock, Eye, Edit, BarChart3, MessageSquare, Trash2, X, CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Stats {
   totalListings: number;
@@ -396,7 +400,8 @@ interface TaskItem {
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newTime, setNewTime] = useState("");
+  const [newDate, setNewDate] = useState<Date>();
+  const [newTimeSlot, setNewTimeSlot] = useState("9:00 AM");
   const [newPriority, setNewPriority] = useState<"high" | "medium" | "low">("medium");
 
   // Build tasks from appointments + custom tasks stored in localStorage
@@ -425,15 +430,17 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
 
   const handleAddTask = () => {
     if (!newTitle.trim()) return;
+    const timeDisplay = newDate ? `${format(newDate, "MMM d, yyyy")}, ${newTimeSlot}` : newTimeSlot;
     const task: TaskItem = {
       id: crypto.randomUUID(),
       title: newTitle.trim(),
-      time: newTime || "No time set",
+      time: timeDisplay,
       priority: newPriority,
     };
     setCustomTasks(prev => [...prev, task]);
     setNewTitle("");
-    setNewTime("");
+    setNewDate(undefined);
+    setNewTimeSlot("9:00 AM");
     setNewPriority("medium");
     setAddDialogOpen(false);
     toast.success("Task added");
@@ -503,12 +510,40 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
               />
             </div>
             <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn("w-full justify-start text-left font-normal", !newDate && "text-muted-foreground")}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newDate ? format(newDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newDate}
+                    onSelect={setNewDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Time</label>
-              <Input
-                placeholder="e.g. Tomorrow, 10:30 AM"
-                value={newTime}
-                onChange={e => setNewTime(e.target.value)}
-              />
+              <Select value={newTimeSlot} onValueChange={setNewTimeSlot}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["8:00 AM","8:30 AM","9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM","6:00 PM"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Priority</label>
