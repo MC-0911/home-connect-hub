@@ -160,5 +160,20 @@ export function useBlogAutosave(
     };
   }, [isDialogOpen, save, getSnapshot]);
 
-  return { autosaveStatus, lastSavedAt };
+  // Keyboard shortcut: Ctrl+S / Cmd+S
+  useEffect(() => {
+    if (!isDialogOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        save();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDialogOpen, save]);
+
+  return { autosaveStatus, lastSavedAt, manualSave: save };
 }
