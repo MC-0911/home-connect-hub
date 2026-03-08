@@ -83,7 +83,7 @@ export default function AgentDashboard() {
                   </span>
                 )}
               </button>
-              <button className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+              <button onClick={() => setActiveSection("settings")} className="p-2.5 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
                 <Settings className="h-5 w-5 text-muted-foreground" />
               </button>
             </div>
