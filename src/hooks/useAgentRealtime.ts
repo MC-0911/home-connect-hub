@@ -36,6 +36,7 @@ export function useAgentRealtime(onNavigate?: (section: string) => void) {
   const [stats, setStats] = useState<AgentStats>({
     totalListings: 0, activeListings: 0, soldListings: 0,
     totalLeads: 0, newLeads: 0, totalViews: 0, monthlyCommission: 0,
+    totalOffers: 0, pendingOffers: 0, acceptedOffers: 0, declinedOffers: 0,
   });
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
