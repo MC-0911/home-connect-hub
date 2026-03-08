@@ -510,12 +510,40 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
               />
             </div>
             <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn("w-full justify-start text-left font-normal", !newDate && "text-muted-foreground")}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newDate ? format(newDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newDate}
+                    onSelect={setNewDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Time</label>
-              <Input
-                placeholder="e.g. Tomorrow, 10:30 AM"
-                value={newTime}
-                onChange={e => setNewTime(e.target.value)}
-              />
+              <Select value={newTimeSlot} onValueChange={setNewTimeSlot}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["8:00 AM","8:30 AM","9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM","6:00 PM"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Priority</label>
