@@ -81,7 +81,8 @@ export default function Auth() {
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
-              full_name: formData.name
+              full_name: formData.name,
+              account_type: accountType
             }
           }
         });
@@ -95,6 +96,11 @@ export default function Auth() {
           if (data.user.identities?.length === 0) {
             toast.error("This email is already registered. Please sign in instead.");
           } else {
+            // Assign role to the new user
+            await supabase.rpc('assign_user_role', {
+              _user_id: data.user.id,
+              _role: accountType
+            });
             toast.success("Account created! Please check your email to verify your account.", {
               duration: 5000
             });
