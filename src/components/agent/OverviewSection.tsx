@@ -923,3 +923,103 @@ function MaintenanceRequestsCard({ onNavigate }: { onNavigate: (section: string)
     </Card>
   );
 }
+
+// --- Rent Collection Chart ---
+function RentCollectionChart() {
+  const [chartData, setChartData] = useState<{ month: string; collected: number; expected: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get all tenants for expected rent
+      const { data: tenants } = await supabase
+        .from("tenants")
+        .select("monthly_rent, lease_start, lease_end")
+        .eq("user_id", user.id);
+
+      // Get all payments for collected rent
+      const { data: payments } = await supabase
+        .from("rent_payments")
+        .select("amount, payment_month")
+        .eq("user_id", user.id);
+
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const year = new Date().getFullYear();
+
+      const data = monthNames.map((name, idx) => {
+        // Expected: sum of monthly_rent for tenants active during this month
+        const monthStart = new Date(year, idx, 1);
+        const monthEnd = new Date(year, idx + 1, 0);
+        const expected = (tenants || []).reduce((sum, t) => {
+          const leaseStart = t.lease_start ? new Date(t.lease_start) : new Date(0);
+          const leaseEnd = t.lease_end ? new Date(t.lease_end) : new Date(9999, 11);
+          if (leaseStart <= monthEnd && leaseEnd >= monthStart) {
+            return sum + Number(t.monthly_rent || 0);
+          }
+          return sum;
+        }, 0);
+
+        // Collected: sum of payments for this month
+        const fullMonthName = ["January","February","March","April","May","June","July","August","September","October","November","December"][idx];
+        const monthLabel = `${fullMonthName} ${year}`;
+        const collected = (payments || [])
+          .filter(p => p.payment_month === monthLabel)
+          .reduce((sum, p) => sum + Number(p.amount), 0);
+
+        return { month: name, collected, expected };
+      });
+
+      setChartData(data);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  const totalCollected = chartData.reduce((s, d) => s + d.collected, 0);
+  const totalExpected = chartData.reduce((s, d) => s + d.expected, 0);
+  const collectionRate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
+
+  return (
+    <Card className="border border-border/50 shadow-sm">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-base font-semibold">Rent Collection Summary</CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">
+              Collected: <span className="font-semibold text-foreground">${totalCollected.toLocaleString()}</span> / Expected: <span className="font-semibold text-foreground">${totalExpected.toLocaleString()}</span>
+              {totalExpected > 0 && <span className="ml-2">({collectionRate}% rate)</span>}
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-primary inline-block" /> Collected</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-muted-foreground/30 inline-block" /> Expected</span>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <p className="text-sm text-muted-foreground text-center py-12">Loading...</p>
+        ) : (
+          <div className="h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
+                  formatter={(value: number) => [`$${value.toLocaleString()}`, undefined]}
+                />
+                <Bar dataKey="expected" fill="hsl(var(--muted-foreground) / 0.2)" radius={[4, 4, 0, 0]} name="Expected" />
+                <Bar dataKey="collected" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Collected" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
