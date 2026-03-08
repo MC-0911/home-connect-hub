@@ -94,7 +94,7 @@ function OfferDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Offer Amount" value={meta.offer_amount ? `$${Number(meta.offer_amount).toLocaleString()}` : undefined} />
       <DetailRow label="Status" value={<Badge variant="outline" className="text-xs">{meta.status}</Badge>} />
       <DetailRow label="Message" value={meta.message} />
-      <DetailRow label="Counter Amount" value={meta.counter_amount ? `₦${Number(meta.counter_amount).toLocaleString()}` : undefined} />
+      <DetailRow label="Counter Amount" value={meta.counter_amount ? <DetailRow label="Counter Amount" value={meta.counter_amount ? `$${Number(meta.counter_amount).toLocaleString()}` : undefined} /> : undefined} />
       <DetailRow label="Expires" value={meta.expires_at ? format(new Date(meta.expires_at), 'MMM d, yyyy h:mm a') : undefined} />
       <DetailRow label="Buyer" value={
         (meta.buyer_name || meta.buyer_email) ? (
