@@ -46,7 +46,7 @@ function ListingDetails({ meta }: { meta: Record<string, any> }) {
       <DetailRow label="Title" value={meta.title} />
       <DetailRow label="Property Type" value={meta.property_type} />
       <DetailRow label="Listing Type" value={meta.listing_type === 'sale' ? 'For Sale' : 'For Rent'} />
-      <DetailRow label="Price" value={meta.price ? `₦${Number(meta.price).toLocaleString()}` : undefined} />
+      <DetailRow label="Price" value={meta.price ? <DetailRow label="Price" value={meta.price ? `$${Number(meta.price).toLocaleString()}` : undefined} /> : undefined} />
       <DetailRow label="Location" value={[meta.city, meta.state].filter(Boolean).join(', ')} />
       <DetailRow label="Bedrooms" value={meta.bedrooms} />
       <DetailRow label="Bathrooms" value={meta.bathrooms} />
