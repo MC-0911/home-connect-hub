@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Building2, Users, CalendarDays, MessageSquare,
+  LayoutDashboard, Building2, Users, UsersRound, CalendarDays, MessageSquare,
   FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
