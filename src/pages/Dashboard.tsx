@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, Heart, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck, Clipboard } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Building2, DollarSign, Users, TrendingUp, MessageSquare, Bell, MoreVertical, CheckCircle, Clock, Home, XCircle, ArrowUpRight, CalendarCheck, Clipboard } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
@@ -435,10 +435,6 @@ export default function Dashboard() {
                   <Building2 className="w-4 h-4 mr-1" />
                   My Listings 
                 </TabsTrigger>
-                <TabsTrigger value="saved" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Heart className="w-4 h-4 mr-1" />
-                  Saved 
-                </TabsTrigger>
                 <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   <CalendarCheck className="w-4 h-4 mr-1" />
                   Visits
@@ -641,17 +637,6 @@ export default function Dashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="saved" className="mt-6">
-                <Card className="bg-card border-border">
-                  <CardContent className="py-12">
-                    <div className="text-center">
-                      <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium text-foreground mb-2">No saved properties</h3>
-                      <p className="text-muted-foreground">Properties you save will appear here</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
               <TabsContent value="visits" className="mt-6">
                 <VisitsTab onDataChange={fetchPendingVisitsCount} />
