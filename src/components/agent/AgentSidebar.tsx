@@ -99,6 +99,7 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
     if (id === "messages") return unreadMessages;
     if (id === "calendar") return pendingVisits;
     if (id === "listings") return listingsCount;
+    if (id === "offers") return pendingOffers;
     return 0;
   };
 
