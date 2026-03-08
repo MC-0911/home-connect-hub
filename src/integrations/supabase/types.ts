@@ -22,6 +22,7 @@ export type Database = {
           end_time: string
           id: string
           notes: string | null
+          reminder_sent: boolean
           start_time: string
           status: string
           title: string
@@ -35,6 +36,7 @@ export type Database = {
           end_time?: string
           id?: string
           notes?: string | null
+          reminder_sent?: boolean
           start_time?: string
           status?: string
           title: string
@@ -48,6 +50,7 @@ export type Database = {
           end_time?: string
           id?: string
           notes?: string | null
+          reminder_sent?: boolean
           start_time?: string
           status?: string
           title?: string
