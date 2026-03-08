@@ -203,7 +203,7 @@ const ImagesStep = () => {
       )}
 
       {totalImages === 0 && (
-        <div className="rounded-lg p-4 text-center bg-sky-50">
+        <div className="rounded-lg p-4 text-center bg-muted/50">
           <p className="text-muted-foreground">
             Add at least one photo of your property. High-quality images help attract more buyers.
           </p>
