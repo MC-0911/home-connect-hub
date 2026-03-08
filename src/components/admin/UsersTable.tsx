@@ -421,19 +421,13 @@ export function UsersTable({ globalSearch = '' }: { globalSearch?: string }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {user.is_admin && <Badge variant="secondary" className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
-                          <Shield className="h-3 w-3" />
-                          Admin
-                        </Badge>}
-                      {user.is_suspended ? <Badge variant="destructive" className="gap-1">
-                          <UserX className="h-3 w-3" />
-                          Suspended
-                        </Badge> : <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
-                          <UserCheck className="h-3 w-3" />
-                          Active
-                        </Badge>}
-                    </div>
+                    {user.is_suspended ? <Badge variant="destructive" className="gap-1">
+                        <UserX className="h-3 w-3" />
+                        Suspended
+                      </Badge> : <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
+                        <UserCheck className="h-3 w-3" />
+                        Active
+                      </Badge>}
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center gap-1.5 text-sm">
