@@ -4,32 +4,39 @@ import { useAuth } from "@/hooks/useAuth";
 import { Tables } from "@/integrations/supabase/types";
 import { PropertyCard } from "@/components/property/PropertyCard";
 import { Heart, Loader2 } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Property = Tables<"properties">;
 
 export function FavoritesSection() {
   const { user } = useAuth();
-  const [favorites, setFavorites] = useState<Property[]>([]);
+  const { favoriteIds, loading: favsLoading, toggleFavorite, isFavorite } = useFavorites();
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For now, show user's own properties as placeholder
-    // A proper favorites system would require a favorites table
-    const fetchFavorites = async () => {
-      if (!user) return;
+    const fetchFavoriteProperties = async () => {
+      if (!user || favsLoading) return;
+
+      const ids = Array.from(favoriteIds);
+      if (ids.length === 0) {
+        setProperties([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       const { data } = await supabase
         .from("properties")
         .select("*")
-        .eq("status", "active")
-        .limit(12);
-      setFavorites(data || []);
+        .in("id", ids);
+      setProperties(data || []);
       setLoading(false);
     };
-    fetchFavorites();
-  }, [user]);
+    fetchFavoriteProperties();
+  }, [user, favoriteIds, favsLoading]);
 
-  if (loading) {
+  if (loading || favsLoading) {
     return (
       <div className="flex justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -44,7 +51,7 @@ export function FavoritesSection() {
         <h2 className="text-2xl font-bold">My Favorite Properties</h2>
       </div>
 
-      {favorites.length === 0 ? (
+      {properties.length === 0 ? (
         <div className="text-center py-16 bg-card rounded-xl border border-border">
           <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">No favorites yet</h3>
@@ -52,8 +59,14 @@ export function FavoritesSection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {favorites.map((property, i) => (
-            <PropertyCard key={property.id} property={property} index={i} />
+          {properties.map((property, i) => (
+            <PropertyCard
+              key={property.id}
+              property={property}
+              index={i}
+              isFavorite={isFavorite(property.id)}
+              onToggleFavorite={toggleFavorite}
+            />
           ))}
         </div>
       )}
