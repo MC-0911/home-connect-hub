@@ -25,13 +25,14 @@ const menuItems = [
 interface AgentSidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export function AgentSidebar({ activeSection, onSectionChange }: AgentSidebarProps) {
+export function AgentSidebar({ activeSection, onSectionChange, collapsed, onToggleCollapse }: AgentSidebarProps) {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingVisits, setPendingVisits] = useState(0);
   const [listingsCount, setListingsCount] = useState(0);
