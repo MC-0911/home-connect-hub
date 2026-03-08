@@ -10,6 +10,7 @@ import { DocumentsSection } from "@/components/agent/DocumentsSection";
 import { AnalyticsSection } from "@/components/agent/AnalyticsSection";
 import { SettingsSection } from "@/components/agent/SettingsSection";
 import { OffersSection } from "@/components/agent/OffersSection";
+import { TenantsSection } from "@/components/agent/TenantsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentRealtime } from "@/hooks/useAgentRealtime";
 import { Input } from "@/components/ui/input";
