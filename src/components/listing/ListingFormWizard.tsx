@@ -10,6 +10,7 @@ import NeighborhoodStep from './steps/NeighborhoodStep';
 import LandFeaturesStep from './steps/LandFeaturesStep';
 import ImagesStep from './steps/ImagesStep';
 import SuccessStep from './steps/SuccessStep';
+import ListingLivePreviewCard from './ListingLivePreviewCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
