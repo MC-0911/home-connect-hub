@@ -258,10 +258,6 @@ export function AlertsTab() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={createTestAlerts}>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Test Alerts
-          </Button>
           {unreadCount > 0 && (
             <Button variant="outline" size="sm" onClick={markAllAsRead}>
               <Check className="w-4 h-4 mr-2" />
