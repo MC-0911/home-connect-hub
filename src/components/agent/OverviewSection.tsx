@@ -43,9 +43,9 @@ const statusColors: Record<string, string> = {
 };
 
 function formatPrice(price: number) {
-  if (price >= 1_000_000) return `₦${(price / 1_000_000).toFixed(1)}M`;
-  if (price >= 1_000) return `₦${(price / 1_000).toFixed(0)}K`;
-  return `₦${price.toLocaleString()}`;
+  if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(1)}M`;
+  if (price >= 1_000) return `$${(price / 1_000).toFixed(0)}K`;
+  return `$${price.toLocaleString()}`;
 }
 
 export function OverviewSection({ stats, recentActivity, onNavigate, listings, leads, appointments }: OverviewSectionProps) {
