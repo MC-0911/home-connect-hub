@@ -9,6 +9,13 @@ interface BlogViewData {
   slug: string;
 }
 
+export interface QuickOverviewData {
+  buyerCount: number;
+  sellerCount: number;
+  agentCount: number;
+  topAgent: { name: string; deals: number } | null;
+}
+
 export interface AnalyticsData {
   totalUsers: number;
   activeUsers: number;
@@ -43,6 +50,8 @@ export interface AnalyticsData {
   // Device traffic
   deviceTraffic: { name: string; value: number }[];
   totalSessions: number;
+  // Quick overview
+  quickOverview: QuickOverviewData;
 }
 
 const INITIAL: AnalyticsData = {
@@ -56,6 +65,7 @@ const INITIAL: AnalyticsData = {
   rawListings: [], rawUsers: [], rawOffers: [], rawLeads: [],
   rawBlogViews: [], rawSoldListings: [], rawBlogs: [],
   deviceTraffic: [], totalSessions: 0,
+  quickOverview: { buyerCount: 0, sellerCount: 0, agentCount: 0, topAgent: null },
 };
 
 export function useAnalyticsData(dateRange: DateRange) {
@@ -76,10 +86,10 @@ export function useAnalyticsData(dateRange: DateRange) {
       const toDate = dateRange.to ? endOfDay(dateRange.to).toISOString() : null;
 
       let usersQ = supabase.from('profiles').select('id, is_suspended, created_at');
-      let listingsQ = supabase.from('properties').select('id, status, property_type, created_at, price, updated_at');
+      let listingsQ = supabase.from('properties').select('id, status, property_type, created_at, price, updated_at, user_id');
       let blogsQ = supabase.from('blogs').select('id, title, slug, views, status, created_at');
       let leadsQ = supabase.from('buyer_requirements').select('id, created_at, status, requirement_type');
-      let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount');
+      let offersQ = supabase.from('property_offers').select('id, status, created_at, offer_amount, user_id');
       let blogViewsQ = supabase.from('blog_views').select('id, viewed_at');
       let pageViewsQ = supabase.from('page_views').select('id, device_type, created_at');
 
@@ -192,6 +202,31 @@ export function useAnalyticsData(dateRange: DateRange) {
         name: name.charAt(0).toUpperCase() + name.slice(1), value,
       }));
 
+      // Quick Overview: buyers = unique offer makers, sellers = unique listing owners
+      const uniqueOfferUsers = new Set(offers.map((o: any) => o.user_id).filter(Boolean));
+      const uniqueSellerUsers = new Set(listings.map((l: any) => l.user_id).filter(Boolean));
+      const buyerCount = Math.max(uniqueOfferUsers.size, leads.length);
+      const sellerCount = uniqueSellerUsers.size;
+
+      // Top agent: seller with most listings
+      const sellerListingCounts: Record<string, number> = {};
+      listings.forEach((l: any) => {
+        if (l.user_id) sellerListingCounts[l.user_id] = (sellerListingCounts[l.user_id] || 0) + 1;
+      });
+      let topAgentData: QuickOverviewData['topAgent'] = null;
+      const topSellerId = Object.entries(sellerListingCounts).sort(([, a], [, b]) => b - a)[0];
+      if (topSellerId) {
+        const { data: topProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', topSellerId[0])
+          .single();
+        topAgentData = {
+          name: topProfile?.full_name || 'Unknown',
+          deals: topSellerId[1],
+        };
+      }
+
       setAnalytics({
         totalUsers: users.length, activeUsers, suspendedUsers,
         totalListings: listings.length, activeListings, pendingListings, soldListings,
@@ -209,6 +244,12 @@ export function useAnalyticsData(dateRange: DateRange) {
         rawBlogs: blogs.map((b) => ({ created_at: b.created_at })),
         deviceTraffic,
         totalSessions: totalPageSessions,
+        quickOverview: {
+          buyerCount,
+          sellerCount,
+          agentCount: sellerCount,
+          topAgent: topAgentData,
+        },
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
