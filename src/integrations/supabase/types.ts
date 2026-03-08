@@ -776,6 +776,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tenants: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          lease_end: string | null
+          lease_start: string | null
+          monthly_rent: number | null
+          notes: string | null
+          payment_status: string
+          phone: string | null
+          property_name: string | null
+          tenant_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          lease_end?: string | null
+          lease_start?: string | null
+          monthly_rent?: number | null
+          notes?: string | null
+          payment_status?: string
+          phone?: string | null
+          property_name?: string | null
+          tenant_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          lease_end?: string | null
+          lease_start?: string | null
+          monthly_rent?: number | null
+          notes?: string | null
+          payment_status?: string
+          phone?: string | null
+          property_name?: string | null
+          tenant_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_presence: {
         Row: {
           is_online: boolean | null
