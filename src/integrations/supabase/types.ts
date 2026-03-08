@@ -20,7 +20,6 @@ export type Database = {
           id: string
           is_completed: boolean
           priority: string
-          tag: string | null
           task_date: string | null
           task_time: string
           title: string
@@ -32,7 +31,6 @@ export type Database = {
           id?: string
           is_completed?: boolean
           priority?: string
-          tag?: string | null
           task_date?: string | null
           task_time?: string
           title: string
@@ -44,7 +42,6 @@ export type Database = {
           id?: string
           is_completed?: boolean
           priority?: string
-          tag?: string | null
           task_date?: string | null
           task_time?: string
           title?: string

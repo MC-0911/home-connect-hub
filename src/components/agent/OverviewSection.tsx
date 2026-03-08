@@ -390,17 +390,6 @@ function RecentPropertiesCard({ listings, navigate }: { listings: Tables<"proper
 }
 
 // --- Upcoming Tasks Card Component ---
-const TAG_OPTIONS = [
-  { value: "urgent", label: "Urgent", color: "bg-red-500" },
-  { value: "follow-up", label: "Follow Up", color: "bg-amber-500" },
-  { value: "meeting", label: "Meeting", color: "bg-blue-500" },
-  { value: "personal", label: "Personal", color: "bg-violet-500" },
-  { value: "client", label: "Client", color: "bg-emerald-500" },
-  { value: "showing", label: "Showing", color: "bg-pink-500" },
-] as const;
-
-type TagValue = typeof TAG_OPTIONS[number]["value"] | null;
-
 interface TaskItem {
   id: string;
   title: string;
@@ -410,7 +399,6 @@ interface TaskItem {
   isCompleted?: boolean;
   rawDate?: string | null;
   rawTime?: string;
-  tag?: TagValue;
 }
 
 function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
@@ -423,9 +411,6 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [newPriority, setNewPriority] = useState<"high" | "medium" | "low">("medium");
   const [customTasks, setCustomTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [tagDialogOpen, setTagDialogOpen] = useState(false);
-  const [taggingTask, setTaggingTask] = useState<TaskItem | null>(null);
 
   // Fetch tasks from Supabase
   const fetchTasks = async () => {
@@ -445,7 +430,6 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
         isCompleted: t.is_completed,
         rawDate: t.task_date,
         rawTime: t.task_time,
-        tag: t.tag as TagValue,
       })));
     }
     setLoading(false);
@@ -527,26 +511,6 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
     fetchTasks();
   };
 
-  const openTagDialog = (task: TaskItem) => {
-    setTaggingTask(task);
-    setTagDialogOpen(true);
-  };
-
-  const handleSetTag = async (tagValue: TagValue) => {
-    if (!taggingTask) return;
-    // Optimistic update
-    setCustomTasks(prev => prev.map(t => t.id === taggingTask.id ? { ...t, tag: tagValue } : t));
-    const { error } = await supabase.from("agent_tasks").update({ tag: tagValue }).eq("id", taggingTask.id);
-    if (error) {
-      toast.error("Failed to update tag");
-      fetchTasks();
-      return;
-    }
-    setTagDialogOpen(false);
-    setTaggingTask(null);
-    toast.success(tagValue ? "Tag applied" : "Tag removed");
-  };
-
   return (
     <Card className="lg:col-span-3 border border-border/50 shadow-sm">
       <CardHeader className="pb-3">
@@ -581,17 +545,7 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                 )}
               </button>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className={cn("text-sm font-medium text-foreground", task.isCompleted && "line-through text-muted-foreground")}>{task.title}</p>
-                  {task.tag && (() => {
-                    const tagOption = TAG_OPTIONS.find(t => t.value === task.tag);
-                    return tagOption ? (
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white ${tagOption.color}`}>
-                        {tagOption.label}
-                      </span>
-                    ) : null;
-                  })()}
-                </div>
+                <p className={cn("text-sm font-medium text-foreground", task.isCompleted && "line-through text-muted-foreground")}>{task.title}</p>
                 <p className="text-xs text-muted-foreground">{task.time}</p>
               </div>
               <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
@@ -609,7 +563,7 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-36">
-                    <DropdownMenuItem onClick={() => openTagDialog(task)}>
+                    <DropdownMenuItem onClick={() => openEditDialog(task)}>
                       <Tag className="h-3.5 w-3.5 mr-2" />
                       Tag
                     </DropdownMenuItem>
@@ -768,40 +722,6 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
             <Button variant="outline" onClick={() => { setEditDialogOpen(false); setEditingTask(null); }}>Cancel</Button>
             <Button onClick={handleEditTask} disabled={!newTitle.trim()}>Save Changes</Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Tag Selection Dialog */}
-      <Dialog open={tagDialogOpen} onOpenChange={(open) => { setTagDialogOpen(open); if (!open) setTaggingTask(null); }}>
-        <DialogContent className="sm:max-w-xs">
-          <DialogHeader>
-            <DialogTitle>Assign Tag</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-2 py-2">
-            {TAG_OPTIONS.map((tag) => {
-              const isSelected = taggingTask?.tag === tag.value;
-              return (
-                <button
-                  key={tag.value}
-                  onClick={() => handleSetTag(tag.value)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all text-sm font-medium text-left",
-                    isSelected
-                      ? "border-primary bg-primary/10 ring-2 ring-primary/30"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                  )}
-                >
-                  <span className={`h-3 w-3 rounded-full shrink-0 ${tag.color}`} />
-                  {tag.label}
-                </button>
-              );
-            })}
-          </div>
-          {taggingTask?.tag && (
-            <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => handleSetTag(null)}>
-              Remove Tag
-            </Button>
-          )}
         </DialogContent>
       </Dialog>
     </Card>
