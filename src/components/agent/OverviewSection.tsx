@@ -403,18 +403,30 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
   const [newDate, setNewDate] = useState<Date>();
   const [newTimeSlot, setNewTimeSlot] = useState("9:00 AM");
   const [newPriority, setNewPriority] = useState<"high" | "medium" | "low">("medium");
+  const [customTasks, setCustomTasks] = useState<TaskItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Build tasks from appointments + custom tasks stored in localStorage
-  const [customTasks, setCustomTasks] = useState<TaskItem[]>(() => {
-    try {
-      const stored = localStorage.getItem("agent_custom_tasks");
-      return stored ? JSON.parse(stored) : [];
-    } catch { return []; }
-  });
+  // Fetch tasks from Supabase
+  const fetchTasks = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("agent_tasks")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("task_date", { ascending: true });
+    if (!error && data) {
+      setCustomTasks(data.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        time: t.task_date ? `${format(new Date(t.task_date + "T00:00:00"), "MMM d, yyyy")}, ${t.task_time}` : t.task_time,
+        priority: t.priority as "high" | "medium" | "low",
+      })));
+    }
+    setLoading(false);
+  };
 
-  useEffect(() => {
-    localStorage.setItem("agent_custom_tasks", JSON.stringify(customTasks));
-  }, [customTasks]);
+  useEffect(() => { fetchTasks(); }, []);
 
   const appointmentTasks: TaskItem[] = useMemo(() => {
     return appointments.slice(0, 4).map((a: any) => ({
@@ -428,25 +440,30 @@ function UpcomingTasksCard({ appointments }: { appointments: any[] }) {
 
   const allTasks = [...appointmentTasks, ...customTasks];
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTitle.trim()) return;
-    const timeDisplay = newDate ? `${format(newDate, "MMM d, yyyy")}, ${newTimeSlot}` : newTimeSlot;
-    const task: TaskItem = {
-      id: crypto.randomUUID(),
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("You must be logged in"); return; }
+    const { error } = await supabase.from("agent_tasks").insert({
+      user_id: user.id,
       title: newTitle.trim(),
-      time: timeDisplay,
+      task_date: newDate ? format(newDate, "yyyy-MM-dd") : null,
+      task_time: newTimeSlot,
       priority: newPriority,
-    };
-    setCustomTasks(prev => [...prev, task]);
+    });
+    if (error) { toast.error("Failed to add task"); return; }
     setNewTitle("");
     setNewDate(undefined);
     setNewTimeSlot("9:00 AM");
     setNewPriority("medium");
     setAddDialogOpen(false);
     toast.success("Task added");
+    fetchTasks();
   };
 
-  const handleDeleteTask = (id: string) => {
+  const handleDeleteTask = async (id: string) => {
+    const { error } = await supabase.from("agent_tasks").delete().eq("id", id);
+    if (error) { toast.error("Failed to delete task"); return; }
     setCustomTasks(prev => prev.filter(t => t.id !== id));
     toast.success("Task removed");
   };
