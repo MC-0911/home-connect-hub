@@ -15,7 +15,7 @@ const useFieldChecks = (formData: any, isLand: boolean): FieldCheck[] => {
   const lastStep = isLand ? 4 : 6;
   const checks: FieldCheck[] = [
     { label: 'Property type', filled: !!formData.propertyType, step: 1 },
-    { label: 'Title', filled: !!formData.title, step: 1 },
+    
     { label: 'Price', filled: !!formData.price, step: 1 },
     { label: 'Address', filled: !!formData.address, step: 2 },
     { label: 'City', filled: !!formData.city, step: 2 },
