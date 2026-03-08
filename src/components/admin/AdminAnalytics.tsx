@@ -9,6 +9,7 @@ import { AnalyticsStatsCards } from './analytics/AnalyticsStatsCards';
 import { LiveActivityFeed } from './analytics/LiveActivityFeed';
 import { QuickOverviewPanel } from './analytics/QuickOverviewPanel';
 import { LatestListingsTable } from './analytics/LatestListingsTable';
+import { RecentOffersPanel } from './analytics/RecentOffersPanel';
 import {
   ActivityOverTimeChart,
   UserGrowthChart,
