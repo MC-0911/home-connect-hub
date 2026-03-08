@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { User, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { User, Mail, Phone, MapPin, ArrowRight, LogOut } from "lucide-react";
 
 export function SettingsSection() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const navigate = useNavigate();
 
@@ -47,9 +47,21 @@ export function SettingsSection() {
             ))}
           </div>
 
-          <Button onClick={() => navigate("/profile")} className="gap-2">
-            Edit Full Profile <ArrowRight className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button onClick={() => navigate("/profile")} className="gap-2">
+              Edit Full Profile <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              className="gap-2"
+              onClick={async () => {
+                await signOut();
+                navigate("/auth");
+              }}
+            >
+              <LogOut className="h-4 w-4" /> Logout
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
