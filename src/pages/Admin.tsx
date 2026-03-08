@@ -171,7 +171,7 @@ export default function Admin() {
               {activeSection === 'leads' && (
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
-                    <LeadsTable />
+                    <LeadsTable globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
