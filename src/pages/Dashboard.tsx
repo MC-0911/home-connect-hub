@@ -435,10 +435,6 @@ export default function Dashboard() {
                   <Building2 className="w-4 h-4 mr-1" />
                   My Listings 
                 </TabsTrigger>
-                <TabsTrigger value="saved" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Heart className="w-4 h-4 mr-1" />
-                  Saved 
-                </TabsTrigger>
                 <TabsTrigger value="visits" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:text-accent rounded-none border-b-2 border-transparent px-4 py-3 text-muted-foreground hover:text-foreground transition-colors relative">
                   <CalendarCheck className="w-4 h-4 mr-1" />
                   Visits
