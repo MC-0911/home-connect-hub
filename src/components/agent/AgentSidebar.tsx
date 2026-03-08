@@ -20,7 +20,6 @@ const menuItems = [
   { id: "messages", label: "Messages", icon: MessageSquare },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "documents", label: "Documents", icon: FileText },
-  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 interface AgentSidebarProps {
