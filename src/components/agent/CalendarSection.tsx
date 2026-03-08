@@ -68,11 +68,11 @@ export function CalendarSection({ appointments, onRefresh }: CalendarSectionProp
   const fetchAppts = async () => {
     if (!user) return;
     const { data } = await supabase
-      .from("agent_appointments")
+      .from("agent_appointments" as any)
       .select("*")
       .eq("user_id", user.id)
       .order("appointment_date", { ascending: true });
-    if (data) setAgentAppts(data as AgentAppointment[]);
+    if (data) setAgentAppts(data as unknown as AgentAppointment[]);
   };
 
   useEffect(() => {
