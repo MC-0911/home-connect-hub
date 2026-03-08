@@ -1,21 +1,21 @@
 import { motion } from "framer-motion";
-import { Search, MessageSquare, Home, ArrowRight } from "lucide-react";
+import { Search, MessageSquare, Home } from "lucide-react";
 
 const steps = [
   {
-    number: "1",
+    number: "01",
     icon: Search,
     title: "Find Your Match",
     description: "Use our smart search to find your next property with the perfect location, amenities, and more.",
   },
   {
-    number: "2",
+    number: "02",
     icon: MessageSquare,
     title: "Connect Directly",
     description: "Message buyers or sellers instantly through our platform with no middlemen – direct communication.",
   },
   {
-    number: "3",
+    number: "03",
     icon: Home,
     title: "Make It Yours",
     description: "Negotiate freely and close the deal on your terms. Move into your new place. Make it home.",
@@ -24,7 +24,7 @@ const steps = [
 
 export function HowItWorks({ className }: { className?: string }) {
   return (
-    <section className={`py-20 sm:py-28 bg-muted/30 ${className || ""}`}>
+    <section className={`py-24 sm:py-32 ${className || ""}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -36,49 +36,60 @@ export function HowItWorks({ className }: { className?: string }) {
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
             How It Works
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg">
+          <p className="text-muted-foreground mt-5 max-w-xl mx-auto text-lg leading-relaxed">
             Finding or selling a property has never been easier. Follow these simple steps.
           </p>
         </motion.div>
 
         <div className="relative max-w-5xl mx-auto">
-          {/* Connector line between steps */}
-          <div className="hidden md:block absolute top-[4.5rem] left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-border to-transparent z-0" />
+          {/* Desktop connector line */}
+          <div className="hidden md:block absolute top-[5.5rem] left-[22%] right-[22%] z-0">
+            <div className="h-px bg-border relative">
+              {/* Animated dots on the line */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/40" />
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 relative z-10">
             {steps.map((step, index) => (
               <motion.div
                 key={step.number}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="relative text-center group"
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="relative flex flex-col items-center text-center group"
               >
-                {/* Large background circle */}
-                <div className="relative inline-flex items-center justify-center mb-8">
-                  <div className="w-28 h-28 rounded-full bg-accent/[0.06] flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
-                    <div className="w-20 h-20 rounded-full bg-accent/[0.08] flex items-center justify-center">
-                      <step.icon className="w-9 h-9 text-accent transition-transform duration-300 group-hover:scale-110" />
+                {/* Icon container with layered circles */}
+                <div className="relative mb-10">
+                  {/* Outer glow ring on hover */}
+                  <div className="absolute inset-0 w-[7.5rem] h-[7.5rem] rounded-full bg-accent/5 scale-100 group-hover:scale-125 transition-transform duration-700 ease-out" />
+                  
+                  {/* Main circle */}
+                  <div className="relative w-[7.5rem] h-[7.5rem] rounded-full bg-card border-2 border-border/60 flex items-center justify-center shadow-[0_8px_30px_-8px_hsl(var(--accent)/0.12)] group-hover:border-accent/30 group-hover:shadow-[0_12px_40px_-8px_hsl(var(--accent)/0.2)] transition-all duration-500">
+                    {/* Inner accent circle */}
+                    <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/15 transition-colors duration-300">
+                      <step.icon className="w-7 h-7 text-accent" strokeWidth={1.8} />
                     </div>
                   </div>
-                  {/* Number badge */}
-                  <span className="absolute -top-1 -right-1 w-9 h-9 rounded-full bg-accent text-accent-foreground font-bold text-sm flex items-center justify-center shadow-[0_4px_12px_hsl(var(--accent)/0.35)] ring-4 ring-background">
-                    {step.number}
-                  </span>
+
+                  {/* Step number badge */}
+                  <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-accent flex items-center justify-center shadow-[0_4px_14px_hsl(var(--accent)/0.4)] ring-[3px] ring-background">
+                    <span className="text-accent-foreground font-bold text-xs tracking-wide">{step.number}</span>
+                  </div>
                 </div>
 
-                {/* Arrow connector on mobile */}
+                {/* Mobile down arrow */}
                 {index < steps.length - 1 && (
-                  <div className="md:hidden flex justify-center my-2">
-                    <ArrowRight className="w-5 h-5 text-muted-foreground/40 rotate-90" />
+                  <div className="md:hidden flex justify-center -mt-4 mb-4">
+                    <div className="w-px h-10 bg-gradient-to-b from-border to-transparent" />
                   </div>
                 )}
 
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-3">
+                <h3 className="font-display text-xl font-bold text-foreground mb-3">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
+                <p className="text-muted-foreground leading-relaxed max-w-[260px] text-[0.95rem]">
                   {step.description}
                 </p>
               </motion.div>
