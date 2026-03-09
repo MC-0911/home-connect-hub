@@ -197,7 +197,7 @@ export default function Auth() {
                   <Input placeholder="Full Name" className="pl-10 h-12" value={formData.name} onChange={e => setFormData({
                 ...formData,
                 name: e.target.value
-              })} disabled={loading} />
+              })} required disabled={loading} />
                 </div>
 
                 {/* Account Type Selector */}
