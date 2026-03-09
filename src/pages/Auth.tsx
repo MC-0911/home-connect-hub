@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Home, Building2, Briefcase } from "lucide-react";
