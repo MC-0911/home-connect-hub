@@ -310,6 +310,7 @@ export default function Auth() {
           </motion.div>
         </div>
       </main>
+      <ForgotPasswordDialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
       <Footer />
     </div>;
 }
