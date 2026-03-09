@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
@@ -39,6 +40,7 @@ const App = () => <HelmetProvider>
               <Route path="/properties" element={<Properties />} />
               <Route path="/property/:id" element={<PropertyDetail />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/add-property" element={<AddProperty />} />

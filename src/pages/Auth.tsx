@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Home, Building2, Briefcase } from "lucide-react";
@@ -25,6 +26,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState<AccountType>("buyer");
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -249,7 +251,7 @@ export default function Auth() {
               </div>
 
               {mode === "login" && <div className="flex justify-end">
-                  <button type="button" className="text-sm text-accent hover:underline">
+                  <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm text-accent hover:underline">
                     Forgot password?
                   </button>
                 </div>}
@@ -308,6 +310,7 @@ export default function Auth() {
           </motion.div>
         </div>
       </main>
+      <ForgotPasswordDialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
       <Footer />
     </div>;
 }
