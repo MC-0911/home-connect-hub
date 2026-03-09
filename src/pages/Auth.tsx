@@ -61,7 +61,7 @@ export default function Auth() {
   }, [navigate, redirectTo, roleLoading, primaryRole, getDashboardPath]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
+    if (!formData.email || !formData.password || (mode === "signup" && !formData.name.trim())) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -197,7 +197,7 @@ export default function Auth() {
                   <Input placeholder="Full Name" className="pl-10 h-12" value={formData.name} onChange={e => setFormData({
                 ...formData,
                 name: e.target.value
-              })} disabled={loading} />
+              })} required disabled={loading} />
                 </div>
 
                 {/* Account Type Selector */}
