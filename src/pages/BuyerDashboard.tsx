@@ -95,7 +95,7 @@ export default function BuyerDashboard() {
     <div className="min-h-screen flex bg-muted/30">
       <BuyerSidebar
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={handleSectionChange}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
