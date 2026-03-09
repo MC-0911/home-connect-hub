@@ -37,6 +37,7 @@ export default function BuyerDashboard() {
   const [activeSection, setActiveSection] = useState("discover");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pendingFilters, setPendingFilters] = useState<SearchFilters | null>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
 
   if (!user) return null;
 
