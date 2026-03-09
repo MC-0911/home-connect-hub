@@ -23,6 +23,7 @@ export function PropertyCard({
   index = 0,
   isFavorite: isFavoriteProp,
   onToggleFavorite,
+  onViewDetails,
 }: PropertyCardProps) {
   const [localFavorite, setLocalFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
