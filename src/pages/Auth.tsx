@@ -251,7 +251,7 @@ export default function Auth() {
               </div>
 
               {mode === "login" && <div className="flex justify-end">
-                  <button type="button" className="text-sm text-accent hover:underline">
+                  <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm text-accent hover:underline">
                     Forgot password?
                   </button>
                 </div>}
