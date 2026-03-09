@@ -22,9 +22,10 @@ interface DiscoverSectionProps {
     maxPrice: number;
     searchQuery: string;
   } | null;
+  onViewProperty?: (propertyId: string) => void;
 }
 
-export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
+export function DiscoverSection({ initialFilters, onViewProperty }: DiscoverSectionProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -188,6 +189,7 @@ export function DiscoverSection({ initialFilters }: DiscoverSectionProps) {
                 index={i}
                 isFavorite={isFavorite(property.id)}
                 onToggleFavorite={toggleFavorite}
+                onViewDetails={onViewProperty}
               />
             ))}
           </div>

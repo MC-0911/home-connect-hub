@@ -11,6 +11,7 @@ import { MortgageCalculatorSection } from "@/components/buyer/MortgageCalculator
 import { BuyerMessagesSection } from "@/components/buyer/BuyerMessagesSection";
 import { BuyerSettingsSection } from "@/components/buyer/BuyerSettingsSection";
 import { BuyerOffersSection } from "@/components/buyer/BuyerOffersSection";
+import { BuyerPropertyDetail } from "@/components/buyer/BuyerPropertyDetail";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings, Plus, Heart, Calculator, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export default function BuyerDashboard() {
   const [activeSection, setActiveSection] = useState("discover");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pendingFilters, setPendingFilters] = useState<SearchFilters | null>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
 
   if (!user) return null;
 
@@ -56,9 +58,25 @@ export default function BuyerDashboard() {
     settings: { title: "Settings", subtitle: "Manage your account" },
   };
 
+  const handleViewProperty = (propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+  };
+
+  const handleBackFromProperty = () => {
+    setSelectedPropertyId(null);
+  };
+
+  const handleSectionChange = (section: string) => {
+    setSelectedPropertyId(null);
+    setActiveSection(section);
+  };
+
   const renderSection = () => {
+    if (selectedPropertyId) {
+      return <BuyerPropertyDetail propertyId={selectedPropertyId} onBack={handleBackFromProperty} />;
+    }
     switch (activeSection) {
-      case "discover": return <DiscoverSection initialFilters={pendingFilters} />;
+      case "discover": return <DiscoverSection initialFilters={pendingFilters} onViewProperty={handleViewProperty} />;
       case "favorites": return <FavoritesSection />;
       case "saved-searches": return <SavedSearchesSection onRunSearch={handleRunSearch} />;
       case "viewings": return <ViewingsSection />;
@@ -67,7 +85,7 @@ export default function BuyerDashboard() {
       case "calculator": return <MortgageCalculatorSection />;
       case "messages": return <BuyerMessagesSection />;
       case "settings": return <BuyerSettingsSection />;
-      default: return <DiscoverSection initialFilters={pendingFilters} />;
+      default: return <DiscoverSection initialFilters={pendingFilters} onViewProperty={handleViewProperty} />;
     }
   };
 
@@ -77,7 +95,7 @@ export default function BuyerDashboard() {
     <div className="min-h-screen flex bg-muted/30">
       <BuyerSidebar
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={handleSectionChange}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />

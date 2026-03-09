@@ -15,6 +15,7 @@ interface PropertyCardProps {
   index?: number;
   isFavorite?: boolean;
   onToggleFavorite?: (propertyId: string) => void;
+  onViewDetails?: (propertyId: string) => void;
 }
 
 export function PropertyCard({
@@ -22,6 +23,7 @@ export function PropertyCard({
   index = 0,
   isFavorite: isFavoriteProp,
   onToggleFavorite,
+  onViewDetails,
 }: PropertyCardProps) {
   const [localFavorite, setLocalFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -40,6 +42,13 @@ export function PropertyCard({
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (onViewDetails) {
+      e.preventDefault();
+      onViewDetails(property.id);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -47,7 +56,7 @@ export function PropertyCard({
       transition={{ duration: 0.4, delay: index * 0.1 }}
       className="group"
     >
-      <Link to={`/property/${property.id}`}>
+      <Link to={`/property/${property.id}`} onClick={handleCardClick}>
         <div className="bg-card rounded-xl overflow-hidden border border-border shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <div className="relative aspect-[4/3] overflow-hidden">
             <div className={cn("absolute inset-0 bg-secondary animate-pulse", imageLoaded && "hidden")} />
