@@ -15,6 +15,7 @@ interface PropertyCardProps {
   index?: number;
   isFavorite?: boolean;
   onToggleFavorite?: (propertyId: string) => void;
+  onViewDetails?: (propertyId: string) => void;
 }
 
 export function PropertyCard({
