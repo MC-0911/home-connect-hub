@@ -189,6 +189,7 @@ export function DiscoverSection({ initialFilters, onViewProperty }: DiscoverSect
                 index={i}
                 isFavorite={isFavorite(property.id)}
                 onToggleFavorite={toggleFavorite}
+                onViewDetails={onViewProperty}
               />
             ))}
           </div>
