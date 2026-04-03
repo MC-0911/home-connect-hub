@@ -22,7 +22,7 @@ interface AdminSidebarProps {
 }
 
 const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: 'analytics', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'analytics', label: 'Overview', icon: LayoutDashboard },
   { id: 'users', label: 'Users', icon: Users },
   { id: 'listings', label: 'Listings', icon: Home },
   { id: 'leads', label: 'Leads', icon: MessageSquare },
