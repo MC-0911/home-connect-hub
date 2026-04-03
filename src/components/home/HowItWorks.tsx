@@ -67,16 +67,27 @@ export function HowItWorks({ className }: { className?: string }) {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
               whileHover={{
-                y: -8,
-                transition: { duration: 0.3, ease: "easeOut" },
+                y: -12,
+                scale: 1.03,
+                transition: { duration: 0.35, ease: "easeOut" },
               }}
-              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default"
+              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default transition-all duration-500"
               style={{
                 background:
                   "linear-gradient(160deg, hsl(190 30% 65% / 0.45), hsl(200 35% 55% / 0.35))",
                 backdropFilter: "blur(20px) saturate(180%)",
                 boxShadow:
                   "0 20px 50px -12px hsl(200 30% 30% / 0.2), inset 0 0 0 1px rgba(255,255,255,0.15)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 30px 60px -15px hsl(var(--accent) / 0.35), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 20px hsl(var(--accent) / 0.15)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 20px 50px -12px hsl(200 30% 30% / 0.2), inset 0 0 0 1px rgba(255,255,255,0.15)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
               }}
             >
               {/* Step number + illustration area */}
@@ -93,18 +104,19 @@ export function HowItWorks({ className }: { className?: string }) {
                   loading="lazy"
                   width={512}
                   height={512}
-                  className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-xl"
-                  whileHover={{ scale: 1.08, rotate: 2 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-xl transition-[filter] duration-500 group-hover:drop-shadow-[0_10px_25px_hsl(var(--accent)/0.4)]"
+                  initial={{ y: 0, rotate: 0 }}
+                  whileHover={{ scale: 1.12, rotate: 3, y: -6 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 18 }}
                 />
               </div>
 
               {/* Text content */}
               <div className="px-6 pb-6 pt-2 text-center">
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                <h3 className="font-display text-xl font-bold text-foreground mb-2 transition-colors duration-300 group-hover:text-accent">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm leading-relaxed transition-colors duration-300 group-hover:text-foreground/80">
                   {step.description}
                 </p>
               </div>
