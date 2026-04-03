@@ -20,7 +20,7 @@ import { AlertsDropdown } from '@/components/agent/AlertsDropdown';
 import { useAuth } from '@/hooks/useAuth';
 
 const sectionMeta: Record<AdminSection, { title: string; description: string; icon: typeof Shield }> = {
-  analytics: { title: 'Dashboard Overview', description: 'Platform analytics and performance metrics', icon: Crown },
+  analytics: { title: 'Overview', description: 'Platform analytics and performance metrics', icon: Crown },
   users: { title: 'User Management', description: 'View and manage all registered users', icon: Shield },
   listings: { title: 'Listing Management', description: 'Manage all property listings', icon: Shield },
   leads: { title: 'Lead Management', description: 'Track and export buyer leads', icon: Shield },
