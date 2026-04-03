@@ -102,10 +102,10 @@ export function HowItWorks({ className }: { className?: string }) {
 
               {/* Text content */}
               <div className="px-6 pb-6 pt-2 text-center">
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                <h3 className="font-display text-xl font-bold text-foreground mb-2 transition-colors duration-300 group-hover:text-accent">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm leading-relaxed transition-colors duration-300 group-hover:text-foreground/80">
                   {step.description}
                 </p>
               </div>
