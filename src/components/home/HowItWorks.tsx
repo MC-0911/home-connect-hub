@@ -67,16 +67,27 @@ export function HowItWorks({ className }: { className?: string }) {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
               whileHover={{
-                y: -8,
-                transition: { duration: 0.3, ease: "easeOut" },
+                y: -12,
+                scale: 1.03,
+                transition: { duration: 0.35, ease: "easeOut" },
               }}
-              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default"
+              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default transition-all duration-500"
               style={{
                 background:
                   "linear-gradient(160deg, hsl(190 30% 65% / 0.45), hsl(200 35% 55% / 0.35))",
                 backdropFilter: "blur(20px) saturate(180%)",
                 boxShadow:
                   "0 20px 50px -12px hsl(200 30% 30% / 0.2), inset 0 0 0 1px rgba(255,255,255,0.15)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 30px 60px -15px hsl(var(--accent) / 0.35), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 20px hsl(var(--accent) / 0.15)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow =
+                  "0 20px 50px -12px hsl(200 30% 30% / 0.2), inset 0 0 0 1px rgba(255,255,255,0.15)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
               }}
             >
               {/* Step number + illustration area */}
