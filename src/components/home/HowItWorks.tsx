@@ -71,7 +71,7 @@ export function HowItWorks({ className }: { className?: string }) {
                 scale: 1.03,
                 transition: { duration: 0.35, ease: "easeOut" },
               }}
-              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default transition-all duration-500"
+              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default transition-all duration-500 before:absolute before:inset-0 before:z-20 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-200%] before:skew-x-[-20deg] before:transition-transform before:duration-700 before:ease-in-out hover:before:translate-x-[200%] before:pointer-events-none"
               style={{
                 background:
                   "linear-gradient(160deg, hsl(190 30% 65% / 0.45), hsl(200 35% 55% / 0.35))",
