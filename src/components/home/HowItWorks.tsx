@@ -1,101 +1,115 @@
 import { motion } from "framer-motion";
-import { Search, MessageSquare, Home } from "lucide-react";
+import searchImg from "@/assets/how-it-works-search.png";
+import connectImg from "@/assets/how-it-works-connect.png";
+import yoursImg from "@/assets/how-it-works-yours.png";
 
 const steps = [
   {
     number: "01",
-    icon: Search,
     title: "Find Your Match",
-    description: "Use our smart search to find your next property with the perfect location, amenities, and more.",
+    description:
+      "Use our smart search to find your next property with the perfect location, amenities, and more.",
+    image: searchImg,
   },
   {
     number: "02",
-    icon: MessageSquare,
     title: "Connect Directly",
-    description: "Message buyers or sellers instantly through our platform with no middlemen – direct communication.",
+    description:
+      "Message buyers or sellers instantly through our platform with no middlemen – direct communication.",
+    image: connectImg,
   },
   {
     number: "03",
-    icon: Home,
     title: "Make It Yours",
-    description: "Negotiate freely and close the deal on your terms. Move into your new place. Make it home.",
+    description:
+      "Negotiate freely and close the deal on your terms. Move into your new place. Make it home.",
+    image: yoursImg,
   },
 ];
 
 export function HowItWorks({ className }: { className?: string }) {
   return (
-    <section className={`py-24 sm:py-32 ${className || ""}`}>
+    <section
+      className={`py-24 sm:py-32 ${className || ""}`}
+      style={{
+        background:
+          "linear-gradient(135deg, hsl(var(--muted) / 0.5), hsl(var(--muted) / 0.8))",
+      }}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-foreground/10 text-foreground/70 text-sm font-medium mb-4 border border-foreground/10">
+            Step 02
+          </span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
             How It Works
           </h2>
           <p className="text-muted-foreground mt-5 max-w-xl mx-auto text-lg leading-relaxed">
-            Finding or selling a property has never been easier. Follow these simple steps.
+            Finding or selling a property has never been easier. Follow these
+            simple steps.
           </p>
         </motion.div>
 
-        <div className="relative max-w-5xl mx-auto">
-          {/* Desktop connector line */}
-          <div className="hidden md:block absolute top-[5.5rem] left-[22%] right-[22%] z-0">
-            <div className="h-px bg-border relative">
-              {/* Animated dots on the line */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/40" />
-            </div>
-          </div>
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.15 }}
+              whileHover={{
+                y: -8,
+                transition: { duration: 0.3, ease: "easeOut" },
+              }}
+              className="group relative flex flex-col rounded-3xl overflow-hidden border border-white/20 cursor-default"
+              style={{
+                background:
+                  "linear-gradient(160deg, hsl(190 30% 65% / 0.45), hsl(200 35% 55% / 0.35))",
+                backdropFilter: "blur(20px) saturate(180%)",
+                boxShadow:
+                  "0 20px 50px -12px hsl(200 30% 30% / 0.2), inset 0 0 0 1px rgba(255,255,255,0.15)",
+              }}
+            >
+              {/* Step number + illustration area */}
+              <div className="relative h-52 sm:h-56 flex items-center justify-center overflow-hidden">
+                {/* Large step number */}
+                <span className="absolute top-4 left-5 text-6xl sm:text-7xl font-black text-foreground/15 leading-none select-none z-0">
+                  {step.number}
+                </span>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 relative z-10">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.number}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
-                className="relative flex flex-col items-center text-center group cursor-default rounded-3xl p-6 transition-shadow duration-300 hover:shadow-[0_20px_50px_-12px_hsl(var(--accent)/0.15)]"
-              >
-                {/* Icon container with layered circles */}
-                <div className="relative mb-10">
-                  {/* Outer glow ring on hover */}
-                  <div className="absolute inset-0 w-[7.5rem] h-[7.5rem] rounded-full bg-accent/5 scale-100 group-hover:scale-125 transition-transform duration-700 ease-out" />
-                  
-                  {/* Main circle */}
-                  <div className="relative w-[7.5rem] h-[7.5rem] rounded-full bg-card border-2 border-border/60 flex items-center justify-center shadow-[0_8px_30px_-8px_hsl(var(--accent)/0.12)] group-hover:border-accent/30 group-hover:shadow-[0_12px_40px_-8px_hsl(var(--accent)/0.2)] transition-all duration-500">
-                    {/* Inner accent circle */}
-                    <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/15 transition-colors duration-300">
-                      <step.icon className="w-7 h-7 text-accent" strokeWidth={1.8} />
-                    </div>
-                  </div>
+                {/* Illustration */}
+                <motion.img
+                  src={step.image}
+                  alt={step.title}
+                  loading="lazy"
+                  width={512}
+                  height={512}
+                  className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-xl"
+                  whileHover={{ scale: 1.08, rotate: 2 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                />
+              </div>
 
-                  {/* Step number badge */}
-                  <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-accent flex items-center justify-center shadow-[0_4px_14px_hsl(var(--accent)/0.4)] ring-[3px] ring-background">
-                    <span className="text-accent-foreground font-bold text-xs tracking-wide">{step.number}</span>
-                  </div>
-                </div>
-
-                {/* Mobile down arrow */}
-                {index < steps.length - 1 && (
-                  <div className="md:hidden flex justify-center -mt-4 mb-4">
-                    <div className="w-px h-10 bg-gradient-to-b from-border to-transparent" />
-                  </div>
-                )}
-
-                <h3 className="font-display text-xl font-bold text-foreground mb-3">
+              {/* Text content */}
+              <div className="px-6 pb-6 pt-2 text-center">
+                <h3 className="font-display text-xl font-bold text-foreground mb-2">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed max-w-[260px] text-[0.95rem]">
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {step.description}
                 </p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
