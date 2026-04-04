@@ -57,6 +57,7 @@ export default function BuyerDashboard() {
     calculator: { title: "Mortgage Calculator", subtitle: "Estimate your monthly payments" },
     messages: { title: "Messages", subtitle: "Your conversations" },
     settings: { title: "Settings", subtitle: "Manage your account" },
+    requirements: { title: "Property Requirements", subtitle: "Tell us what you're looking for" },
   };
 
   const handleViewProperty = (propertyId: string) => {
