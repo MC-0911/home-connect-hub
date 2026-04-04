@@ -12,6 +12,7 @@ import { BuyerMessagesSection } from "@/components/buyer/BuyerMessagesSection";
 import { BuyerSettingsSection } from "@/components/buyer/BuyerSettingsSection";
 import { BuyerOffersSection } from "@/components/buyer/BuyerOffersSection";
 import { BuyerPropertyDetail } from "@/components/buyer/BuyerPropertyDetail";
+import { RequirementsFormWizard } from "@/components/property-requirements/RequirementsFormWizard";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings, Plus, Heart, Calculator, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
