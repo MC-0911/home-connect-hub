@@ -88,7 +88,7 @@ export function HowItWorks({ className }: { className?: string }) {
               }}
             >
               {/* Step number + illustration area */}
-              <div className="relative h-52 sm:h-56 flex items-center justify-center overflow-hidden">
+              <div className="relative h-64 sm:h-72 flex items-center justify-center overflow-hidden">
                 {/* Large step number */}
                 <span className="absolute top-4 left-5 text-6xl sm:text-7xl font-black text-foreground/15 leading-none select-none z-0">
                   {step.number}
