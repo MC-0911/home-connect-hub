@@ -101,7 +101,7 @@ export function HowItWorks({ className }: { className?: string }) {
                   loading="lazy"
                   width={512}
                   height={512}
-                  className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 object-contain drop-shadow-xl transition-[filter] duration-500 group-hover:drop-shadow-[0_10px_25px_hsl(var(--accent)/0.4)]"
+                  className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 object-contain drop-shadow-xl transition-[filter] duration-500 group-hover:drop-shadow-[0_10px_25px_hsl(var(--accent)/0.4)]"
                   initial={{ y: 0, rotate: 0 }}
                   whileHover={{ scale: 1.12, rotate: 3, y: -6 }}
                   transition={{ type: "spring", stiffness: 260, damping: 18 }}
