@@ -85,6 +85,7 @@ export default function BuyerDashboard() {
       case "offers": return <BuyerOffersSection />;
       case "compare": return <CompareSection />;
       case "calculator": return <MortgageCalculatorSection />;
+      case "requirements": return <div className="max-w-3xl mx-auto"><RequirementsFormWizard /></div>;
       case "messages": return <BuyerMessagesSection />;
       case "settings": return <BuyerSettingsSection />;
       default: return <DiscoverSection initialFilters={pendingFilters} onViewProperty={handleViewProperty} />;
