@@ -12,11 +12,12 @@ import { BuyerMessagesSection } from "@/components/buyer/BuyerMessagesSection";
 import { BuyerSettingsSection } from "@/components/buyer/BuyerSettingsSection";
 import { BuyerOffersSection } from "@/components/buyer/BuyerOffersSection";
 import { BuyerPropertyDetail } from "@/components/buyer/BuyerPropertyDetail";
+import { RequirementsFormWizard } from "@/components/property-requirements/RequirementsFormWizard";
 import { Input } from "@/components/ui/input";
 import { Search, MessageSquare, Settings, Plus, Heart, Calculator, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -56,6 +57,7 @@ export default function BuyerDashboard() {
     calculator: { title: "Mortgage Calculator", subtitle: "Estimate your monthly payments" },
     messages: { title: "Messages", subtitle: "Your conversations" },
     settings: { title: "Settings", subtitle: "Manage your account" },
+    requirements: { title: "Property Requirements", subtitle: "Tell us what you're looking for" },
   };
 
   const handleViewProperty = (propertyId: string) => {
@@ -83,6 +85,7 @@ export default function BuyerDashboard() {
       case "offers": return <BuyerOffersSection />;
       case "compare": return <CompareSection />;
       case "calculator": return <MortgageCalculatorSection />;
+      case "requirements": return <div className="max-w-3xl mx-auto"><RequirementsFormWizard /></div>;
       case "messages": return <BuyerMessagesSection />;
       case "settings": return <BuyerSettingsSection />;
       default: return <DiscoverSection initialFilters={pendingFilters} onViewProperty={handleViewProperty} />;
@@ -122,11 +125,12 @@ export default function BuyerDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
-                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
-                      <Link to="/property-requirements" className="flex items-center gap-3">
-                        <Plus className="w-4 h-4 text-accent" />
-                        <span className="font-medium">Submit Requirements</span>
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => handleSectionChange("requirements")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Plus className="w-4 h-4 text-accent" />
+                      <span className="font-medium">Submit Requirements</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setActiveSection("favorites")}
