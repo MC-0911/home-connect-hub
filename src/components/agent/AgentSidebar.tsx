@@ -198,7 +198,10 @@ export function AgentSidebar({ activeSection, onSectionChange, collapsed, onTogg
                 )}
               </AnimatePresence>
               {count > 0 && !collapsed && (
-                <span className="bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center">
+                <span className={cn(
+                  "bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center",
+                  item.id === "messages" && "animate-pulse"
+                )}>
                   {count}
                 </span>
               )}
