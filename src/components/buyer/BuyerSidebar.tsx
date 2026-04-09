@@ -203,12 +203,18 @@ export function BuyerSidebar({ activeSection, onSectionChange, collapsed, onTogg
                 )}
               </AnimatePresence>
               {count > 0 && !collapsed && (
-                <span className="bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center">
+                <span className={cn(
+                  "bg-destructive text-destructive-foreground text-[11px] font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center",
+                  item.id === "messages" && "animate-pulse"
+                )}>
                   {count}
                 </span>
               )}
               {count > 0 && collapsed && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center">
+                <span className={cn(
+                  "absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center",
+                  item.id === "messages" && "animate-pulse"
+                )}>
                   {count > 9 ? "9+" : count}
                 </span>
               )}
