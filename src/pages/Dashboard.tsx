@@ -7,6 +7,7 @@ import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
 import { AlertsTab } from "@/components/dashboard/AlertsTab";
 import { MyBookingsTab } from "@/components/dashboard/MyBookingsTab";
+import { SellerMessagesInline } from "@/components/dashboard/SellerMessagesInline";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -718,60 +719,7 @@ export default function Dashboard() {
               </TabsContent>
 
               <TabsContent value="messages" className="mt-0">
-                <div className="bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden">
-                  <div className="p-5 sm:p-6 border-b border-border/50 flex items-center justify-between">
-                    <h3 className="font-display text-lg font-semibold text-foreground">Messages</h3>
-                    <Button variant="outline" size="sm" asChild className="rounded-lg">
-                      <Link to="/messages">View All</Link>
-                    </Button>
-                  </div>
-                  <div className="p-5 sm:p-6">
-                    {conversations.length === 0 ? (
-                      <div className="text-center py-16">
-                        <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
-                          <MessageSquare className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-foreground mb-2">No messages</h3>
-                        <p className="text-muted-foreground text-sm">Messages from buyers will appear here</p>
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-border/50">
-                        {conversations.slice(0, 5).map(conv => {
-                          const initials = conv.other_user?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
-                          return (
-                            <Link key={conv.id} to="/messages" className="flex items-center gap-4 py-4 first:pt-0 last:pb-0 hover:bg-muted/30 -mx-2 px-2 rounded-lg transition-colors">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage src={conv.other_user?.avatar_url || undefined} />
-                                <AvatarFallback className="bg-accent/10 text-accent text-sm">
-                                  {initials}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <p className="font-medium text-foreground truncate text-sm">
-                                    {conv.other_user?.full_name || 'Unknown User'}
-                                  </p>
-                                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
-                                  </span>
-                                </div>
-                                {conv.property && <p className="text-xs text-accent truncate">Re: {conv.property.title}</p>}
-                                <p className="text-sm text-muted-foreground truncate">
-                                  {conv.last_message?.content || 'No messages yet'}
-                                </p>
-                              </div>
-                              {conv.unread_count && conv.unread_count > 0 && (
-                                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent text-accent-foreground px-1.5 text-[10px] font-semibold">
-                                  {conv.unread_count}
-                                </span>
-                              )}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <SellerMessagesInline />
               </TabsContent>
 
               <TabsContent value="alerts" className="mt-0">
