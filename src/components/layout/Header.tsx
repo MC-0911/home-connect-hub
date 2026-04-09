@@ -15,10 +15,6 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 const navLinks = [{
-  href: "/",
-  label: "Home",
-  icon: Home
-}, {
   href: "/properties",
   label: "Properties",
   icon: Search
