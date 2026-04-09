@@ -7,6 +7,7 @@ import { VisitsTab } from "@/components/dashboard/VisitsTab";
 import { OffersTab } from "@/components/dashboard/OffersTab";
 import { AlertsTab } from "@/components/dashboard/AlertsTab";
 import { MyBookingsTab } from "@/components/dashboard/MyBookingsTab";
+import { SellerMessagesInline } from "@/components/dashboard/SellerMessagesInline";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
