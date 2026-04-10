@@ -23,7 +23,6 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
-import { VerificationBanner } from "@/components/agent/VerificationBanner";
 import { Footer } from "@/components/layout/Footer";
 
 export default function AgentDashboard() {
@@ -162,11 +161,6 @@ export default function AgentDashboard() {
             </TooltipProvider>
           </div>
         </motion.header>
-
-        {/* Verification Banner */}
-        <div className="px-6 sm:px-8 pt-4">
-          <VerificationBanner />
-        </div>
 
         {/* Content */}
         <div className="p-8">
