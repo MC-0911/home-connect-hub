@@ -58,7 +58,8 @@ export default function AgentDashboard() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} />;
+      case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} onAddProperty={() => setActiveSection("add-listing")} />;
+      case "add-listing": return <ListingFormWizard />;
       case "offers": return <OffersSection onRefresh={refreshListings} />;
       case "leads": return <LeadsSection leads={leads} onRefresh={refreshLeads} />;
       case "tenants": return <TenantsSection />;
@@ -97,11 +98,12 @@ export default function AgentDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
-                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
-                      <Link to="/add-property" className="flex items-center gap-3">
-                        <Plus className="w-4 h-4 text-accent" />
-                        <span className="font-medium">Add Property</span>
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("add-listing")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Plus className="w-4 h-4 text-accent" />
+                      <span className="font-medium">Add Property</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setActiveSection("tenants")}
