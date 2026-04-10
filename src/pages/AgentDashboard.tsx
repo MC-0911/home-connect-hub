@@ -43,6 +43,7 @@ export default function AgentDashboard() {
   const sectionTitles: Record<string, { title: string; subtitle: string }> = {
     overview: { title: "Agent Dashboard", subtitle: format(new Date(), "EEEE, MMMM d, yyyy") },
     listings: { title: "My Listings", subtitle: "Manage your property listings" },
+    "add-listing": { title: "Add Property", subtitle: "Create a new property listing" },
     offers: { title: "Offers", subtitle: "Review and respond to property offers" },
     leads: { title: "Leads", subtitle: "Track and manage your leads" },
     tenants: { title: "Tenants", subtitle: "Manage tenants and leases" },
