@@ -13,6 +13,7 @@ import type { Tables } from "@/integrations/supabase/types";
 interface ListingsSectionProps {
   listings: Tables<"properties">[];
   onRefresh: () => void;
+  onAddProperty?: () => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -24,7 +25,7 @@ const statusColors: Record<string, string> = {
   declined: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
-export function ListingsSection({ listings, onRefresh }: ListingsSectionProps) {
+export function ListingsSection({ listings, onRefresh, onAddProperty }: ListingsSectionProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -84,7 +85,7 @@ export function ListingsSection({ listings, onRefresh }: ListingsSectionProps) {
           <Button variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
             {viewMode === "grid" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
           </Button>
-          <Button onClick={() => navigate("/add-property")} className="gap-2">
+          <Button onClick={() => onAddProperty ? onAddProperty() : navigate("/add-property")} className="gap-2">
             <Plus className="h-4 w-4" /> Add Property
           </Button>
         </div>
