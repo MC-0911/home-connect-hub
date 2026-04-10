@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Building2, Users, UsersRound, CalendarDays, MessageSquare,
-  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign, PlusCircle
+  FileText, BarChart3, Settings, LogOut, Home, Crown, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -13,7 +13,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "add-property", label: "Add Property", icon: PlusCircle },
   { id: "listings", label: "My Properties", icon: Building2 },
   { id: "offers", label: "Offers", icon: DollarSign },
   { id: "leads", label: "Clients", icon: Users },
