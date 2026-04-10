@@ -11,6 +11,7 @@ import { AnalyticsSection } from "@/components/agent/AnalyticsSection";
 import { SettingsSection } from "@/components/agent/SettingsSection";
 import { OffersSection } from "@/components/agent/OffersSection";
 import { TenantsSection } from "@/components/agent/TenantsSection";
+import ListingFormWizard from "@/components/listing/ListingFormWizard";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentRealtime } from "@/hooks/useAgentRealtime";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ export default function AgentDashboard() {
   const sectionTitles: Record<string, { title: string; subtitle: string }> = {
     overview: { title: "Agent Dashboard", subtitle: format(new Date(), "EEEE, MMMM d, yyyy") },
     listings: { title: "My Listings", subtitle: "Manage your property listings" },
+    "add-listing": { title: "Add Property", subtitle: "Create a new property listing" },
     offers: { title: "Offers", subtitle: "Review and respond to property offers" },
     leads: { title: "Leads", subtitle: "Track and manage your leads" },
     tenants: { title: "Tenants", subtitle: "Manage tenants and leases" },
@@ -56,7 +58,8 @@ export default function AgentDashboard() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} />;
+      case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} onAddProperty={() => setActiveSection("add-listing")} />;
+      case "add-listing": return <ListingFormWizard />;
       case "offers": return <OffersSection onRefresh={refreshListings} />;
       case "leads": return <LeadsSection leads={leads} onRefresh={refreshLeads} />;
       case "tenants": return <TenantsSection />;
@@ -95,11 +98,12 @@ export default function AgentDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
-                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
-                      <Link to="/add-property" className="flex items-center gap-3">
-                        <Plus className="w-4 h-4 text-accent" />
-                        <span className="font-medium">Add Property</span>
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("add-listing")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Plus className="w-4 h-4 text-accent" />
+                      <span className="font-medium">Add Property</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setActiveSection("tenants")}
