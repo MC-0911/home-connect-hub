@@ -74,7 +74,7 @@ export function Header() {
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to={user ? getDashboardPath() : "/"} className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center shadow-gold transition-transform group-hover:scale-105">
               <span className="font-display font-bold text-accent-foreground text-lg">R</span>
             </div>
