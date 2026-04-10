@@ -24,6 +24,7 @@ import BlogPost from "./pages/BlogPost";
 import Messages from "./pages/Messages";
 import ServiceDetail from "./pages/ServiceDetail";
 import AgentDashboard from "./pages/AgentDashboard";
+import AgentVerification from "./pages/AgentVerification";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
@@ -59,6 +60,11 @@ const App = () => <HelmetProvider>
               <Route path="/agent-dashboard" element={
                 <ProtectedDashboard allowedRoles={['agent']}>
                   <AgentDashboard />
+                </ProtectedDashboard>
+              } />
+              <Route path="/agent-verification" element={
+                <ProtectedDashboard allowedRoles={['agent']}>
+                  <AgentVerification />
                 </ProtectedDashboard>
               } />
               <Route path="/buyer-dashboard" element={
