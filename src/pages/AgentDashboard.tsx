@@ -50,7 +50,7 @@ export default function AgentDashboard() {
     messages: { title: "Messages", subtitle: "Your conversations" },
     documents: { title: "Documents", subtitle: "Manage your files and documents" },
     analytics: { title: "Analytics", subtitle: "Performance metrics and insights" },
-    settings: { title: "Settings", subtitle: "Manage your account preferences" },
+    "add-property": { title: "Add Property", subtitle: "Create a new property listing" },
   };
 
   const currentSection = sectionTitles[activeSection] || sectionTitles.overview;
@@ -66,6 +66,7 @@ export default function AgentDashboard() {
       case "documents": return <DocumentsSection />;
       case "analytics": return <AnalyticsSection stats={stats} />;
       case "settings": return <SettingsSection />;
+      case "add-property": return <ListingFormWizard />;
       default: return <OverviewSection stats={stats} recentActivity={recentActivity} onNavigate={setActiveSection} listings={listings} leads={leads} appointments={appointments} />;
     }
   };
@@ -96,11 +97,12 @@ export default function AgentDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
-                    <DropdownMenuItem asChild className="rounded-lg px-3 py-2.5 cursor-pointer">
-                      <Link to="/add-property" className="flex items-center gap-3">
-                        <Plus className="w-4 h-4 text-accent" />
-                        <span className="font-medium">Add Property</span>
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => setActiveSection("add-property")}
+                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                    >
+                      <Plus className="w-4 h-4 text-accent" />
+                      <span className="font-medium">Add Property</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setActiveSection("tenants")}
