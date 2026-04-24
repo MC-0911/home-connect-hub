@@ -86,7 +86,7 @@ export function RoleSwitcher({ variant, isHomePage, isScrolled, onMobileClose }:
     return (
       <div className="space-y-1">
         <span className="flex items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
-          My Dashboards
+          {isAdmin ? "Switch Account Type" : "My Dashboards"}
         </span>
         {availableRoles.map((opt) => {
           const Icon = opt.icon;
