@@ -149,36 +149,60 @@ export type Database = {
       agent_verifications: {
         Row: {
           admin_notes: string | null
+          agency_name: string | null
+          board_membership_url: string | null
           created_at: string
+          full_name: string | null
           id: string
+          license_expiry: string | null
           license_number: string
           license_photo_url: string
+          phone: string | null
+          rejection_reason: string | null
           state: string
           status: string
           updated_at: string
           user_id: string
+          verified_at: string | null
+          years_experience: string | null
         }
         Insert: {
           admin_notes?: string | null
+          agency_name?: string | null
+          board_membership_url?: string | null
           created_at?: string
+          full_name?: string | null
           id?: string
+          license_expiry?: string | null
           license_number: string
           license_photo_url: string
+          phone?: string | null
+          rejection_reason?: string | null
           state: string
           status?: string
           updated_at?: string
           user_id: string
+          verified_at?: string | null
+          years_experience?: string | null
         }
         Update: {
           admin_notes?: string | null
+          agency_name?: string | null
+          board_membership_url?: string | null
           created_at?: string
+          full_name?: string | null
           id?: string
+          license_expiry?: string | null
           license_number?: string
           license_photo_url?: string
+          phone?: string | null
+          rejection_reason?: string | null
           state?: string
           status?: string
           updated_at?: string
           user_id?: string
+          verified_at?: string | null
+          years_experience?: string | null
         }
         Relationships: []
       }

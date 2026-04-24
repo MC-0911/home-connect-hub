@@ -24,12 +24,16 @@ import { format } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertsDropdown } from "@/components/agent/AlertsDropdown";
 import { Footer } from "@/components/layout/Footer";
+import { UnverifiedBanner } from "@/components/verify-agent/UnverifiedBanner";
+import { useAgentVerification } from "@/hooks/useAgentVerification";
+import { ShieldAlert } from "lucide-react";
 
 export default function AgentDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isVerified, needsVerification } = useAgentVerification();
 
   const {
     listings, leads, appointments, documents, unreadMessages, unreadAlerts,
@@ -59,7 +63,17 @@ export default function AgentDashboard() {
   const renderSection = () => {
     switch (activeSection) {
       case "listings": return <ListingsSection listings={listings} onRefresh={refreshListings} onAddProperty={() => setActiveSection("add-listing")} />;
-      case "add-listing": return <ListingFormWizard />;
+      case "add-listing":
+        return needsVerification ? (
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-8 text-center">
+            <ShieldAlert className="mx-auto mb-3 h-10 w-10 text-amber-500" />
+            <h3 className="font-display text-xl font-semibold text-foreground">Verification Required</h3>
+            <p className="mt-2 text-muted-foreground">Get verified as a real estate agent to start listing properties.</p>
+            <Button className="mt-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:opacity-90" onClick={() => navigate("/verify-agent")}>
+              Start Verification
+            </Button>
+          </div>
+        ) : <ListingFormWizard />;
       case "offers": return <OffersSection onRefresh={refreshListings} />;
       case "leads": return <LeadsSection leads={leads} onRefresh={refreshLeads} />;
       case "tenants": return <TenantsSection />;
@@ -98,13 +112,23 @@ export default function AgentDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border border-border/50 p-1">
-                    <DropdownMenuItem
-                      onClick={() => setActiveSection("add-listing")}
-                      className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
-                    >
-                      <Plus className="w-4 h-4 text-accent" />
-                      <span className="font-medium">Add Property</span>
-                    </DropdownMenuItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <DropdownMenuItem
+                            onClick={() => !needsVerification && setActiveSection("add-listing")}
+                            disabled={needsVerification}
+                            className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
+                          >
+                            <Plus className="w-4 h-4 text-accent" />
+                            <span className="font-medium">Add Property</span>
+                          </DropdownMenuItem>
+                        </div>
+                      </TooltipTrigger>
+                      {needsVerification && (
+                        <TooltipContent>Get verified to list properties</TooltipContent>
+                      )}
+                    </Tooltip>
                     <DropdownMenuItem
                       onClick={() => setActiveSection("tenants")}
                       className="rounded-lg px-3 py-2.5 cursor-pointer flex items-center gap-3"
@@ -164,6 +188,7 @@ export default function AgentDashboard() {
 
         {/* Content */}
         <div className="p-8">
+          <UnverifiedBanner />
           <motion.div
             key={activeSection}
             initial={{ opacity: 0, y: 20 }}
