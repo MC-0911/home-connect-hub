@@ -114,6 +114,7 @@ export function RoleSwitcher({ variant, isHomePage, isScrolled, onMobileClose }:
 
   // Desktop dropdown
   const ActiveIcon = currentRole?.icon ?? LayoutDashboard;
+  const triggerLabel = isAdmin ? (currentRole?.label ?? "Switch Dashboard") : "My Dashboard";
 
   return (
     <DropdownMenu>
@@ -126,14 +127,19 @@ export function RoleSwitcher({ variant, isHomePage, isScrolled, onMobileClose }:
           )}
         >
           <ActiveIcon className="w-4 h-4" />
-          My Dashboard
+          {triggerLabel}
           <ChevronDown className="w-3 h-3 opacity-60" />
           {isDashboardActive && (
             <motion.div layoutId="activeNavDashboard" className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent rounded-full" />
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-52">
+      <DropdownMenuContent align="start" className="w-56">
+        {isAdmin && (
+          <div className="px-2 py-1.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/70 border-b border-border mb-1">
+            Switch Account Type
+          </div>
+        )}
         {availableRoles.map((opt) => {
           const Icon = opt.icon;
           const isActive = location.pathname === opt.path;
