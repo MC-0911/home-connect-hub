@@ -106,6 +106,10 @@ export default function Auth() {
             toast.success("Account created! Please check your email to verify your account.", {
               duration: 5000
             });
+            // Agents go through license verification next
+            if (accountType === "agent") {
+              navigate("/verify-agent");
+            }
           }
         }
       } else {
