@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedDashboard } from "@/components/auth/ProtectedDashboard";
-import { AccountTypeBanner } from "@/components/layout/AccountTypeBanner";
 import Index from "./pages/Index";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
@@ -36,7 +35,6 @@ const App = () => <HelmetProvider>
           <Sonner />
           <BrowserRouter>
             <PageViewTracker />
-            <AccountTypeBanner />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/properties" element={<Properties />} />
