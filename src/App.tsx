@@ -25,6 +25,7 @@ import Messages from "./pages/Messages";
 import ServiceDetail from "./pages/ServiceDetail";
 import AgentDashboard from "./pages/AgentDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
+import VerifyAgent from "./pages/VerifyAgent";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => <HelmetProvider>
@@ -66,6 +67,7 @@ const App = () => <HelmetProvider>
                   <BuyerDashboard />
                 </ProtectedDashboard>
               } />
+              <Route path="/verify-agent" element={<VerifyAgent />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
