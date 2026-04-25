@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import {
   ShieldCheck, AlertTriangle, Clock, CheckCircle2, XCircle, FileText,
-  Mail, Phone, MapPin, Hash, CalendarDays, ExternalLink, Loader2, RefreshCw,
+  Mail, Phone, MapPin, Hash, CalendarDays, Loader2, RefreshCw,
   FileQuestion, ZoomIn, ZoomOut, RotateCw, Maximize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
