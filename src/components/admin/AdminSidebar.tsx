@@ -28,6 +28,7 @@ const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard 
   { id: 'leads', label: 'Leads', icon: MessageSquare },
   { id: 'bookings', label: 'Bookings', icon: CalendarCheck },
   { id: 'blogs', label: 'Blogs', icon: FileText },
+  { id: 'verifications', label: 'Agent Verifications', icon: ShieldCheck },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
