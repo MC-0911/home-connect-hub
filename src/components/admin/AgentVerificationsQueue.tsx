@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import {
   ShieldCheck, AlertTriangle, Clock, CheckCircle2, XCircle, FileText,
-  Mail, Phone, MapPin, Hash, CalendarDays, ExternalLink, Loader2, RefreshCw,
-  FileQuestion,
+  Mail, Phone, MapPin, Hash, CalendarDays, Loader2, RefreshCw,
+  FileQuestion, ZoomIn, ZoomOut, RotateCw, Maximize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -322,7 +322,7 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
 
       {/* Detail dialog */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-accent" />
@@ -348,10 +348,12 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
                 <Field icon={Phone} label="Phone" value={selected.phone || "—"} stack />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <DocPreview label="License document" url={licenseUrl} path={selected.license_photo_url} />
-                <DocPreview label="Board membership card" url={boardUrl} path={selected.board_membership_url} />
-              </div>
+              <DocumentInspector
+                docs={[
+                  { label: "License document", url: licenseUrl, path: selected.license_photo_url },
+                  { label: "Board membership card", url: boardUrl, path: selected.board_membership_url },
+                ]}
+              />
 
               <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                 Current status: <StatusBadge status={selected.status} />
@@ -436,47 +438,212 @@ function Field({
   );
 }
 
-function DocPreview({ label, url, path }: { label: string; url: string | null; path: string | null }) {
-  if (!path) {
+interface DocItem {
+  label: string;
+  url: string | null;
+  path: string | null;
+}
+
+function DocumentInspector({ docs }: { docs: DocItem[] }) {
+  const available = docs.filter((d) => d.path);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+
+  // Reset transforms when switching docs
+  useEffect(() => {
+    setZoom(1);
+    setRotation(0);
+    setOffset({ x: 0, y: 0 });
+  }, [activeIdx]);
+
+  if (available.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4 text-center text-xs text-muted-foreground">
-        {label}: not provided
+      <div className="rounded-xl border border-dashed border-border bg-muted/20 p-6 text-center text-xs text-muted-foreground">
+        No documents uploaded.
       </div>
     );
   }
-  const isPdf = path.toLowerCase().endsWith(".pdf");
+
+  const active = available[Math.min(activeIdx, available.length - 1)];
+  const isPdf = !!active.path?.toLowerCase().endsWith(".pdf");
+
+  const onWheel = (e: React.WheelEvent) => {
+    if (isPdf) return;
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.15 : -0.15;
+    setZoom((z) => Math.min(5, Math.max(1, +(z + delta).toFixed(2))));
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (zoom <= 1 || isPdf) return;
+    setDragging(true);
+    dragStart.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!dragging || !dragStart.current) return;
+    setOffset({
+      x: dragStart.current.ox + (e.clientX - dragStart.current.x),
+      y: dragStart.current.oy + (e.clientY - dragStart.current.y),
+    });
+  };
+  const stopDrag = () => {
+    setDragging(false);
+    dragStart.current = null;
+  };
+
   return (
-    <div className="space-y-2 rounded-xl border border-border bg-muted/20 p-3">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-foreground">{label}</span>
-        {url && (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Documents ({available.length})
+        </span>
+        {active.url && (
           <a
-            href={url}
+            href={active.url}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
           >
-            Open <ExternalLink className="h-3 w-3" />
+            <Maximize2 className="h-3 w-3" /> Open full size
           </a>
         )}
       </div>
-      <div className="overflow-hidden rounded-lg bg-background">
-        {url ? (
-          isPdf ? (
-            <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">
-              <FileText className="mr-1.5 h-4 w-4" /> PDF document
+
+      <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
+        {/* Thumbnails */}
+        <div className="flex flex-row gap-2 sm:flex-col">
+          {available.map((doc, i) => {
+            const docIsPdf = doc.path?.toLowerCase().endsWith(".pdf");
+            const selected = i === activeIdx;
+            return (
+              <button
+                key={doc.path}
+                type="button"
+                onClick={() => setActiveIdx(i)}
+                className={`group relative aspect-square w-24 sm:w-full overflow-hidden rounded-lg border-2 bg-background transition-all ${
+                  selected ? "border-accent shadow-md" : "border-border hover:border-accent/50"
+                }`}
+              >
+                {doc.url ? (
+                  docIsPdf ? (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-muted/30 text-[10px] text-muted-foreground">
+                      <FileText className="h-6 w-6 text-accent" />
+                      PDF
+                    </div>
+                  ) : (
+                    <img src={doc.url} alt={doc.label} className="h-full w-full object-cover" />
+                  )
+                ) : (
+                  <Skeleton className="h-full w-full" />
+                )}
+                <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-background/95 to-transparent px-1.5 pb-1 pt-3 text-[10px] font-medium text-foreground">
+                  {doc.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Viewer */}
+        <div className="space-y-2">
+          <div
+            className="relative h-80 overflow-hidden rounded-xl border border-border bg-[radial-gradient(circle_at_center,hsl(var(--muted))_1px,transparent_1px)] [background-size:16px_16px]"
+            onWheel={onWheel}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={stopDrag}
+            onMouseLeave={stopDrag}
+            style={{ cursor: isPdf ? "default" : zoom > 1 ? (dragging ? "grabbing" : "grab") : "zoom-in" }}
+          >
+            {!active.url ? (
+              <Skeleton className="h-full w-full" />
+            ) : isPdf ? (
+              <iframe
+                src={active.url}
+                title={active.label}
+                className="h-full w-full bg-white"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <img
+                  src={active.url}
+                  alt={active.label}
+                  draggable={false}
+                  className="max-h-full max-w-full select-none transition-transform duration-150 ease-out"
+                  style={{
+                    transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom}) rotate(${rotation}deg)`,
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Floating zoom badge */}
+            {!isPdf && active.url && (
+              <div className="absolute left-3 top-3 rounded-md bg-background/80 px-2 py-1 text-[10px] font-medium text-foreground backdrop-blur">
+                {Math.round(zoom * 100)}%
+              </div>
+            )}
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 p-2">
+            <span className="px-1.5 text-xs font-medium text-foreground">{active.label}</span>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                disabled={isPdf || zoom <= 1}
+                onClick={() => setZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))}
+                title="Zoom out"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                disabled={isPdf || zoom >= 5}
+                onClick={() => setZoom((z) => Math.min(5, +(z + 0.25).toFixed(2)))}
+                title="Zoom in"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                disabled={isPdf}
+                onClick={() => setRotation((r) => (r + 90) % 360)}
+                title="Rotate 90°"
+              >
+                <RotateCw className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2 text-xs"
+                disabled={isPdf}
+                onClick={() => { setZoom(1); setRotation(0); setOffset({ x: 0, y: 0 }); }}
+              >
+                Reset
+              </Button>
             </div>
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt={label} className="h-32 w-full object-cover" />
-          )
-        ) : (
-          <Skeleton className="h-32 w-full" />
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
 
 function StatCard({
   label, value, icon: Icon, tone, onClick, active,
