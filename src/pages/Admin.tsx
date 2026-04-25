@@ -27,6 +27,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string; ic
   leads: { title: 'Lead Management', description: 'Track and export buyer leads', icon: Shield },
   bookings: { title: 'Service Bookings', description: 'Manage service booking requests', icon: Shield },
   blogs: { title: 'Blog Management', description: 'Create and manage blog posts', icon: Shield },
+  verifications: { title: 'Agent Verifications', description: 'Review pending and rejected agent license submissions', icon: Shield },
   settings: { title: 'Platform Settings', description: 'Manage property types and amenities', icon: Shield },
 };
 
