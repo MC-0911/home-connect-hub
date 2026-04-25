@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { requestManualReview, verifyLicense } from "@/lib/verification/verification-service";
@@ -58,8 +58,91 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record.id, status]);
 
+  const fileNameFromPath = (p?: string | null) => {
+    if (!p) return null;
+    return p.split("/").pop() ?? p;
+  };
+
+  const licensePhotoName = fileNameFromPath(record.license_photo_url);
+  const boardName = fileNameFromPath(record.board_membership_url);
+  const expiry = record.license_expiry
+    ? new Date(record.license_expiry).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
   return (
     <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl border border-border bg-muted/30 p-5"
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h4 className="text-sm font-semibold text-foreground">Submitted License Details</h4>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Preview</span>
+        </div>
+        <dl className="grid gap-3 sm:grid-cols-2">
+          <div className="flex items-start gap-2.5">
+            <Hash className="mt-0.5 h-4 w-4 text-accent" />
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">License Number</dt>
+              <dd className="truncate font-mono text-sm font-medium text-foreground">
+                {record.license_number || "—"}
+              </dd>
+            </div>
+          </div>
+          <div className="flex items-start gap-2.5">
+            <MapPin className="mt-0.5 h-4 w-4 text-accent" />
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">State / Province</dt>
+              <dd className="truncate text-sm font-medium text-foreground">
+                {record.state || "—"}
+              </dd>
+            </div>
+          </div>
+          {expiry && (
+            <div className="flex items-start gap-2.5">
+              <CalendarDays className="mt-0.5 h-4 w-4 text-accent" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">Expiration</dt>
+                <dd className="truncate text-sm font-medium text-foreground">{expiry}</dd>
+              </div>
+            </div>
+          )}
+          {record.agency_name && (
+            <div className="flex items-start gap-2.5">
+              <FileText className="mt-0.5 h-4 w-4 text-accent" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">Agency</dt>
+                <dd className="truncate text-sm font-medium text-foreground">{record.agency_name}</dd>
+              </div>
+            </div>
+          )}
+        </dl>
+        <div className="mt-4 space-y-2 border-t border-border/60 pt-3">
+          {licensePhotoName && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Paperclip className="h-3.5 w-3.5 text-emerald-500" />
+              <span className="font-medium text-foreground">License document:</span>
+              <span className="truncate">{licensePhotoName}</span>
+            </div>
+          )}
+          {boardName && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Paperclip className="h-3.5 w-3.5 text-emerald-500" />
+              <span className="font-medium text-foreground">Board membership card:</span>
+              <span className="truncate">{boardName}</span>
+            </div>
+          )}
+          {!licensePhotoName && !boardName && (
+            <p className="text-xs text-muted-foreground">No documents attached.</p>
+          )}
+        </div>
+      </motion.div>
+
       {(status === "verifying" || status === "pending") && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/5 p-5">
