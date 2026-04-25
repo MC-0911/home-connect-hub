@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, Users, Home, FileText, MessageSquare, 
   CalendarCheck, Settings, Crown, ChevronLeft, ChevronRight,
-  LogOut
+  LogOut, ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export type AdminSection = 
   | 'analytics' | 'users' | 'listings' | 'leads' 
-  | 'bookings' | 'blogs' | 'settings';
+  | 'bookings' | 'blogs' | 'verifications' | 'settings';
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
@@ -28,6 +28,7 @@ const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard 
   { id: 'leads', label: 'Leads', icon: MessageSquare },
   { id: 'bookings', label: 'Bookings', icon: CalendarCheck },
   { id: 'blogs', label: 'Blogs', icon: FileText },
+  { id: 'verifications', label: 'Agent Verifications', icon: ShieldCheck },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 

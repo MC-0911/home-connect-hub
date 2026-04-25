@@ -9,6 +9,7 @@ import { LeadsTable } from '@/components/admin/LeadsTable';
 import { ServiceBookingsTable } from '@/components/admin/ServiceBookingsTable';
 import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { AdminSidebar, type AdminSection } from '@/components/admin/AdminSidebar';
+import { AgentVerificationsQueue } from '@/components/admin/AgentVerificationsQueue';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, Crown, Search } from 'lucide-react';
@@ -26,6 +27,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string; ic
   leads: { title: 'Lead Management', description: 'Track and export buyer leads', icon: Shield },
   bookings: { title: 'Service Bookings', description: 'Manage service booking requests', icon: Shield },
   blogs: { title: 'Blog Management', description: 'Create and manage blog posts', icon: Shield },
+  verifications: { title: 'Agent Verifications', description: 'Review pending and rejected agent license submissions', icon: Shield },
   settings: { title: 'Platform Settings', description: 'Manage property types and amenities', icon: Shield },
 };
 
@@ -213,6 +215,14 @@ export default function Admin() {
                 <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
                   <div className="p-6">
                     <BlogsTable globalSearch={globalSearch} />
+                  </div>
+                </div>
+              )}
+
+              {activeSection === 'verifications' && (
+                <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+                  <div className="p-6">
+                    <AgentVerificationsQueue globalSearch={globalSearch} />
                   </div>
                 </div>
               )}
