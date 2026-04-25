@@ -9,6 +9,7 @@ import { LeadsTable } from '@/components/admin/LeadsTable';
 import { ServiceBookingsTable } from '@/components/admin/ServiceBookingsTable';
 import { PropertyTypesManager } from '@/components/admin/PropertyTypesManager';
 import { AdminSidebar, type AdminSection } from '@/components/admin/AdminSidebar';
+import { AgentVerificationsQueue } from '@/components/admin/AgentVerificationsQueue';
 import { useAdmin } from '@/hooks/useAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { Shield, Crown, Search } from 'lucide-react';
