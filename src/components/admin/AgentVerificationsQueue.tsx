@@ -348,10 +348,12 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
                 <Field icon={Phone} label="Phone" value={selected.phone || "—"} stack />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <DocPreview label="License document" url={licenseUrl} path={selected.license_photo_url} />
-                <DocPreview label="Board membership card" url={boardUrl} path={selected.board_membership_url} />
-              </div>
+              <DocumentInspector
+                docs={[
+                  { label: "License document", url: licenseUrl, path: selected.license_photo_url },
+                  { label: "Board membership card", url: boardUrl, path: selected.board_membership_url },
+                ]}
+              />
 
               <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                 Current status: <StatusBadge status={selected.status} />
