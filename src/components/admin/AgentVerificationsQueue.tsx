@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   ShieldCheck, AlertTriangle, Clock, CheckCircle2, XCircle, FileText,
   Mail, Phone, MapPin, Hash, CalendarDays, ExternalLink, Loader2, RefreshCw,
-  FileQuestion,
+  FileQuestion, ZoomIn, ZoomOut, RotateCw, Maximize2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
