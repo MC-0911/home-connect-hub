@@ -86,12 +86,13 @@ export function useAgentVerification() {
   const status: VerificationStatus = record
     ? (record.status as VerificationStatus)
     : "none";
-  const isVerified = status === "verified";
+  // Admins bypass verification entirely
+  const isVerified = isAdmin || status === "verified";
   const isPending =
-    status === "pending" || status === "verifying" || status === "manual_review";
-  const isRejected = status === "rejected";
+    !isAdmin && (status === "pending" || status === "verifying" || status === "manual_review");
+  const isRejected = !isAdmin && status === "rejected";
   const needsVerification =
-    isAgent && !isVerified && !roleLoading && !loading;
+    !isAdmin && isAgent && status !== "verified" && !roleLoading && !loading;
 
   return {
     record,
