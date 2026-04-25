@@ -143,6 +143,8 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
         </div>
       </motion.div>
 
+      <VerificationTimeline record={record} />
+
       {(status === "verifying" || status === "pending") && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/5 p-5">
