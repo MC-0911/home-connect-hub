@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip, FileUp, Search, BadgeCheck, XCircle, Radio, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { requestManualReview, verifyLicense } from "@/lib/verification/verification-service";
@@ -143,6 +143,8 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
         </div>
       </motion.div>
 
+      <VerificationTimeline record={record} />
+
       {(status === "verifying" || status === "pending") && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/5 p-5">
@@ -245,6 +247,155 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
           </div>
         </motion.div>
       )}
+    </div>
+  );
+}
+
+type StageState = "done" | "current" | "pending" | "failed";
+
+interface Stage {
+  key: string;
+  label: string;
+  description: string;
+  icon: typeof FileUp;
+  state: StageState;
+  timestamp?: string | null;
+}
+
+function VerificationTimeline({ record }: { record: VerificationRecord }) {
+  const status = record.status;
+  const isRejected = status === "rejected";
+  const isVerified = status === "verified";
+  const isManual = status === "manual_review";
+  const isReviewing = status === "verifying" || status === "pending" || isManual;
+
+  const submittedAt = record.created_at;
+  const updatedAt = record.updated_at;
+  const verifiedAt = record.verified_at;
+
+  const stages: Stage[] = [
+    {
+      key: "submitted",
+      label: "Submitted",
+      description: "Your application was received.",
+      icon: FileUp,
+      state: "done",
+      timestamp: submittedAt,
+    },
+    {
+      key: "review",
+      label: isManual ? "Manual Review" : "Under Review",
+      description: isManual
+        ? "Our team is double-checking your documents."
+        : "Cross-checking your license with the registry.",
+      icon: isManual ? UserCheck : Search,
+      state: isReviewing ? "current" : "done",
+      timestamp: isReviewing ? null : updatedAt,
+    },
+    {
+      key: "decision",
+      label: isVerified ? "Verified" : isRejected ? "Rejected" : "Decision",
+      description: isVerified
+        ? "You're cleared to list properties."
+        : isRejected
+          ? record.rejection_reason ?? "Your application could not be verified."
+          : "Final outcome will appear here.",
+      icon: isVerified ? BadgeCheck : isRejected ? XCircle : CheckCircle2,
+      state: isVerified ? "done" : isRejected ? "failed" : "pending",
+      timestamp: isVerified ? verifiedAt : isRejected ? updatedAt : null,
+    },
+  ];
+
+  const tone = (s: StageState) => {
+    switch (s) {
+      case "done":
+        return {
+          dot: "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white border-transparent shadow-md shadow-emerald-500/20",
+          line: "bg-emerald-500/60",
+          label: "text-foreground",
+        };
+      case "current":
+        return {
+          dot: "bg-gradient-to-br from-indigo-500 to-violet-600 text-white border-transparent shadow-md shadow-indigo-500/30 animate-pulse",
+          line: "bg-gradient-to-b from-emerald-500/60 to-border",
+          label: "text-foreground",
+        };
+      case "failed":
+        return {
+          dot: "bg-destructive text-destructive-foreground border-transparent shadow-md shadow-destructive/30",
+          line: "bg-destructive/40",
+          label: "text-destructive",
+        };
+      default:
+        return {
+          dot: "bg-muted text-muted-foreground border-border",
+          line: "bg-border",
+          label: "text-muted-foreground",
+        };
+    }
+  };
+
+  const fmt = (iso?: string | null) =>
+    iso
+      ? new Date(iso).toLocaleString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : null;
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/60 p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h4 className="text-sm font-semibold text-foreground">Verification Timeline</h4>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-600">
+          <Radio className="h-3 w-3 animate-pulse" /> Live
+        </span>
+      </div>
+
+      <ol className="relative space-y-5">
+        {stages.map((stage, i) => {
+          const t = tone(stage.state);
+          const Icon = stage.icon;
+          const isLast = i === stages.length - 1;
+          return (
+            <li key={stage.key} className="relative flex gap-4">
+              {/* Connector */}
+              {!isLast && (
+                <span
+                  className={`absolute left-[18px] top-9 -bottom-5 w-[2px] rounded-full ${t.line}`}
+                  aria-hidden
+                />
+              )}
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: i * 0.08, type: "spring", stiffness: 220, damping: 18 }}
+                className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 ${t.dot}`}
+              >
+                {stage.state === "current" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Icon className="h-4 w-4" />
+                )}
+              </motion.div>
+              <div className="flex-1 pt-1">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className={`text-sm font-semibold ${t.label}`}>{stage.label}</p>
+                  {stage.timestamp && (
+                    <span className="text-[11px] text-muted-foreground">{fmt(stage.timestamp)}</span>
+                  )}
+                  {stage.state === "current" && (
+                    <span className="text-[11px] font-medium text-indigo-500">In progress…</span>
+                  )}
+                </div>
+                <p className="mt-0.5 text-xs text-muted-foreground">{stage.description}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
