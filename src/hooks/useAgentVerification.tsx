@@ -37,6 +37,7 @@ export function useAgentVerification() {
   const [loading, setLoading] = useState(true);
 
   const isAgent = hasRole("agent");
+  const isAdmin = hasRole("admin");
 
   const checkStatus = useCallback(async () => {
     if (!user) {
