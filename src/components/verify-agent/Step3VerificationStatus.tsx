@@ -594,3 +594,222 @@ function ReviewDetailsSection({ record }: { record: VerificationRecord }) {
     </Collapsible>
   );
 }
+
+// ── Rejection-reason → tailored checklist ─────────────────────────────────────
+
+type FixCategory =
+  | "license_number"
+  | "state_mismatch"
+  | "expired"
+  | "name_mismatch"
+  | "agency"
+  | "photo_quality"
+  | "photo_missing"
+  | "photo_tampered"
+  | "document_unreadable"
+  | "board_membership"
+  | "not_found"
+  | "duplicate";
+
+interface FixItem {
+  id: FixCategory;
+  icon: typeof Hash;
+  title: string;
+  detail: string;
+  priority: number;
+}
+
+const FIX_LIBRARY: Record<FixCategory, Omit<FixItem, "id">> = {
+  license_number: {
+    icon: Hash,
+    title: "Re-enter your license number",
+    detail:
+      "Check for typos, extra spaces, or missing prefixes — it must match the state registry character-for-character.",
+    priority: 1,
+  },
+  state_mismatch: {
+    icon: MapPin,
+    title: "Verify the issuing state / province",
+    detail:
+      "Make sure the state you selected is the one that issued the license shown on your document.",
+    priority: 1,
+  },
+  expired: {
+    icon: CalendarDays,
+    title: "Renew or update your license expiration",
+    detail:
+      "Your license appears expired. Upload your renewed license and update the expiration date to a future date.",
+    priority: 0,
+  },
+  name_mismatch: {
+    icon: User,
+    title: "Match your full legal name",
+    detail:
+      "The name on your profile must exactly match the name printed on the license document.",
+    priority: 1,
+  },
+  agency: {
+    icon: Building2,
+    title: "Update your agency / brokerage details",
+    detail:
+      "Provide the registered brokerage name as it appears on your license records.",
+    priority: 2,
+  },
+  photo_quality: {
+    icon: Camera,
+    title: "Re-upload a higher-quality photo",
+    detail:
+      "Take the photo in good lighting with all four corners visible. Avoid glare, blur, and shadows.",
+    priority: 1,
+  },
+  photo_missing: {
+    icon: ImageIcon,
+    title: "Upload your license photo",
+    detail:
+      "We didn't receive a valid license image. Please attach a clear scan or photo of the front of your license.",
+    priority: 0,
+  },
+  photo_tampered: {
+    icon: ShieldAlert,
+    title: "Submit an unedited original",
+    detail:
+      "The image looks edited. Please upload a clean, unmodified photo or scan straight from the source.",
+    priority: 0,
+  },
+  document_unreadable: {
+    icon: ScanLine,
+    title: "Make sure the document is readable",
+    detail:
+      "License number, expiration date, and your name must all be clearly legible without cropping.",
+    priority: 1,
+  },
+  board_membership: {
+    icon: Paperclip,
+    title: "Re-upload your board membership card",
+    detail:
+      "Attach a current, legible copy of your real estate board / association membership card.",
+    priority: 2,
+  },
+  not_found: {
+    icon: Search,
+    title: "Confirm your license is active",
+    detail:
+      "We couldn't find a matching record in the registry. Double-check the number and state, or request a manual review.",
+    priority: 1,
+  },
+  duplicate: {
+    icon: Info,
+    title: "License already linked to another account",
+    detail:
+      "This license appears to be in use elsewhere. Contact support if this is an error.",
+    priority: 2,
+  },
+};
+
+function parseRejectionReason(reason: string | null | undefined): FixCategory[] {
+  if (!reason) return [];
+  const r = reason.toLowerCase();
+  const hits: FixCategory[] = [];
+  const add = (c: FixCategory) => {
+    if (!hits.includes(c)) hits.push(c);
+  };
+
+  if (/\bexpir(e|ed|ation|y)\b|\bout of date\b|\blapsed\b/.test(r)) add("expired");
+  if (/\bnot found\b|\bno match\b|\bcouldn'?t (be )?(find|verify)\b|\bnot in (the )?(state )?registry\b|\bregistry\b.*\b(no|not)\b/.test(r))
+    add("not_found");
+  if (/\blicense (number|no\.?|#)\b|\binvalid (license )?number\b|\bwrong number\b|\btypo\b/.test(r))
+    add("license_number");
+  if (/\bstate\b|\bjurisdiction\b|\bprovince\b|\bissuing (state|authority)\b/.test(r))
+    add("state_mismatch");
+  if (/\bname (does ?n[o']?t match|mismatch)\b|\bfull name\b|\blegal name\b/.test(r))
+    add("name_mismatch");
+  if (/\bagency\b|\bbrokerage\b|\bbroker\b|\bfirm\b/.test(r)) add("agency");
+  if (/\b(blurry|blurred|low.?quality|low.?res|unclear|dark|glare|cropped|cut.?off|cut off)\b/.test(r))
+    add("photo_quality");
+  if (/\b(missing|no) (photo|image|document|upload)\b|\bnot (uploaded|provided)\b|\bno file\b/.test(r))
+    add("photo_missing");
+  if (/\b(edited|tampered|altered|photoshopped|modified|fake|forged)\b/.test(r))
+    add("photo_tampered");
+  if (/\b(unreadable|illegible|can'?t read|cannot read)\b/.test(r))
+    add("document_unreadable");
+  if (/\bboard\b|\bmembership\b|\bassociation\b/.test(r)) add("board_membership");
+  if (/\bduplicate\b|\balready (in use|linked|registered)\b|\banother account\b/.test(r))
+    add("duplicate");
+
+  return hits;
+}
+
+const DEFAULT_FIXES: FixCategory[] = [
+  "license_number",
+  "photo_quality",
+  "expired",
+];
+
+function TailoredFixChecklist({ reason }: { reason: string | null | undefined }) {
+  const detected = parseRejectionReason(reason);
+  const isTailored = detected.length > 0;
+  const categories = (isTailored ? detected : DEFAULT_FIXES)
+    .slice()
+    .sort((a, b) => FIX_LIBRARY[a].priority - FIX_LIBRARY[b].priority);
+
+  return (
+    <div className="mt-4 rounded-xl border border-border/60 bg-background/70 p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          What to fix before retrying
+        </p>
+        <span
+          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+            isTailored
+              ? "border-destructive/30 bg-destructive/10 text-destructive"
+              : "border-border bg-muted text-muted-foreground"
+          }`}
+        >
+          {isTailored ? (
+            <>
+              <ShieldAlert className="h-3 w-3" />
+              Tailored to your rejection
+            </>
+          ) : (
+            <>
+              <Info className="h-3 w-3" />
+              General checklist
+            </>
+          )}
+        </span>
+      </div>
+
+      <ul className="space-y-2.5">
+        {categories.map((id, i) => {
+          const item = FIX_LIBRARY[id];
+          const Icon = item.icon;
+          return (
+            <motion.li
+              key={id}
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="flex items-start gap-3 rounded-lg border border-border/40 bg-card/60 p-3"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <Icon className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {item.detail}
+                </p>
+              </div>
+            </motion.li>
+          );
+        })}
+      </ul>
+
+      {!isTailored && reason && (
+        <p className="mt-3 text-[11px] italic text-muted-foreground">
+          We couldn't auto-categorize the rejection note — showing general guidance instead.
+        </p>
+      )}
+    </div>
+  );
+}
