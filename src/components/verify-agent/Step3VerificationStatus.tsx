@@ -199,21 +199,6 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
               <p className="text-sm text-muted-foreground">This usually takes under a minute.</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-slate-950 p-5 font-mono text-xs text-emerald-300">
-            <AnimatePresence>
-              {logs.map((l, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="leading-relaxed"
-                >
-                  {l}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            <span className="inline-block h-3 w-2 animate-pulse bg-emerald-400" />
-          </div>
         </motion.div>
       )}
 
