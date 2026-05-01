@@ -229,22 +229,68 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
       )}
 
       {status === "rejected" && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6"
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-2xl border border-destructive/40 bg-gradient-to-br from-destructive/10 via-rose-500/5 to-orange-500/5 p-6"
         >
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground">Verification Failed</h3>
+              <h3 className="font-display text-lg font-bold text-foreground">Verification Failed</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 {record.rejection_reason ?? "We couldn't verify your license automatically."}
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button onClick={onRetry} variant="outline">
-                  <RefreshCw className="mr-1.5 h-4 w-4" /> Update & Retry
-                </Button>
+
+              {/* What to fix */}
+              <div className="mt-4 rounded-xl border border-border/60 bg-background/70 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  What to fix before retrying
+                </p>
+                <ul className="space-y-1.5 text-sm text-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
+                    Double-check your license number and state match the official registry exactly.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
+                    Re-upload a clear, unedited photo of your license (all four corners visible, readable text).
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
+                    Confirm the expiration date is in the future and matches the document.
+                  </li>
+                </ul>
+              </div>
+
+              {/* Prominent Retry CTA */}
+              <motion.div
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 200, damping: 18 }}
+                className="mt-5"
+              >
                 <Button
-                  variant="default"
+                  size="lg"
+                  onClick={onRetry}
+                  className="group w-full bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white shadow-lg shadow-rose-500/30 hover:opacity-95 sm:w-auto"
+                >
+                  <RefreshCw className="mr-2 h-5 w-5 transition-transform group-hover:rotate-180" />
+                  Retry Verification
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Update your details and resubmit — most retries succeed on the second attempt.
+                </p>
+              </motion.div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border/60 pt-4">
+                <span className="text-xs text-muted-foreground">Still stuck?</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={async () => {
                     try {
                       await requestManualReview(record.id);
