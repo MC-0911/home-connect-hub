@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip, FileUp, Search, BadgeCheck, XCircle, Radio, UserCheck, ArrowRight, ChevronDown, ClipboardList, StickyNote, Clock } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip, FileUp, Search, BadgeCheck, XCircle, Radio, UserCheck, ArrowRight, ChevronDown, ClipboardList, StickyNote, Clock, Camera, ShieldAlert, Image as ImageIcon, Info, ScanLine, Building2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
