@@ -244,26 +244,8 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
                 {record.rejection_reason ?? "We couldn't verify your license automatically."}
               </p>
 
-              {/* What to fix */}
-              <div className="mt-4 rounded-xl border border-border/60 bg-background/70 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  What to fix before retrying
-                </p>
-                <ul className="space-y-1.5 text-sm text-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
-                    Double-check your license number and state match the official registry exactly.
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
-                    Re-upload a clear, unedited photo of your license (all four corners visible, readable text).
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-destructive" />
-                    Confirm the expiration date is in the future and matches the document.
-                  </li>
-                </ul>
-              </div>
+              {/* What to fix — tailored to the rejection reason */}
+              <TailoredFixChecklist reason={record.rejection_reason} />
 
               {/* Prominent Retry CTA */}
               <motion.div
