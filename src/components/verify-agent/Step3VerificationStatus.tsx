@@ -146,6 +146,8 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
 
       <VerificationTimeline record={record} />
 
+      <ReviewDetailsSection record={record} />
+
       <AnimatePresence>
         {(status === "verified" || status === "rejected") && (
           <motion.div
