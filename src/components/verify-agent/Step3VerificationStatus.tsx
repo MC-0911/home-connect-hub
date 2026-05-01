@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip, FileUp, Search, BadgeCheck, XCircle, Radio, UserCheck, ArrowRight } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2, RefreshCw, MailQuestion, FileText, MapPin, Hash, CalendarDays, Paperclip, FileUp, Search, BadgeCheck, XCircle, Radio, UserCheck, ArrowRight, ChevronDown, ClipboardList, StickyNote, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
 import { requestManualReview, verifyLicense } from "@/lib/verification/verification-service";
 import { toast } from "sonner";
@@ -144,6 +145,8 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
       </motion.div>
 
       <VerificationTimeline record={record} />
+
+      <ReviewDetailsSection record={record} />
 
       <AnimatePresence>
         {(status === "verified" || status === "rejected") && (
@@ -424,5 +427,142 @@ function VerificationTimeline({ record }: { record: VerificationRecord }) {
         })}
       </ol>
     </div>
+  );
+}
+
+function ReviewDetailsSection({ record }: { record: VerificationRecord }) {
+  const status = record.status;
+  const reasons = (record.rejection_reason ?? "")
+    .split(/\r?\n|•|;|\u2022/)
+    .map((r) => r.trim())
+    .filter(Boolean);
+
+  const hasReasons = reasons.length > 0;
+  const hasNotes = !!record.admin_notes?.trim();
+  const isTerminalReview =
+    status === "rejected" || status === "manual_review" || status === "verified";
+
+  // Only show when there's something meaningful to reveal
+  if (!hasReasons && !hasNotes && status !== "rejected") return null;
+
+  const tone =
+    status === "rejected"
+      ? {
+          border: "border-destructive/40",
+          bg: "bg-destructive/5",
+          icon: "text-destructive",
+          chip: "bg-destructive/10 text-destructive border-destructive/30",
+          title: "Review details",
+          subtitle: hasReasons
+            ? `${reasons.length} issue${reasons.length > 1 ? "s" : ""} flagged by reviewer`
+            : "Reviewer feedback available",
+        }
+      : status === "manual_review"
+        ? {
+            border: "border-amber-500/40",
+            bg: "bg-amber-500/5",
+            icon: "text-amber-500",
+            chip: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+            title: "Review details",
+            subtitle: "Notes from our review team",
+          }
+        : {
+            border: "border-emerald-500/30",
+            bg: "bg-emerald-500/5",
+            icon: "text-emerald-600",
+            chip: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+            title: "Review details",
+            subtitle: "Reviewer notes from your verification",
+          };
+
+  const updatedAt = record.updated_at
+    ? new Date(record.updated_at).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : null;
+
+  return (
+    <Collapsible defaultOpen={status === "rejected"}>
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`overflow-hidden rounded-2xl border ${tone.border} ${tone.bg}`}
+      >
+        <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-foreground/[0.02]">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${tone.chip}`}
+            >
+              <ClipboardList className={`h-4 w-4 ${tone.icon}`} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">{tone.title}</p>
+              <p className="truncate text-xs text-muted-foreground">{tone.subtitle}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {isTerminalReview && updatedAt && (
+              <span className="hidden items-center gap-1 text-[11px] text-muted-foreground sm:inline-flex">
+                <Clock className="h-3 w-3" />
+                {updatedAt}
+              </span>
+            )}
+            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </div>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <div className="space-y-4 border-t border-border/60 px-4 pb-4 pt-4">
+            {hasReasons && (
+              <div>
+                <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <AlertTriangle className={`h-3.5 w-3.5 ${tone.icon}`} />
+                  Rejection reason{reasons.length > 1 ? "s" : ""}
+                </div>
+                <ul className="space-y-2">
+                  {reasons.map((reason, i) => (
+                    <motion.li
+                      key={i}
+                      initial={{ opacity: 0, x: -6 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-background/60 p-3"
+                    >
+                      <span
+                        className={`mt-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold ${tone.chip}`}
+                      >
+                        {i + 1}
+                      </span>
+                      <p className="text-sm leading-relaxed text-foreground">{reason}</p>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {hasNotes && (
+              <div>
+                <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <StickyNote className="h-3.5 w-3.5 text-accent" />
+                  Reviewer notes
+                </div>
+                <p className="whitespace-pre-wrap rounded-xl border border-border/60 bg-background/60 p-3 text-sm leading-relaxed text-foreground">
+                  {record.admin_notes}
+                </p>
+              </div>
+            )}
+
+            {!hasReasons && !hasNotes && status === "rejected" && (
+              <p className="text-sm text-muted-foreground">
+                No specific reason was provided. Please request a manual review for more information.
+              </p>
+            )}
+          </div>
+        </CollapsibleContent>
+      </motion.div>
+    </Collapsible>
   );
 }
