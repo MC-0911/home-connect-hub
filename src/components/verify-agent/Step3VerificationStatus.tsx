@@ -145,6 +145,48 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
 
       <VerificationTimeline record={record} />
 
+      <AnimatePresence>
+        {(status === "verified" || status === "rejected") && (
+          <motion.div
+            key={`continue-${status}`}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ delay: 0.4, type: "spring", stiffness: 180, damping: 20 }}
+            className={`flex items-center justify-between gap-4 rounded-2xl border p-4 ${
+              status === "verified"
+                ? "border-emerald-500/40 bg-emerald-500/5"
+                : "border-destructive/40 bg-destructive/5"
+            }`}
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">
+                {status === "verified" ? "All set — your account is ready" : "Let's get this sorted"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {status === "verified"
+                  ? "Continue to your agent dashboard to start listing properties."
+                  : "Continue to update your details and try verification again."}
+              </p>
+            </div>
+            <Button
+              size="lg"
+              onClick={() =>
+                status === "verified" ? navigate("/agent-dashboard") : onRetry()
+              }
+              className={
+                status === "verified"
+                  ? "bg-gradient-to-r from-emerald-500 to-indigo-600 text-white hover:opacity-90"
+                  : "bg-gradient-to-r from-rose-500 to-orange-500 text-white hover:opacity-90"
+              }
+            >
+              Continue to next step
+              <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {(status === "verifying" || status === "pending") && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="flex items-center gap-3 rounded-2xl border border-accent/30 bg-accent/5 p-5">
