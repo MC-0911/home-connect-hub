@@ -60,7 +60,7 @@ const PromotionalProperties = () => {
 
   return (
     <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
+      <div className="w-full px-4 md:px-8">
         <OffersCarousel
           offerIcon={<Gift className="w-5 h-5 text-primary" />}
           offerTitle="Flat 25% off on hotels"
