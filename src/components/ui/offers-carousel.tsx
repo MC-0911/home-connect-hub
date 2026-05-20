@@ -1,146 +1,169 @@
-import { useRef, type ReactNode } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Star, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import * as React from "react";
+import { motion, useAnimation } from "framer-motion";
+import { ChevronLeft, ChevronRight, Star, Gift } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export interface CarouselItem {
   id: number | string;
   imageUrl: string;
   title: string;
-  subtitle?: string;
-  rating?: number;
+  subtitle: string;
+  rating: number;
   price: number;
   originalPrice?: number;
   discountPercentage?: number;
 }
 
-interface OffersCarouselProps {
-  offerIcon?: ReactNode;
+export interface OffersCarouselProps {
+  offerIcon?: React.ReactNode;
   offerTitle: string;
-  offerSubtitle?: string;
-  ctaText?: string;
-  onCtaClick?: () => void;
+  offerSubtitle: string;
+  ctaText: string;
+  onCtaClick: () => void;
   items: CarouselItem[];
   className?: string;
 }
 
-export function OffersCarousel({
-  offerIcon,
-  offerTitle,
-  offerSubtitle,
-  ctaText,
-  onCtaClick,
-  items,
-  className,
-}: OffersCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const scroll = (dir: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const amount = scrollRef.current.clientWidth * 0.8;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
-  };
-
-  return (
-    <div className={cn("w-full", className)}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-        <div className="flex items-start gap-3">
-          {offerIcon && (
-            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              {offerIcon}
-            </div>
+const ItemCard = ({ item }: { item: CarouselItem }) => (
+  <motion.div
+    className="group w-64 flex-shrink-0"
+    whileHover={{ y: -5 }}
+    transition={{ type: "spring", stiffness: 300 }}
+  >
+    <div className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="relative">
+        <img
+          src={item.imageUrl}
+          alt={item.title}
+          width={256}
+          height={160}
+          className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        {item.discountPercentage && (
+          <div className="absolute bottom-2 right-2 rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">
+            {item.discountPercentage}% OFF
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <div className="flex items-start justify-between">
+          <h3 className="text-base font-semibold leading-tight">{item.title}</h3>
+          <div className="ml-2 flex flex-shrink-0 items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            <span>{item.rating.toFixed(1)}</span>
+          </div>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">{item.subtitle}</p>
+        <div className="mt-3 flex items-end gap-2">
+          <p className="text-lg font-bold">${item.price.toLocaleString()}</p>
+          {item.originalPrice && (
+            <p className="text-sm text-muted-foreground line-through">
+              ${item.originalPrice.toLocaleString()}
+            </p>
           )}
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
-              {offerTitle}
-            </h2>
-            {offerSubtitle && (
-              <p className="text-sm text-muted-foreground mt-1">{offerSubtitle}</p>
+        </div>
+        <p className="text-xs text-muted-foreground">/ night</p>
+      </div>
+    </div>
+  </motion.div>
+);
+
+export const OffersCarousel = React.forwardRef<HTMLDivElement, OffersCarouselProps>(
+  ({ offerIcon, offerTitle, offerSubtitle, ctaText, onCtaClick, items, className }, ref) => {
+    const carouselRef = React.useRef<HTMLDivElement>(null);
+    const controls = useAnimation();
+    const [isAtStart, setIsAtStart] = React.useState(true);
+    const [isAtEnd, setIsAtEnd] = React.useState(false);
+
+    const scroll = (direction: "left" | "right") => {
+      if (carouselRef.current) {
+        const scrollAmount = carouselRef.current.clientWidth * 0.8;
+        const newScrollLeft =
+          carouselRef.current.scrollLeft + (direction === "right" ? scrollAmount : -scrollAmount);
+        controls.start({
+          x: -newScrollLeft,
+          transition: { type: "spring", stiffness: 300, damping: 30 },
+        });
+        carouselRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" });
+      }
+    };
+
+    const checkScrollPosition = React.useCallback(() => {
+      if (carouselRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+        setIsAtStart(scrollLeft < 10);
+        setIsAtEnd(scrollWidth - scrollLeft - clientWidth < 10);
+      }
+    }, []);
+
+    React.useEffect(() => {
+      const currentCarousel = carouselRef.current;
+      if (currentCarousel) {
+        currentCarousel.addEventListener("scroll", checkScrollPosition);
+        checkScrollPosition();
+      }
+      return () => {
+        if (currentCarousel) {
+          currentCarousel.removeEventListener("scroll", checkScrollPosition);
+        }
+      };
+    }, [checkScrollPosition, items]);
+
+    return (
+      <div
+        ref={ref}
+        className={cn("w-full max-w-6xl mx-auto rounded-2xl border bg-card p-4 shadow-sm md:p-6", className)}
+      >
+        <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
+          <div className="flex flex-col items-center text-center lg:col-span-3 lg:items-start lg:text-left">
+            <div className="flex items-center gap-3">
+              {offerIcon || <Gift className="h-6 w-6 text-primary" />}
+              <p className="text-sm text-muted-foreground">Exclusive member perk!</p>
+            </div>
+            <h2 className="mt-4 text-2xl font-bold text-primary">{offerTitle}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{offerSubtitle}</p>
+            <Button variant="outline" className="mt-6 w-full max-w-xs lg:w-auto" onClick={onCtaClick}>
+              {ctaText}
+            </Button>
+          </div>
+
+          <div className="relative lg:col-span-9">
+            <div ref={carouselRef} className="overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+              <motion.div className="flex gap-4 px-1 py-2" animate={controls}>
+                {items.map((item) => (
+                  <ItemCard key={item.id} item={item} />
+                ))}
+              </motion.div>
+            </div>
+
+            {!isAtStart && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full h-9 w-9 shadow-md z-10 hidden md:flex"
+                onClick={() => scroll("left")}
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            )}
+            {!isAtEnd && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 rounded-full h-9 w-9 shadow-md z-10 hidden md:flex"
+                onClick={() => scroll("right")}
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {ctaText && onCtaClick && (
-            <Button variant="ghost" onClick={onCtaClick} className="text-accent hover:text-accent">
-              {ctaText}
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          )}
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => scroll("left")}
-              className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-accent hover:border-accent/40 transition"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-accent hover:border-accent/40 transition"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
       </div>
-
-      {/* Carousel */}
-      <div
-        ref={scrollRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-1 px-1"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {items.map((item, i) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.05 }}
-            className="snap-start shrink-0 w-[260px] sm:w-[280px] group cursor-pointer"
-          >
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-border/60 bg-card shadow-sm hover:shadow-xl transition-all duration-300">
-              <img
-                src={item.imageUrl}
-                alt={item.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-              {item.discountPercentage !== undefined && (
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-accent text-accent-foreground text-xs font-bold shadow-md">
-                  {item.discountPercentage}% OFF
-                </div>
-              )}
-
-              {item.rating !== undefined && (
-                <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-card/95 backdrop-blur text-xs font-semibold text-foreground">
-                  <Star className="w-3 h-3 fill-accent text-accent" />
-                  {item.rating}
-                </div>
-              )}
-
-              <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                <h3 className="font-semibold text-base leading-tight truncate">{item.title}</h3>
-                {item.subtitle && (
-                  <p className="text-xs text-white/80 mt-0.5 truncate">{item.subtitle}</p>
-                )}
-                <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-lg font-bold">${item.price.toLocaleString()}</span>
-                  {item.originalPrice && (
-                    <span className="text-xs line-through text-white/60">
-                      ${item.originalPrice.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  );
-}
+    );
+  }
+);
+OffersCarousel.displayName = "OffersCarousel";
