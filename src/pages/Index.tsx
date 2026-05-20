@@ -5,6 +5,7 @@ import { FeaturedProperties } from "@/components/home/FeaturedProperties";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PropertyTypes } from "@/components/home/PropertyTypes";
 import { MapExplore } from "@/components/home/MapExplore";
+import PromotionalProperties from "@/components/home/PromotionalProperties";
 import { UserTypeCards } from "@/components/home/UserTypeCards";
 import { ServicesSection } from "@/components/home/ServicesSection";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
@@ -21,6 +22,7 @@ const Index = () => {
         <FeaturedProperties className="bg-primary-foreground" />
         <HowItWorks className="bg-background" />
         <PropertyTypes />
+        <PromotionalProperties />
         <MapExplore className="bg-secondary-foreground" />
         <UserTypeCards className="bg-background" />
         <ServicesSection className="bg-background" />
