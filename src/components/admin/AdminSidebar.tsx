@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export type AdminSection = 
   | 'analytics' | 'users' | 'listings' | 'leads' 
-  | 'bookings' | 'blogs' | 'verifications' | 'settings';
+  | 'bookings' | 'blogs' | 'verifications' | 'promotions' | 'settings';
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
