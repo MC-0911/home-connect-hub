@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Star, Gift } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { trackPromoEvent } from "@/lib/promoAnalytics";
 
 export interface CarouselItem {
   id: number | string;
