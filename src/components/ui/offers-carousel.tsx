@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Star, Gift } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { trackPromoEvent } from "@/lib/promoAnalytics";
 
 export interface CarouselItem {
   id: number | string;
@@ -27,8 +28,30 @@ export interface OffersCarouselProps {
   autoScrollIntervalMs?: number;
 }
 
-const ItemCard = ({ item }: { item: CarouselItem }) => (
+const ItemCard = ({ item }: { item: CarouselItem }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            trackPromoEvent("impression", String(item.id));
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: [0.5] }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [item.id]);
+
+  return (
   <motion.div
+    ref={ref}
     className="group flex-shrink-0 w-full"
     whileHover={{ y: -5 }}
     transition={{ type: "spring", stiffness: 300 }}
@@ -67,7 +90,8 @@ const ItemCard = ({ item }: { item: CarouselItem }) => (
       </div>
     </div>
   </motion.div>
-);
+  );
+};
 
 export const OffersCarousel = React.forwardRef<HTMLDivElement, OffersCarouselProps>(
   (
@@ -146,7 +170,7 @@ export const OffersCarousel = React.forwardRef<HTMLDivElement, OffersCarouselPro
             </div>
             <h2 className="mt-4 text-2xl font-bold text-primary">{offerTitle}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{offerSubtitle}</p>
-            <Button variant="outline" className="mt-6 w-full max-w-xs lg:w-auto" onClick={onCtaClick}>
+            <Button variant="outline" className="mt-6 w-full max-w-xs lg:w-auto" onClick={() => { trackPromoEvent("cta_click"); onCtaClick(); }}>
               {ctaText}
             </Button>
           </div>
