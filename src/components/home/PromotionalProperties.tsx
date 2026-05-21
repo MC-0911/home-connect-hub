@@ -1,62 +1,48 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Gift } from "lucide-react";
 import { OffersCarousel, type CarouselItem } from "@/components/ui/offers-carousel";
-
-const promotionalProperties: CarouselItem[] = [
-  {
-    id: 1,
-    imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&q=80",
-    title: "Ramada by Wyndham",
-    subtitle: "5 star hotel in Katibagiya",
-    rating: 4.7,
-    price: 3671,
-    originalPrice: 5500,
-    discountPercentage: 33,
-  },
-  {
-    id: 2,
-    imageUrl: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=500&q=80",
-    title: "Hotel Clarks Avadh",
-    subtitle: "5 star hotel in Qaisar Bagh",
-    rating: 4.3,
-    price: 4114,
-    originalPrice: 8249,
-    discountPercentage: 50,
-  },
-  {
-    id: 3,
-    imageUrl: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=500&q=80",
-    title: "The Oberoi Resort",
-    subtitle: "Luxury resort with private pool",
-    rating: 4.9,
-    price: 6750,
-    originalPrice: 9000,
-    discountPercentage: 25,
-  },
-  {
-    id: 4,
-    imageUrl: "https://images.unsplash.com/photo-1549294413-26f195200c16?w=500&q=80",
-    title: "Hyatt Regency",
-    subtitle: "Business hotel near airport",
-    rating: 4.6,
-    price: 5200,
-    originalPrice: 6500,
-    discountPercentage: 20,
-  },
-  {
-    id: 5,
-    imageUrl: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=500&q=80",
-    title: "Radisson Blu",
-    subtitle: "Modern hotel in city center",
-    rating: 4.5,
-    price: 4800,
-    originalPrice: 7000,
-    discountPercentage: 31,
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const PromotionalProperties = () => {
   const navigate = useNavigate();
+  const [items, setItems] = useState<CarouselItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOffers = async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("promotional_offers")
+        .select("*")
+        .eq("is_active", true)
+        .or(`start_date.is.null,start_date.lte.${today}`)
+        .or(`end_date.is.null,end_date.gte.${today}`)
+        .order("display_order", { ascending: true });
+
+      const mapped: CarouselItem[] = (data || []).map((o: any) => ({
+        id: o.id,
+        imageUrl: o.image_url,
+        title: o.title,
+        subtitle: o.subtitle || "",
+        rating: Number(o.rating) || 0,
+        price: Number(o.price) || 0,
+        originalPrice: o.original_price ? Number(o.original_price) : undefined,
+        discountPercentage: o.discount_percentage || 0,
+      }));
+      setItems(mapped);
+      setLoading(false);
+    };
+    fetchOffers();
+
+    const channel = supabase
+      .channel("home-promo-offers")
+      .on("postgres_changes", { event: "*", schema: "public", table: "promotional_offers" }, () => fetchOffers())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  if (loading || items.length === 0) return null;
 
   return (
     <section className="py-16 bg-background">
@@ -67,7 +53,7 @@ const PromotionalProperties = () => {
           offerSubtitle="CTBEST - Code pre-applied for you!"
           ctaText="View all hotels"
           onCtaClick={() => navigate("/properties?type=hotel")}
-          items={promotionalProperties}
+          items={items}
         />
       </div>
     </section>
