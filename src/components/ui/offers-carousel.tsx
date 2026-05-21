@@ -170,7 +170,7 @@ export const OffersCarousel = React.forwardRef<HTMLDivElement, OffersCarouselPro
             </div>
             <h2 className="mt-4 text-2xl font-bold text-primary">{offerTitle}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{offerSubtitle}</p>
-            <Button variant="outline" className="mt-6 w-full max-w-xs lg:w-auto" onClick={onCtaClick}>
+            <Button variant="outline" className="mt-6 w-full max-w-xs lg:w-auto" onClick={() => { trackPromoEvent("cta_click"); onCtaClick(); }}>
               {ctaText}
             </Button>
           </div>
