@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, Users, Home, FileText, MessageSquare, 
   CalendarCheck, Settings, Crown, ChevronLeft, ChevronRight,
-  LogOut, ShieldCheck
+  LogOut, ShieldCheck, Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
