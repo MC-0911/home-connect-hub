@@ -29,6 +29,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string; ic
   bookings: { title: 'Service Bookings', description: 'Manage service booking requests', icon: Shield },
   blogs: { title: 'Blog Management', description: 'Create and manage blog posts', icon: Shield },
   verifications: { title: 'Agent Verifications', description: 'Review pending and rejected agent license submissions', icon: Shield },
+  promotions: { title: 'Promotional Offers', description: 'Manage homepage hotel & rental promotional cards', icon: Shield },
   settings: { title: 'Platform Settings', description: 'Manage property types and amenities', icon: Shield },
 };
 
