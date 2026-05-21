@@ -28,8 +28,30 @@ export interface OffersCarouselProps {
   autoScrollIntervalMs?: number;
 }
 
-const ItemCard = ({ item }: { item: CarouselItem }) => (
+const ItemCard = ({ item }: { item: CarouselItem }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            trackPromoEvent("impression", String(item.id));
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: [0.5] }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [item.id]);
+
+  return (
   <motion.div
+    ref={ref}
     className="group flex-shrink-0 w-full"
     whileHover={{ y: -5 }}
     transition={{ type: "spring", stiffness: 300 }}
