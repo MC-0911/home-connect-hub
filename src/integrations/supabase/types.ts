@@ -627,6 +627,60 @@ export type Database = {
         }
         Relationships: []
       }
+      promotional_offers: {
+        Row: {
+          created_at: string
+          cta_link: string | null
+          discount_percentage: number
+          display_order: number
+          end_date: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          original_price: number | null
+          price: number
+          rating: number
+          start_date: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_link?: string | null
+          discount_percentage?: number
+          display_order?: number
+          end_date?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          original_price?: number | null
+          price?: number
+          rating?: number
+          start_date?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_link?: string | null
+          discount_percentage?: number
+          display_order?: number
+          end_date?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          original_price?: number | null
+          price?: number
+          rating?: number
+          start_date?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       properties: {
         Row: {
           address: string
