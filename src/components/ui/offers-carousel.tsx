@@ -90,7 +90,8 @@ const ItemCard = ({ item }: { item: CarouselItem }) => {
       </div>
     </div>
   </motion.div>
-);
+  );
+};
 
 export const OffersCarousel = React.forwardRef<HTMLDivElement, OffersCarouselProps>(
   (
