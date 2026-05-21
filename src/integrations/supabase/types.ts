@@ -627,6 +627,44 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_offer_events: {
+        Row: {
+          created_at: string
+          device_type: string | null
+          event_type: string
+          id: string
+          offer_id: string | null
+          page_path: string | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_type?: string | null
+          event_type: string
+          id?: string
+          offer_id?: string | null
+          page_path?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_type?: string | null
+          event_type?: string
+          id?: string
+          offer_id?: string | null
+          page_path?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_offer_events_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "promotional_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotional_offers: {
         Row: {
           created_at: string
