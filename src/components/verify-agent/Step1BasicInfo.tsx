@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -39,6 +40,12 @@ export function Step1BasicInfo({ defaultValues, email, onNext }: Props) {
     resolver: zodResolver(step1Schema),
     defaultValues: { email, ...defaultValues },
   });
+
+  // Reset when async defaults (e.g. profile) arrive after mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    form.reset({ email, ...defaultValues });
+  }, [defaultValues.full_name, defaultValues.phone, defaultValues.agency_name, defaultValues.years_experience, email]);
 
   return (
     <motion.form

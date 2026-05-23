@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAgentVerification } from "@/hooks/useAgentVerification";
+import { useProfile } from "@/hooks/useProfile";
 import { Step1BasicInfo, type Step1Values } from "@/components/verify-agent/Step1BasicInfo";
 import { Step2LicenseDetails, type Step2Values } from "@/components/verify-agent/Step2LicenseDetails";
 import { Step3VerificationStatus } from "@/components/verify-agent/Step3VerificationStatus";
@@ -27,6 +28,7 @@ export default function VerifyAgent() {
   const { user, loading: authLoading } = useAuth();
   const { hasRole, loading: roleLoading } = useUserRole();
   const { record, status, loading, checkStatus } = useAgentVerification();
+  const { profile } = useProfile();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [step1, setStep1] = useState<Partial<Step1Values>>({});
@@ -65,17 +67,22 @@ export default function VerifyAgent() {
       // Jump to status step if already submitted
       if (status !== "none") setStepIndex(2);
     } else {
+      let draft: { step1?: Partial<Step1Values>; step2?: Partial<Step2Values> } | null = null;
       try {
-        const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
-        if (draft) {
-          setStep1(draft.step1 ?? {});
-          setStep2(draft.step2 ?? {});
-        }
+        draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
       } catch {
         /* ignore */
       }
+      setStep1({
+        full_name: draft?.step1?.full_name || profile?.full_name || "",
+        phone: draft?.step1?.phone || profile?.phone || "",
+        agency_name: draft?.step1?.agency_name || "",
+        years_experience: draft?.step1?.years_experience,
+        email: user?.email ?? "",
+      });
+      if (draft?.step2) setStep2(draft.step2);
     }
-  }, [record, status, user]);
+  }, [record, status, user, profile]);
 
   // Persist draft
   useEffect(() => {
