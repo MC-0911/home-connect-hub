@@ -215,7 +215,7 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
             </div>
             <div>
               <p className="font-semibold text-foreground">Verifying your license</p>
-              <p className="text-sm text-muted-foreground">This usually takes under a minute.</p>
+              <p className="text-sm text-muted-foreground">This usually takes about 10–15 seconds.</p>
             </div>
           </div>
         </motion.div>
