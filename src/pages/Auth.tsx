@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
+import { ScramblePassword } from "@/components/auth/ScramblePassword";
 import { useUserRole } from "@/hooks/useUserRole";
 import "./auth-slide.css";
 
