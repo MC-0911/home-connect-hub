@@ -28,6 +28,7 @@ export default function VerifyAgent() {
   const { user, loading: authLoading } = useAuth();
   const { hasRole, loading: roleLoading } = useUserRole();
   const { record, status, loading, checkStatus } = useAgentVerification();
+  const { profile } = useProfile();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [step1, setStep1] = useState<Partial<Step1Values>>({});
