@@ -99,11 +99,25 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Auto-verify quickly (within 10-15s window handled by client fallback too)
-    const nextStatus: "verified" = "verified";
-    const message = "License verified successfully.";
-    const rejection_reason: string | null = null;
-    const verified_at: string | null = new Date().toISOString();
+    // 70% success rate mock; 15% rejected; 15% manual review
+    const roll = Math.random();
+    let nextStatus: "verified" | "rejected" | "manual_review";
+    let message: string;
+    let rejection_reason: string | null = null;
+    let verified_at: string | null = null;
+
+    if (roll < 0.7) {
+      nextStatus = "verified";
+      message = "License verified successfully.";
+      verified_at = new Date().toISOString();
+    } else if (roll < 0.85) {
+      nextStatus = "rejected";
+      message = "License could not be verified against state records.";
+      rejection_reason = "License number not found in state registry.";
+    } else {
+      nextStatus = "manual_review";
+      message = "Submitted for manual review by our team.";
+    }
 
     await admin
       .from("agent_verifications")
