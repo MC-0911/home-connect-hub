@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
 import { requestManualReview, verifyLicense } from "@/lib/verification/verification-service";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { VerificationRecord } from "@/hooks/useAgentVerification";
 
