@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Eye, EyeOff, Home, Building2, Briefcase, Github } from "lucide-react";
+import { Mail, User, Home, Building2, Briefcase, Github } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { toast } from "sonner";
@@ -23,8 +23,6 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [active, setActive] = useState(searchParams.get("mode") === "signup");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState<AccountType>("buyer");
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
@@ -144,24 +142,13 @@ export default function Auth() {
                 />
                 <Mail className="auth-input-icon" />
               </div>
-              <div className="auth-input-box">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  required
-                  disabled={loading}
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                />
-                <button
-                  type="button"
-                  className="auth-input-icon auth-eye"
-                  onClick={() => setShowPassword((s) => !s)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-                </button>
-              </div>
+              <ScramblePassword
+                value={loginData.password}
+                onChange={(v) => setLoginData({ ...loginData, password: v })}
+                placeholder="Password"
+                required
+                disabled={loading}
+              />
               <div className="auth-forgot">
                 <button type="button" onClick={() => setForgotPasswordOpen(true)}>
                   Forgot Password?
@@ -208,24 +195,13 @@ export default function Auth() {
                 />
                 <Mail className="auth-input-icon" />
               </div>
-              <div className="auth-input-box">
-                <input
-                  type={showPassword2 ? "text" : "password"}
-                  placeholder="Password"
-                  required
-                  disabled={loading}
-                  value={signupData.password}
-                  onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                />
-                <button
-                  type="button"
-                  className="auth-input-icon auth-eye"
-                  onClick={() => setShowPassword2((s) => !s)}
-                  tabIndex={-1}
-                >
-                  {showPassword2 ? <EyeOff className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-                </button>
-              </div>
+              <ScramblePassword
+                value={signupData.password}
+                onChange={(v) => setSignupData({ ...signupData, password: v })}
+                placeholder="Password"
+                required
+                disabled={loading}
+              />
               {signupData.password && (
                 <div className="-mt-4 mb-2 text-left">
                   <PasswordStrengthIndicator password={signupData.password} />
