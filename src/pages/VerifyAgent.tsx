@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAgentVerification } from "@/hooks/useAgentVerification";
+import { useProfile } from "@/hooks/useProfile";
 import { Step1BasicInfo, type Step1Values } from "@/components/verify-agent/Step1BasicInfo";
 import { Step2LicenseDetails, type Step2Values } from "@/components/verify-agent/Step2LicenseDetails";
 import { Step3VerificationStatus } from "@/components/verify-agent/Step3VerificationStatus";
