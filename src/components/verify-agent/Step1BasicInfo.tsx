@@ -40,6 +40,12 @@ export function Step1BasicInfo({ defaultValues, email, onNext }: Props) {
     defaultValues: { email, ...defaultValues },
   });
 
+  // Reset when async defaults (e.g. profile) arrive after mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    form.reset({ email, ...defaultValues });
+  }, [defaultValues.full_name, defaultValues.phone, defaultValues.agency_name, defaultValues.years_experience, email]);
+
   return (
     <motion.form
       initial={{ opacity: 0, x: 12 }}
