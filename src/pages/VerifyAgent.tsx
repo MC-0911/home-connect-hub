@@ -67,17 +67,22 @@ export default function VerifyAgent() {
       // Jump to status step if already submitted
       if (status !== "none") setStepIndex(2);
     } else {
+      let draft: { step1?: Partial<Step1Values>; step2?: Partial<Step2Values> } | null = null;
       try {
-        const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
-        if (draft) {
-          setStep1(draft.step1 ?? {});
-          setStep2(draft.step2 ?? {});
-        }
+        draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
       } catch {
         /* ignore */
       }
+      setStep1({
+        full_name: draft?.step1?.full_name || profile?.full_name || "",
+        phone: draft?.step1?.phone || profile?.phone || "",
+        agency_name: draft?.step1?.agency_name || "",
+        years_experience: draft?.step1?.years_experience,
+        email: user?.email ?? "",
+      });
+      if (draft?.step2) setStep2(draft.step2);
     }
-  }, [record, status, user]);
+  }, [record, status, user, profile]);
 
   // Persist draft
   useEffect(() => {
