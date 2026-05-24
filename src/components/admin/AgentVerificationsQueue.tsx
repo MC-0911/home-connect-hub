@@ -443,7 +443,7 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
           )}
           <DialogFooter className="gap-2 sm:gap-2">
             <Button variant="outline" onClick={() => setSelected(null)}>Close</Button>
-            {selected && (
+            {selected && selected.status !== "verified" && selected.status !== "suspended" && (
               <>
                 <Button
                   variant="destructive"
@@ -459,6 +459,23 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
                   <CheckCircle2 className="mr-1.5 h-4 w-4" /> Approve
                 </Button>
               </>
+            )}
+            {selected && selected.status === "verified" && (
+              <Button
+                className="bg-orange-600 text-white hover:bg-orange-700"
+                onClick={() => { setSuspending(selected); setReason(""); }}
+              >
+                <Ban className="mr-1.5 h-4 w-4" /> Suspend Agent
+              </Button>
+            )}
+            {selected && selected.status === "suspended" && (
+              <Button
+                className="bg-emerald-600 text-white hover:bg-emerald-700"
+                onClick={() => reinstate(selected)}
+                disabled={busyId === selected.id}
+              >
+                <CheckCircle2 className="mr-1.5 h-4 w-4" /> Reinstate
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>
@@ -515,6 +532,41 @@ function Field({
         <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</span>
         <p className="truncate text-sm text-foreground">{value || "—"}</p>
       </div>
+      </Dialog>
+
+      {/* Suspension dialog */}
+      <Dialog open={!!suspending} onOpenChange={(o) => { if (!o) { setSuspending(null); setReason(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-orange-600" /> Suspend agent</DialogTitle>
+            <DialogDescription>
+              The agent will lose access to their dashboard and listing tools until reinstated.
+              They'll see this reason on their verification page.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Reason for suspension</label>
+            <Textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={4}
+              placeholder="e.g. Submitted details don't match registry, license could not be verified manually, etc."
+            />
+            <p className="text-xs text-muted-foreground">{reason.length}/500</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setSuspending(null); setReason(""); }}>Cancel</Button>
+            <Button
+              onClick={suspend}
+              disabled={busyId === suspending?.id}
+              className="bg-orange-600 text-white hover:bg-orange-700"
+            >
+              {busyId === suspending?.id ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Ban className="mr-1.5 h-4 w-4" />}
+              Confirm Suspension
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
