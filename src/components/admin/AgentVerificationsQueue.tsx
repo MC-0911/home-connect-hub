@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   ShieldCheck, AlertTriangle, Clock, CheckCircle2, XCircle, FileText,
   Mail, Phone, MapPin, Hash, CalendarDays, Loader2, RefreshCw,
-  FileQuestion, ZoomIn, ZoomOut, RotateCw, Maximize2,
+  FileQuestion, ZoomIn, ZoomOut, RotateCw, Maximize2, Ban, ShieldOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +41,7 @@ interface VerificationRow {
   email?: string | null;
 }
 
-type FilterTab = "pending" | "rejected" | "manual_review" | "all";
+type FilterTab = "pending" | "rejected" | "manual_review" | "verified" | "suspended" | "all";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-500/10 text-amber-600 border-amber-500/30",
@@ -49,6 +49,7 @@ const STATUS_STYLES: Record<string, string> = {
   manual_review: "bg-amber-500/10 text-amber-600 border-amber-500/30",
   rejected: "bg-destructive/10 text-destructive border-destructive/30",
   verified: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  suspended: "bg-orange-500/10 text-orange-600 border-orange-500/30",
 };
 
 interface Props {
@@ -62,6 +63,7 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<VerificationRow | null>(null);
   const [rejecting, setRejecting] = useState<VerificationRow | null>(null);
+  const [suspending, setSuspending] = useState<VerificationRow | null>(null);
   const [reason, setReason] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [licenseUrl, setLicenseUrl] = useState<string | null>(null);
@@ -134,11 +136,13 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
   }, [selected]);
 
   const counts = useMemo(() => {
-    const c = { pending: 0, rejected: 0, manual_review: 0, all: rows.length };
+    const c = { pending: 0, rejected: 0, manual_review: 0, verified: 0, suspended: 0, all: rows.length };
     for (const r of rows) {
       if (r.status === "pending" || r.status === "verifying") c.pending++;
       else if (r.status === "rejected") c.rejected++;
       else if (r.status === "manual_review") c.manual_review++;
+      else if (r.status === "verified") c.verified++;
+      else if (r.status === "suspended") c.suspended++;
     }
     return c;
   }, [rows]);
@@ -150,6 +154,8 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
         if (tab === "pending") return r.status === "pending" || r.status === "verifying";
         if (tab === "rejected") return r.status === "rejected";
         if (tab === "manual_review") return r.status === "manual_review";
+        if (tab === "verified") return r.status === "verified";
+        if (tab === "suspended") return r.status === "suspended";
         return true;
       })
       .filter((r) => {
@@ -209,6 +215,52 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
     setSelected(null);
   };
 
+  const suspend = async () => {
+    if (!suspending) return;
+    if (reason.trim().length < 5) {
+      toast.error("Please provide a reason (min 5 characters)");
+      return;
+    }
+    setBusyId(suspending.id);
+    const { error } = await supabase
+      .from("agent_verifications")
+      .update({
+        status: "suspended",
+        rejection_reason: reason.trim(),
+        verified_at: null,
+      })
+      .eq("id", suspending.id);
+    setBusyId(null);
+    if (error) {
+      toast.error("Could not suspend");
+      console.error(error);
+      return;
+    }
+    toast.success(`${suspending.full_name ?? "Agent"} suspended`);
+    setSuspending(null);
+    setReason("");
+    setSelected(null);
+  };
+
+  const reinstate = async (row: VerificationRow) => {
+    setBusyId(row.id);
+    const { error } = await supabase
+      .from("agent_verifications")
+      .update({
+        status: "verified",
+        verified_at: new Date().toISOString(),
+        rejection_reason: null,
+      })
+      .eq("id", row.id);
+    setBusyId(null);
+    if (error) {
+      toast.error("Could not reinstate");
+      console.error(error);
+      return;
+    }
+    toast.success(`${row.full_name ?? "Agent"} reinstated`);
+  };
+
   const StatusBadge = ({ status }: { status: string }) => (
     <Badge variant="outline" className={`${STATUS_STYLES[status] ?? ""} capitalize`}>
       {status.replace("_", " ")}
@@ -218,9 +270,11 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
   return (
     <div className="space-y-5">
       {/* Stats strip */}
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard label="Pending" value={counts.pending} icon={Clock} tone="amber" onClick={() => setTab("pending")} active={tab === "pending"} />
-        <StatCard label="Manual Review" value={counts.manual_review} icon={FileQuestion} tone="indigo" onClick={() => setTab("manual_review")} active={tab === "manual_review"} />
+        <StatCard label="Manual" value={counts.manual_review} icon={FileQuestion} tone="indigo" onClick={() => setTab("manual_review")} active={tab === "manual_review"} />
+        <StatCard label="Verified" value={counts.verified} icon={CheckCircle2} tone="emerald" onClick={() => setTab("verified")} active={tab === "verified"} />
+        <StatCard label="Suspended" value={counts.suspended} icon={ShieldOff} tone="amber" onClick={() => setTab("suspended")} active={tab === "suspended"} />
         <StatCard label="Rejected" value={counts.rejected} icon={AlertTriangle} tone="red" onClick={() => setTab("rejected")} active={tab === "rejected"} />
         <StatCard label="Total" value={counts.all} icon={ShieldCheck} tone="emerald" onClick={() => setTab("all")} active={tab === "all"} />
       </div>
@@ -230,6 +284,8 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
           <TabsList>
             <TabsTrigger value="pending">Pending ({counts.pending})</TabsTrigger>
             <TabsTrigger value="manual_review">Manual ({counts.manual_review})</TabsTrigger>
+            <TabsTrigger value="verified">Verified ({counts.verified})</TabsTrigger>
+            <TabsTrigger value="suspended">Suspended ({counts.suspended})</TabsTrigger>
             <TabsTrigger value="rejected">Rejected ({counts.rejected})</TabsTrigger>
             <TabsTrigger value="all">All</TabsTrigger>
           </TabsList>
@@ -296,23 +352,48 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
                   <Button variant="outline" size="sm" onClick={() => setSelected(row)}>
                     <FileText className="mr-1.5 h-4 w-4" /> Review
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => approve(row)}
-                    disabled={busyId === row.id || row.status === "verified"}
-                    className="bg-emerald-600 text-white hover:bg-emerald-700"
-                  >
-                    {busyId === row.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
-                    Approve
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => { setRejecting(row); setReason(row.rejection_reason ?? ""); }}
-                    disabled={busyId === row.id}
-                  >
-                    <XCircle className="mr-1.5 h-4 w-4" /> Reject
-                  </Button>
+                  {row.status !== "verified" && row.status !== "suspended" && (
+                    <Button
+                      size="sm"
+                      onClick={() => approve(row)}
+                      disabled={busyId === row.id}
+                      className="bg-emerald-600 text-white hover:bg-emerald-700"
+                    >
+                      {busyId === row.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
+                      Approve
+                    </Button>
+                  )}
+                  {row.status === "verified" && (
+                    <Button
+                      size="sm"
+                      onClick={() => { setSuspending(row); setReason(""); }}
+                      disabled={busyId === row.id}
+                      className="bg-orange-600 text-white hover:bg-orange-700"
+                    >
+                      <Ban className="mr-1.5 h-4 w-4" /> Suspend
+                    </Button>
+                  )}
+                  {row.status === "suspended" && (
+                    <Button
+                      size="sm"
+                      onClick={() => reinstate(row)}
+                      disabled={busyId === row.id}
+                      className="bg-emerald-600 text-white hover:bg-emerald-700"
+                    >
+                      {busyId === row.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
+                      Reinstate
+                    </Button>
+                  )}
+                  {row.status !== "suspended" && row.status !== "verified" && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => { setRejecting(row); setReason(row.rejection_reason ?? ""); }}
+                      disabled={busyId === row.id}
+                    >
+                      <XCircle className="mr-1.5 h-4 w-4" /> Reject
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
