@@ -513,26 +513,6 @@ export function AgentVerificationsQueue({ globalSearch = "" }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function Field({
-  icon: Icon, label, value, stack,
-}: {
-  icon: typeof Hash;
-  label: string;
-  value: string;
-  stack?: boolean;
-}) {
-  return (
-    <div className={`flex ${stack ? "items-start" : "items-center"} gap-2`}>
-      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-      <div className="min-w-0">
-        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</span>
-        <p className="truncate text-sm text-foreground">{value || "—"}</p>
-      </div>
-      </Dialog>
 
       {/* Suspension dialog */}
       <Dialog open={!!suspending} onOpenChange={(o) => { if (!o) { setSuspending(null); setReason(""); } }}>
@@ -567,6 +547,25 @@ function Field({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function Field({
+  icon: Icon, label, value, stack,
+}: {
+  icon: typeof Hash;
+  label: string;
+  value: string;
+  stack?: boolean;
+}) {
+  return (
+    <div className={`flex ${stack ? "items-start" : "items-center"} gap-2`}>
+      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+      <div className="min-w-0">
+        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</span>
+        <p className="truncate text-sm text-foreground">{value || "—"}</p>
+      </div>
     </div>
   );
 }
