@@ -305,6 +305,28 @@ export function Step3VerificationStatus({ record, onRetry }: Props) {
           </div>
         </motion.div>
       )}
+
+      {status === "suspended" && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-orange-500/40 bg-orange-500/5 p-6"
+        >
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="h-6 w-6 shrink-0 text-orange-500" />
+            <div>
+              <h3 className="font-semibold text-foreground">Account Suspended</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your agent access has been suspended by an administrator.
+                {record.rejection_reason ? (
+                  <> Reason: <span className="font-medium text-foreground">{record.rejection_reason}</span></>
+                ) : null}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Please contact support to resolve this and request reinstatement.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

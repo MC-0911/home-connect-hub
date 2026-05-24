@@ -9,7 +9,8 @@ export type VerificationStatus =
   | "verifying"
   | "verified"
   | "rejected"
-  | "manual_review";
+  | "manual_review"
+  | "suspended";
 
 export interface VerificationRecord {
   id: string;

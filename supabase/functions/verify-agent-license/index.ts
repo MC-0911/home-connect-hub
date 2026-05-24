@@ -1,5 +1,7 @@
 // Mock license verification edge function.
-// Validates the caller, then runs a 70% success-rate mock and updates the record.
+// Simulates a 10-15 second verification check, then approves the agent.
+// Rejects only when the submitted license has already expired.
+// Admins can later suspend a verified agent from the admin dashboard.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 const corsHeaders = {
@@ -55,7 +57,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Service-role client to update the row (RLS allows owner update too).
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -78,7 +79,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Expired license guard
+    // Expired license guard — only automatic rejection reason
     if (record.license_expiry && new Date(record.license_expiry) < new Date()) {
       await admin
         .from("agent_verifications")
@@ -99,39 +100,23 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 70% success rate mock; 15% rejected; 15% manual review
-    const roll = Math.random();
-    let nextStatus: "verified" | "rejected" | "manual_review";
-    let message: string;
-    let rejection_reason: string | null = null;
-    let verified_at: string | null = null;
-
-    if (roll < 0.7) {
-      nextStatus = "verified";
-      message = "License verified successfully.";
-      verified_at = new Date().toISOString();
-    } else if (roll < 0.85) {
-      nextStatus = "rejected";
-      message = "License could not be verified against state records.";
-      rejection_reason = "License number not found in state registry.";
-    } else {
-      nextStatus = "manual_review";
-      message = "Submitted for manual review by our team.";
-    }
+    // Simulate a registry check (10–15s)
+    const delayMs = 10000 + Math.floor(Math.random() * 5000);
+    await new Promise((r) => setTimeout(r, delayMs));
 
     await admin
       .from("agent_verifications")
       .update({
-        status: nextStatus,
-        rejection_reason,
-        verified_at,
+        status: "verified",
+        rejection_reason: null,
+        verified_at: new Date().toISOString(),
       })
       .eq("id", record.id);
 
     return new Response(
       JSON.stringify({
-        status: nextStatus,
-        message,
+        status: "verified",
+        message: "License verified successfully.",
         license_details: {
           license_number: record.license_number,
           state: record.state,
